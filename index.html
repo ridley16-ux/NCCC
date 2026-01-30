@@ -14,6 +14,27 @@ body {
   padding: 30px 16px;
 }
 
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  background: #2c2c2c;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+nav a.active {
+  background: #d1632e;
+}
+
 h1 { text-align: center; margin-bottom: 6px; }
 .subtitle {
   text-align: center;
@@ -175,6 +196,24 @@ h1 { text-align: center; margin-bottom: 6px; }
   color: #aaa;
   font-size: 14px;
 }
+
+footer {
+  text-align: center;
+  margin-top: 32px;
+  color: #888;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .film-card {
+    flex-direction: column;
+  }
+
+  .poster {
+    width: 100%;
+    height: auto;
+  }
+}
 </style>
 </head>
 
@@ -182,6 +221,12 @@ h1 { text-align: center; margin-bottom: 6px; }
 
 <h1>No Context Cinema Club</h1>
 <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
+
+<nav>
+  <a href="index.html" class="active">Films</a>
+  <a href="listen.html">Listen Now</a>
+  <a href="contact.html">Contact Us</a>
+</nav>
 
 <div class="controls">
   <div class="filter">
@@ -200,10 +245,10 @@ h1 { text-align: center; margin-bottom: 6px; }
 
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
+<footer>Copyright No Context Cinema Club 2026</footer>
 
 <script>
 const MANIFEST_URL = "./films/manifest.json";
-
 let allFilms = [];
 let currentFilter = "all";
 let currentSort = "score";
@@ -228,6 +273,7 @@ function setActiveButton(clickedBtn) {
   document.querySelectorAll(".filter button").forEach(btn => btn.classList.remove("active"));
   clickedBtn.classList.add("active");
 }
+
 
 function render() {
   container.innerHTML = "";
