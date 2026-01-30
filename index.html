@@ -6,406 +6,398 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
-  body {
-    font-family: Arial, Helvetica, sans-serif;
-    background: #0f0f0f;
-    color: #ffffff;
-    margin: 0;
-    padding: 30px 16px;
-  }
+body {
+  font-family: Arial, Helvetica, sans-serif;
+  background: #0f0f0f;
+  color: #ffffff;
+  margin: 0;
+  padding: 30px 16px;
+}
 
-  h1 { text-align: center; margin-bottom: 6px; }
-  .subtitle {
-    text-align: center;
-    color: #aaaaaa;
-    margin-bottom: 20px;
-    font-size: 14px;
-  }
+h1 { text-align: center; margin-bottom: 6px; }
+.subtitle {
+  text-align: center;
+  color: #aaaaaa;
+  margin-bottom: 20px;
+  font-size: 14px;
+}
 
-  /* Filter */
-  .filter {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-bottom: 30px;
-    flex-wrap: wrap;
-  }
-  .filter button {
-    background: #2c2c2c;
-    color: #fff;
-    border: none;
-    padding: 10px 16px;
-    border-radius: 20px;
-    font-weight: bold;
-    cursor: pointer;
-  }
-  .filter button.active { background: #d1632e; }
+.filter {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-bottom: 30px;
+  flex-wrap: wrap;
+}
+.filter button {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+.filter button.active { background: #d1632e; }
 
-  .films-list {
-    max-width: 900px;
-    margin: 0 auto;
-    display: flex;
-    flex-direction: column;
-    gap: 20px;
-  }
+.films-list {
+  max-width: 900px;
+  margin: 0 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+}
 
-  .film-card {
-    display: flex;
-    gap: 16px;
-    background: #232323;
-    border-radius: 12px;
-    padding: 16px;
-    position: relative;
-  }
+.film-card {
+  display: flex;
+  gap: 16px;
+  background: #232323;
+  border-radius: 12px;
+  padding: 16px;
+  position: relative;
+}
 
-  .film-card.rob-film { background: #545454; }
+.film-card.rob-film { background: #545454; }
 
-  .rank {
-    position: absolute;
-    top: -10px;
-    left: -10px;
-    background: gold;
-    color: #000;
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 20px;
-    font-size: 14px;
-  }
+.rank {
+  position: absolute;
+  top: -10px;
+  left: -10px;
+  background: gold;
+  color: #000;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 20px;
+}
 
-  /* Flag (top right) */
-  .flag {
-    position: absolute;
-    top: 10px;
-    right: 10px;
-    font-size: 12px;
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 12px;
-    text-transform: uppercase;
-  }
-  .flag.rob { background: #3e5f3e; color: #d8f0d8; }
-  .flag.real { background: #444; color: #fff; }
+.flag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+}
+.flag.rob { background: #3e5f3e; color: #d8f0d8; }
+.flag.real { background: #444; color: #fff; }
 
-  /* Rosettes: right side under Rob flag */
-  .rosettes {
-    position: absolute;
-    top: 46px;          /* sits under the flag */
-    right: 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 6px;
-    align-items: flex-end;
-  }
-  .rosette {
-    font-size: 12px;
-    font-weight: bold;
-    padding: 6px 10px;
-    border-radius: 12px;
-    text-transform: uppercase;
-    color: #fff;
-    background: #666;
-    width: fit-content;
-  }
-  .rosette.new { background: #2e6bd1; }
-  .rosette.best { background: #b58b00; }
+/* Rosettes under flag (right) */
+.rosettes {
+  position: absolute;
+  top: 46px;
+  right: 10px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
+}
+.rosette {
+  font-size: 12px;
+  font-weight: bold;
+  padding: 6px 10px;
+  border-radius: 12px;
+  text-transform: uppercase;
+  color: #fff;
+}
+.rosette.new { background: #2e6bd1; }
+.rosette.best { background: #b58b00; }
 
-  .poster {
-    width: 140px;
-    height: 210px;
-    object-fit: cover;
-    border-radius: 8px;
-    background: #333;
-    flex-shrink: 0;
-  }
+.poster {
+  width: 140px;
+  height: 210px;
+  object-fit: cover;
+  border-radius: 8px;
+  background: #333;
+  flex-shrink: 0;
+}
 
-  .film-title { font-size: 20px; font-weight: bold; margin-bottom: 6px; }
-  .rob-tag { color: #c8e6c8; font-size: 14px; font-weight: bold; }
+.film-title { font-size: 20px; font-weight: bold; margin-bottom: 6px; }
+.rob-tag { color: #c8e6c8; font-size: 14px; font-weight: bold; }
 
-  .director, .starring {
-    font-size: 14px;
-    color: #e0e0e0;
-    margin-bottom: 6px;
-  }
+.director, .starring {
+  font-size: 14px;
+  color: #e0e0e0;
+  margin-bottom: 6px;
+}
 
-  .score {
-    background: #2c2c2c;
-    padding: 6px 10px;
-    border-radius: 6px;
-    font-size: 14px;
-    display: inline-block;
-    margin-bottom: 6px;
-  }
+.score {
+  background: #2c2c2c;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 14px;
+  display: inline-block;
+  margin-bottom: 6px;
+}
 
-  .score-breakdown {
-    font-size: 13px;
-    color: #f0f0f0;
-    margin-bottom: 6px;
-  }
+.score-breakdown {
+  font-size: 13px;
+  color: #f0f0f0;
+  margin-bottom: 6px;
+}
 
-  .podcast-date {
-    font-size: 13px;
-    color: #dddddd;
-    margin-bottom: 10px;
-  }
+.podcast-date {
+  font-size: 13px;
+  color: #dddddd;
+  margin-bottom: 10px;
+}
 
-  .summary {
-    font-size: 14px;
-    line-height: 1.4;
-    margin-bottom: 14px;
-  }
+.summary {
+  font-size: 14px;
+  line-height: 1.4;
+  margin-bottom: 14px;
+}
 
-  .links a {
-    padding: 10px 14px;
-    text-decoration: none;
-    border-radius: 6px;
-    font-size: 14px;
-    font-weight: bold;
-    display: inline-block;
-  }
-  .links a.rt { background: #FBE1B3; color: #000; }
-  .links a.podcast { background: #D1632E; color: #fff; }
+.links a {
+  padding: 10px 14px;
+  text-decoration: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: bold;
+  display: inline-block;
+}
+.links a.rt { background: #FBE1B3; color: #000; }
+.links a.podcast { background: #D1632E; color: #fff; }
 
-  .status {
-    text-align: center;
-    color: #aaaaaa;
-    margin-top: 20px;
-    font-size: 14px;
-  }
+.status {
+  max-width: 900px;
+  margin: 18px auto 0;
+  color: #aaaaaa;
+  font-size: 14px;
+  line-height: 1.4;
+}
 
-  @media (max-width: 600px) {
-    .film-card { flex-direction: column; align-items: center; text-align: center; }
-    .poster { width: 60%; height: auto; }
-    .flag { right: 50%; transform: translateX(50%); }
-    .rosettes { right: 50%; transform: translateX(50%); align-items: center; }
-  }
+.status details {
+  margin-top: 10px;
+  background: #1b1b1b;
+  padding: 12px;
+  border-radius: 10px;
+  border: 1px solid #2a2a2a;
+}
+
+.status code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+  font-size: 12px;
+  color: #FBE1B3;
+}
+
+@media (max-width: 600px) {
+  .film-card { flex-direction: column; align-items: center; text-align: center; }
+  .poster { width: 60%; height: auto; }
+  .flag { right: 50%; transform: translateX(50%); }
+  .rosettes { right: 50%; transform: translateX(50%); align-items: center; }
+}
 </style>
 </head>
 
 <body>
-  <h1>No Context Cinema Club</h1>
-  <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
 
-  <div class="filter">
-    <button id="all" class="active">All Films</button>
-    <button id="rob">Rob’s Films</button>
-    <button id="real">Real Films</button>
+<h1>No Context Cinema Club</h1>
+<div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
 
-    <!-- optional sort (easy win) -->
-    <button id="sortScore">Sort: Score</button>
-    <button id="sortNewest">Sort: Newest</button>
-  </div>
+<div class="filter">
+  <button id="all" class="active">All Films</button>
+  <button id="rob">Rob’s Films</button>
+  <button id="real">Real Films</button>
+</div>
 
-  <div id="films" class="films-list"></div>
-  <div id="status" class="status"></div>
+<div id="films" class="films-list"></div>
+<div id="status" class="status"></div>
 
 <script>
-  // IMPORTANT:
-  // This page loads a manifest file from your hosted site:
-  //   /films/manifest.json
-  //
-  // That manifest lists film files (JSON) inside:
-  //   /films/real/*.json
-  //   /films/robs/*.json
-  //
-  // You cannot load from "C:\Users\..." once it's hosted. Use these relative URLs.
+const MANIFEST_URL = "./films/manifest.json";
 
-  const MANIFEST_URL = "./films/manifest.json";
+let allFilms = [];
+let currentFilter = "all";
 
-  let allFilms = [];
-  let currentFilter = "all";
-  let currentSort = "score"; // "score" | "newest"
+const container = document.getElementById("films");
+const statusEl = document.getElementById("status");
 
-  const container = document.getElementById("films");
-  const statusEl = document.getElementById("status");
+function safeDate(d) {
+  const dt = new Date(d);
+  return isNaN(dt.getTime()) ? null : dt;
+}
 
-  function safeDate(d) {
-    const dt = new Date(d);
-    return isNaN(dt.getTime()) ? null : dt;
-  }
+function calcRobScore(film) {
+  const c = Number(film.coherence ?? 0);
+  const e = Number(film.entertainment ?? 0);
+  const o = Number(film.originality ?? 0);
+  const total = c + e + o;
+  film.totalScore = total;
+  film.score = Math.ceil((total / 30) * 100);
+  film.scoreLabel = "🎙️ Kev’s Score";
+}
 
-  function calcRobScore(film) {
-    // Coherence/Entertainment/Originality sum to /30 -> % rounded up
-    const c = Number(film.coherence ?? 0);
-    const e = Number(film.entertainment ?? 0);
-    const o = Number(film.originality ?? 0);
-    const total = c + e + o;
+function formatPodcastDate(iso) {
+  const d = safeDate(iso);
+  if (!d) return iso || "";
+  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
+}
 
-    film.totalScore = total; // out of 30
-    film.score = Math.ceil((total / 30) * 100);
-    film.scoreLabel = "🎙️ Kev’s Score";
-  }
+function computeRosettes(all) {
+  const robLive = all.filter(f => f.rob && f.active);
+  if (!robLive.length) return { newestId: null, bestId: null };
 
-  function formatPodcastDate(iso) {
-    const d = safeDate(iso);
-    if (!d) return iso || "";
-    return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-  }
+  const newest = robLive
+    .filter(f => safeDate(f.podcastDate))
+    .sort((a, b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
 
-  function getRobNewestAndBest(films) {
-    const robLive = films.filter(f => f.rob && f.active);
-    if (robLive.length === 0) return { newestId: null, bestId: null };
+  const best = [...robLive].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0];
 
-    const newest = robLive
-      .filter(f => safeDate(f.podcastDate))
-      .sort((a, b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0] || null;
+  return { newestId: newest?.id ?? null, bestId: best?.id ?? null };
+}
 
-    const best = robLive.sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0] || null;
+function render() {
+  container.innerHTML = "";
 
-    return { newestId: newest?.id ?? null, bestId: best?.id ?? null };
-  }
+  let films = allFilms.filter(f => f.active);
 
-  function applyFilterAndSort() {
-    let films = allFilms.filter(f => f.active);
+  if (currentFilter === "rob") films = films.filter(f => f.rob);
+  if (currentFilter === "real") films = films.filter(f => !f.rob);
 
-    if (currentFilter === "rob") films = films.filter(f => f.rob);
-    if (currentFilter === "real") films = films.filter(f => !f.rob);
+  films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
-    if (currentSort === "newest") {
-      // If film has a date (Rob films: podcastDate; Real films could optionally have releaseDate), sort by it
-      films.sort((a, b) => {
-        const da = safeDate(a.podcastDate || a.releaseDate);
-        const db = safeDate(b.podcastDate || b.releaseDate);
-        return (db?.getTime() || 0) - (da?.getTime() || 0);
-      });
-    } else {
-      // default: score desc
-      films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
-    }
+  const { newestId, bestId } = computeRosettes(allFilms);
 
-    return films;
-  }
+  films.forEach((film, index) => {
+    const card = document.createElement("div");
+    card.className = `film-card ${film.rob ? "rob-film" : ""}`;
 
-  function render() {
-    container.innerHTML = "";
+    card.innerHTML = `
+      <div class="rank">#${index + 1}</div>
 
-    const films = applyFilterAndSort();
-    const { newestId, bestId } = getRobNewestAndBest(allFilms);
+      <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
 
-    films.forEach((film, index) => {
-      const card = document.createElement("div");
-      card.className = `film-card ${film.rob ? "rob-film" : ""}`;
-
-      const rosettesHtml = film.rob ? `
+      ${film.rob ? `
         <div class="rosettes">
           ${film.id === newestId ? '<div class="rosette new">NEW</div>' : ''}
           ${film.id === bestId ? '<div class="rosette best">BEST</div>' : ''}
         </div>
-      ` : "";
+      ` : ""}
 
-      const breakdownHtml = film.rob ? `
-        <div class="score-breakdown">
-          Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
+      <img src="${film.poster}" alt="${film.title} poster" class="poster" />
+
+      <div>
+        <div class="film-title">
+          ${film.title} ${film.rob ? '<span class="rob-tag">[Rob’s Version]</span>' : ""}
         </div>
-        <div class="podcast-date">Podcasted: ${formatPodcastDate(film.podcastDate)}</div>
-      ` : "";
 
-      const directorHtml = (!film.rob && film.director) ? `<div class="director">Directed by ${film.director}</div>` : "";
+        ${(!film.rob && film.director) ? `<div class="director">Directed by ${film.director}</div>` : ""}
+        <div class="starring">Starring: ${film.starring || ""}</div>
 
-      card.innerHTML = `
-        <div class="rank">#${index + 1}</div>
-        <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
-        ${rosettesHtml}
+        <div class="score">${film.scoreLabel || ""}: ${film.score ?? ""}%</div>
 
-        <img src="${film.poster}" alt="${film.title} poster" class="poster" />
-
-        <div>
-          <div class="film-title">
-            ${film.title} ${film.rob ? '<span class="rob-tag">[Rob’s Version]</span>' : ""}
+        ${film.rob ? `
+          <div class="score-breakdown">
+            Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
           </div>
+          <div class="podcast-date">Podcasted: ${formatPodcastDate(film.podcastDate)}</div>
+        ` : ""}
 
-          ${directorHtml}
-          <div class="starring">Starring: ${film.starring || ""}</div>
+        <div class="summary">${film.summary || ""}</div>
 
-          <div class="score">${film.scoreLabel || ""}: ${film.score ?? ""}%</div>
-          ${breakdownHtml}
+        <div class="links">
+          <a class="${film.linkType}" href="${film.link}" target="_blank" rel="noopener">
+            ${film.linkType === "rt" ? "Rotten Tomatoes" : "Podcast Episode"}
+          </a>
+        </div>
+      </div>
+    `;
 
-          <div class="summary">${film.summary || ""}</div>
+    container.appendChild(card);
+  });
+}
 
-          <div class="links">
-            <a class="${film.linkType}" href="${film.link}" target="_blank" rel="noopener">
-              ${film.linkType === "rt" ? "Rotten Tomatoes" : "Podcast Episode"}
-            </a>
+async function loadFilms() {
+  statusEl.textContent = "Loading films…";
+
+  const failures = [];
+  const loaded = [];
+
+  try {
+    const manifestRes = await fetch(MANIFEST_URL, { cache: "no-store" });
+    if (!manifestRes.ok) throw new Error(`Manifest fetch failed: ${manifestRes.status}`);
+
+    const manifest = await manifestRes.json();
+    if (!manifest?.films || !Array.isArray(manifest.films)) {
+      throw new Error("Manifest is missing a 'films' array");
+    }
+
+    for (const entry of manifest.films) {
+      try {
+        const res = await fetch(entry.path, { cache: "no-store" });
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+
+        // If JSON is invalid, this throws — and we’ll catch it and report it
+        const data = await res.json();
+
+        const film = { ...data, ...entry };
+        film.active = Boolean(film.active);
+        film.rob = Boolean(film.rob);
+
+        if (!film.id) {
+          film.id = `${film.rob ? "rob" : "real"}-${(film.title || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
+        }
+
+        if (film.rob) calcRobScore(film);
+
+        loaded.push(film);
+      } catch (e) {
+        failures.push({ path: entry.path, error: String(e) });
+      }
+    }
+
+    allFilms = loaded;
+    render();
+
+    if (failures.length) {
+      statusEl.innerHTML = `
+        Loaded <strong>${loaded.length}</strong> film(s). <strong>${failures.length}</strong> failed.
+        <details>
+          <summary>Show failed files (click)</summary>
+          <div style="margin-top:10px;">
+            ${failures.map(f => `<div>❌ <code>${f.path}</code><br><span style="opacity:0.8;">${f.error}</span></div>`).join("<hr style='border:0;border-top:1px solid #2a2a2a;margin:10px 0;'>")}
           </div>
+        </details>
+        <div style="margin-top:10px;">
+          Tip: open a failed URL in your browser — if it shows a JSON error, the file isn’t valid JSON.
         </div>
       `;
-
-      container.appendChild(card);
-    });
-
-    statusEl.textContent = films.length ? `Showing ${films.length} film(s).` : "No active films found.";
-  }
-
-  async function loadFilms() {
-    statusEl.textContent = "Loading films…";
-    try {
-      const manifestRes = await fetch(MANIFEST_URL, { cache: "no-store" });
-      if (!manifestRes.ok) throw new Error(`Manifest fetch failed (${manifestRes.status})`);
-
-      const manifest = await manifestRes.json();
-      if (!manifest?.films || !Array.isArray(manifest.films)) {
-        throw new Error("Manifest is missing a 'films' array");
-      }
-
-      // Load each film file
-      const filmJsons = await Promise.all(
-        manifest.films.map(async (entry) => {
-          const res = await fetch(entry.path, { cache: "no-store" });
-          if (!res.ok) throw new Error(`Failed: ${entry.path} (${res.status})`);
-          const data = await res.json();
-
-          // Merge: manifest entry can override (e.g., active flag)
-          return { ...data, ...entry };
-        })
-      );
-
-      // Normalise
-      filmJsons.forEach(f => {
-        f.active = Boolean(f.active);
-        f.rob = Boolean(f.rob);
-        if (!f.id) {
-          // stable-ish fallback id
-          f.id = `${f.rob ? "rob" : "real"}-${(f.title || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-        }
-        if (f.rob) calcRobScore(f);
-      });
-
-      allFilms = filmJsons;
-      render();
-    } catch (err) {
-      console.error(err);
-      statusEl.textContent = "Couldn’t load films. Check the console + make sure you’re running via a local server (not file://).";
+    } else {
+      statusEl.textContent = `Loaded ${loaded.length} film(s).`;
     }
+
+  } catch (err) {
+    console.error("Film loading error:", err);
+    statusEl.textContent = "Couldn’t load films. Manifest fetch failed or manifest JSON is invalid.";
   }
+}
 
-  // Filter buttons
-  document.getElementById("all").onclick = () => {
-    currentFilter = "all";
-    document.getElementById("all").classList.add("active");
-    document.getElementById("rob").classList.remove("active");
-    document.getElementById("real").classList.remove("active");
-    render();
-  };
-  document.getElementById("rob").onclick = () => {
-    currentFilter = "rob";
-    document.getElementById("rob").classList.add("active");
-    document.getElementById("all").classList.remove("active");
-    document.getElementById("real").classList.remove("active");
-    render();
-  };
-  document.getElementById("real").onclick = () => {
-    currentFilter = "real";
-    document.getElementById("real").classList.add("active");
-    document.getElementById("all").classList.remove("active");
-    document.getElementById("rob").classList.remove("active");
-    render();
-  };
+// Filters
+document.getElementById("all").onclick = () => {
+  currentFilter = "all";
+  document.getElementById("all").classList.add("active");
+  document.getElementById("rob").classList.remove("active");
+  document.getElementById("real").classList.remove("active");
+  render();
+};
+document.getElementById("rob").onclick = () => {
+  currentFilter = "rob";
+  document.getElementById("rob").classList.add("active");
+  document.getElementById("all").classList.remove("active");
+  document.getElementById("real").classList.remove("active");
+  render();
+};
+document.getElementById("real").onclick = () => {
+  currentFilter = "real";
+  document.getElementById("real").classList.add("active");
+  document.getElementById("all").classList.remove("active");
+  document.getElementById("rob").classList.remove("active");
+  render();
+};
 
-  // Sort buttons
-  document.getElementById("sortScore").onclick = () => { currentSort = "score"; render(); };
-  document.getElementById("sortNewest").onclick = () => { currentSort = "newest"; render(); };
-
-  // Boot
-  loadFilms();
+loadFilms();
 </script>
 
 </body>
