@@ -159,6 +159,7 @@ h1 { text-align: center; margin-bottom: 6px; }
   margin-bottom: 14px;
 }
 
+
 .links a {
   padding: 10px 14px;
   text-decoration: none;
@@ -203,7 +204,6 @@ h1 { text-align: center; margin-bottom: 6px; }
 
 <script>
 const MANIFEST_URL = "./films/manifest.json";
-
 let allFilms = [];
 let currentFilter = "all";
 let currentSort = "score";
@@ -228,6 +228,7 @@ function setActiveButton(clickedBtn) {
   document.querySelectorAll(".filter button").forEach(btn => btn.classList.remove("active"));
   clickedBtn.classList.add("active");
 }
+
 
 function render() {
   container.innerHTML = "";
