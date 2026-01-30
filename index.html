@@ -159,6 +159,44 @@ h1 { text-align: center; margin-bottom: 6px; }
   margin-bottom: 14px;
 }
 
+.vote-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.vote-score {
+  background: #2c2c2c;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.vote-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.vote-btn {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.vote-btn.active {
+  background: #d1632e;
+}
+
+.vote-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .links a {
   padding: 10px 14px;
   text-decoration: none;
@@ -193,6 +231,7 @@ h1 { text-align: center; margin-bottom: 6px; }
   <div class="sort">
     <select id="sortSelect">
       <option value="score">Sort by score</option>
+      <option value="userScore">Sort by visitor score</option>
       <option value="newest">Sort by newest</option>
     </select>
   </div>
@@ -203,6 +242,12 @@ h1 { text-align: center; margin-bottom: 6px; }
 
 <script>
 const MANIFEST_URL = "./films/manifest.json";
+const VOTES_URL = "./films/votes.json";
+const GITHUB_OWNER = "REPLACE_WITH_OWNER";
+const GITHUB_REPO = "REPLACE_WITH_REPO";
+const GITHUB_BRANCH = "main";
+const GITHUB_FILE_PATH = "films/votes.json";
+const GITHUB_TOKEN_STORAGE_KEY = "nccc-github-token";
 
 let allFilms = [];
 let currentFilter = "all";
@@ -229,6 +274,108 @@ function setActiveButton(clickedBtn) {
   clickedBtn.classList.add("active");
 }
 
+function formatVoteScore(score) {
+  const value = Number(score) || 0;
+  return value > 0 ? `+${value}` : `${value}`;
+}
+
+function getStoredVote(filmId) {
+  const stored = localStorage.getItem(`nccc-vote-${filmId}`);
+  return stored !== null ? Number(stored) : 0;
+}
+
+function setStoredVote(filmId, vote) {
+  localStorage.setItem(`nccc-vote-${filmId}`, String(vote));
+}
+
+function getGitHubToken() {
+  const existing = localStorage.getItem(GITHUB_TOKEN_STORAGE_KEY);
+  if (existing) return existing;
+  const token = window.prompt("Enter a GitHub token with repo content write access:");
+  if (!token) return null;
+  localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, token.trim());
+  return token.trim();
+}
+
+async function loadVoteTotals(films) {
+  try {
+    const response = await fetch(`${VOTES_URL}?v=${Date.now()}`);
+    const data = await response.json();
+    const totals = data.totals ?? {};
+    films.forEach(film => {
+      if (!film.rob) return;
+      film.userScore = totals[film.id] ?? 0;
+      film.userVote = getStoredVote(film.id);
+    });
+  } catch (error) {
+    console.error(error);
+    statusEl.textContent = "Couldn’t load visitor scores.";
+  }
+}
+
+async function updateVoteTotalsOnGitHub(filmId, delta) {
+  const token = getGitHubToken();
+  if (!token) {
+    statusEl.textContent = "GitHub token required to submit votes.";
+    return null;
+  }
+
+  const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}?ref=${GITHUB_BRANCH}`;
+  const headers = {
+    Authorization: `token ${token}`,
+    Accept: "application/vnd.github+json"
+  };
+
+  const fileResponse = await fetch(apiUrl, { headers });
+  if (!fileResponse.ok) {
+    statusEl.textContent = "Unable to read vote file from GitHub.";
+    return null;
+  }
+
+  const fileData = await fileResponse.json();
+  const decoded = atob(fileData.content);
+  const json = JSON.parse(decoded);
+  json.totals = json.totals ?? {};
+  json.totals[filmId] = (json.totals[filmId] ?? 0) + delta;
+  json.updatedAt = new Date().toISOString();
+
+  const updatedContent = btoa(JSON.stringify(json, null, 2));
+  const updateResponse = await fetch(apiUrl, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      message: `Update vote total for ${filmId}`,
+      content: updatedContent,
+      sha: fileData.sha,
+      branch: GITHUB_BRANCH
+    })
+  });
+
+  if (!updateResponse.ok) {
+    statusEl.textContent = "Unable to write vote file to GitHub.";
+    return null;
+  }
+
+  return json.totals[filmId] ?? 0;
+}
+
+async function handleVote(film, value) {
+  if (!film.rob) return;
+
+  const currentVote = film.userVote ?? 0;
+  if (currentVote === value) return;
+
+  const delta = value - currentVote;
+  const newTotal = await updateVoteTotalsOnGitHub(film.id, delta);
+  if (newTotal === null) return;
+
+  film.userScore = newTotal;
+  film.userVote = value;
+  setStoredVote(film.id, value);
+
+  render();
+}
+
 function render() {
   container.innerHTML = "";
 
@@ -241,6 +388,8 @@ function render() {
       (safeDate(b.podcastDate)?.getTime() || 0) -
       (safeDate(a.podcastDate)?.getTime() || 0)
     );
+  } else if (currentSort === "userScore") {
+    films.sort((a, b) => (b.userScore ?? 0) - (a.userScore ?? 0));
   } else {
     films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
@@ -279,6 +428,13 @@ function render() {
           <div class="score-breakdown">
             Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
           </div>
+          <div class="vote-section">
+            <div class="vote-score">Visitor Score: ${formatVoteScore(film.userScore)}</div>
+            <div class="vote-buttons">
+              <button class="vote-btn ${film.userVote === 1 ? "active" : ""}" data-vote="1" aria-label="Vote thumbs up">👍</button>
+              <button class="vote-btn ${film.userVote === -1 ? "active" : ""}" data-vote="-1" aria-label="Vote thumbs down">👎</button>
+            </div>
+          </div>
           <div class="podcast-date">Podcasted: ${film.podcastDate}</div>
         ` : ''}
 
@@ -291,6 +447,13 @@ function render() {
         </div>
       </div>
     `;
+
+    if (film.rob) {
+      card.querySelectorAll(".vote-btn").forEach(btn => {
+        const voteValue = Number(btn.dataset.vote);
+        btn.onclick = () => handleVote(film, voteValue);
+      });
+    }
 
     container.appendChild(card);
   });
@@ -306,12 +469,15 @@ async function loadFilms() {
     for (const entry of manifest.films) {
       const res = await fetch(entry.path);
       const film = await res.json();
+      film.userScore = 0;
+      film.userVote = 0;
       film.active = entry.active;
       if (film.rob) calcRobScore(film);
       films.push(film);
     }
 
     allFilms = films;
+    await loadVoteTotals(allFilms);
     render();
     statusEl.textContent = `Loaded ${films.length} film(s).`;
 
