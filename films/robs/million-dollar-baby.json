@@ -1,0 +1,14 @@
+{
+  "id": "rob-reservoir-dogs",
+  "rob": true,
+  "title": "Reservoir Dogs",
+  "starring": "Erik Per Sullivan",
+  "poster": "https://i.postimg.cc/x8YrmcTQ/Resevoir-Dogs-Rob.png",
+  "coherence": 5,
+  "entertainment": 8,
+  "originality": 3,
+  "podcastDate": "2026-01-22",
+  "summary": "A lonely suburban kid searching for his missing dog stumbles upon a hidden reservoir where abandoned dogs live freely. He finds purpose and a community that finally sees him for who he is.",
+  "link": "#",
+  "linkType": "podcast"
+}
