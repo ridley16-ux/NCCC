@@ -14,6 +14,27 @@ body {
   padding: 30px 16px;
 }
 
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  background: #2c2c2c;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+nav a.active {
+  background: #d1632e;
+}
+
 h1 { text-align: center; margin-bottom: 6px; }
 .subtitle {
   text-align: center;
@@ -183,6 +204,12 @@ h1 { text-align: center; margin-bottom: 6px; }
 
 <h1>No Context Cinema Club</h1>
 <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
+
+<nav>
+  <a href="index.html" class="active">Films</a>
+  <a href="listen.html">Listen Now</a>
+  <a href="contact.html">Contact Us</a>
+</nav>
 
 <div class="controls">
   <div class="filter">
