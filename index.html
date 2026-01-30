@@ -14,6 +14,27 @@ body {
   padding: 30px 16px;
 }
 
+nav {
+  display: flex;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 24px;
+  flex-wrap: wrap;
+}
+
+nav a {
+  background: #2c2c2c;
+  color: #fff;
+  text-decoration: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+}
+
+nav a.active {
+  background: #d1632e;
+}
+
 h1 { text-align: center; margin-bottom: 6px; }
 .subtitle {
   text-align: center;
@@ -66,11 +87,16 @@ h1 { text-align: center; margin-bottom: 6px; }
   gap: 16px;
   background: #232323;
   border-radius: 12px;
-  padding: 16px;
+  padding: 20px;
   position: relative;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
 }
 
 .film-card.rob-film { background: #545454; }
+.film-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.3);
+}
 
 .rank {
   position: absolute;
@@ -138,25 +164,50 @@ h1 { text-align: center; margin-bottom: 6px; }
   border-radius: 6px;
   font-size: 14px;
   display: inline-block;
-  margin-bottom: 6px;
+  margin: 8px 0 6px;
 }
 
-.score-breakdown {
+.meta-row {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
   font-size: 13px;
-  color: #f0f0f0;
-  margin-bottom: 6px;
-}
-
-.podcast-date {
-  font-size: 13px;
-  color: #dddddd;
+  color: #dcdcdc;
   margin-bottom: 10px;
+}
+
+.meta-label {
+  background: #2c2c2c;
+  padding: 4px 8px;
+  border-radius: 6px;
 }
 
 .summary {
   font-size: 14px;
   line-height: 1.4;
   margin-bottom: 14px;
+}
+
+.summary.clamped {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.summary-toggle {
+  background: none;
+  border: none;
+  color: #d1632e;
+  cursor: pointer;
+  font-weight: bold;
+  padding: 0;
+  margin-top: -4px;
+}
+
+.divider {
+  border-top: 1px solid #3a3a3a;
+  margin: 12px 0;
 }
 
 .links a {
@@ -167,13 +218,56 @@ h1 { text-align: center; margin-bottom: 6px; }
   font-weight: bold;
 }
 .links a.rt { background: #FBE1B3; color: #000; }
-.links a.podcast { background: #D1632E; color: #fff; }
+.links a.podcast {
+  background: #D1632E;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  justify-content: center;
+}
+
+.cta-row {
+  margin-top: 10px;
+}
+
+.results-label {
+  text-align: center;
+  margin: -8px 0 20px;
+  color: #bdbdbd;
+  font-size: 14px;
+}
 
 .status {
   text-align: center;
   margin-top: 20px;
   color: #aaa;
   font-size: 14px;
+}
+
+footer {
+  text-align: center;
+  margin-top: 32px;
+  color: #888;
+  font-size: 13px;
+}
+
+@media (max-width: 700px) {
+  .film-card {
+    flex-direction: column;
+  }
+
+  .poster {
+    width: 100%;
+    height: auto;
+  }
+
+  .cta-row {
+    position: sticky;
+    bottom: 0;
+    background: inherit;
+    padding-top: 8px;
+  }
 }
 </style>
 </head>
@@ -182,6 +276,12 @@ h1 { text-align: center; margin-bottom: 6px; }
 
 <h1>No Context Cinema Club</h1>
 <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
+
+<nav>
+  <a href="index.html" class="active">Films</a>
+  <a href="listen.html">Listen Now</a>
+  <a href="contact.html">Contact Us</a>
+</nav>
 
 <div class="controls">
   <div class="filter">
@@ -198,18 +298,20 @@ h1 { text-align: center; margin-bottom: 6px; }
   </div>
 </div>
 
+<div id="resultsLabel" class="results-label"></div>
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
+<footer>Copyright No Context Cinema Club 2026</footer>
 
 <script>
 const MANIFEST_URL = "./films/manifest.json";
-
 let allFilms = [];
 let currentFilter = "all";
 let currentSort = "score";
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
+const resultsLabel = document.getElementById("resultsLabel");
 
 function safeDate(d) {
   const dt = new Date(d);
@@ -229,12 +331,20 @@ function setActiveButton(clickedBtn) {
   clickedBtn.classList.add("active");
 }
 
+
 function render() {
   container.innerHTML = "";
 
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
+
+  const filterLabel = currentFilter === "rob"
+    ? "Rob’s Films"
+    : currentFilter === "real"
+      ? "Real Films"
+      : "All Films";
+  resultsLabel.textContent = `Showing: ${filterLabel} (${films.length})`;
 
   if (currentSort === "newest") {
     films.sort((a, b) =>
@@ -276,21 +386,35 @@ function render() {
         <div class="score">${film.scoreLabel}: ${film.score}%</div>
 
         ${film.rob ? `
-          <div class="score-breakdown">
-            Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
+          <div class="meta-row">
+            <span class="meta-label">Podcasted: ${film.podcastDate}</span>
+            <span class="meta-label">Coherence ${film.coherence}/10</span>
+            <span class="meta-label">Entertainment ${film.entertainment}/10</span>
+            <span class="meta-label">Originality ${film.originality}/10</span>
           </div>
-          <div class="podcast-date">Podcasted: ${film.podcastDate}</div>
         ` : ''}
 
-        <div class="summary">${film.summary}</div>
+        <div class="summary clamped">${film.summary}</div>
+        <button class="summary-toggle" type="button">Read more</button>
 
-        <div class="links">
-          <a class="${film.linkType}" href="${film.link}" target="_blank">
-            ${film.linkType === "rt" ? "Rotten Tomatoes" : "Podcast Episode"}
-          </a>
+        <div class="divider"></div>
+
+        <div class="cta-row">
+          <div class="links">
+            <a class="${film.linkType}" href="${film.link}" target="_blank">
+              ${film.linkType === "rt" ? "Rotten Tomatoes" : "▶ Listen – 45 min"}
+            </a>
+          </div>
         </div>
       </div>
     `;
+
+    const summaryEl = card.querySelector(".summary");
+    const toggleBtn = card.querySelector(".summary-toggle");
+    toggleBtn.onclick = () => {
+      const isClamped = summaryEl.classList.toggle("clamped");
+      toggleBtn.textContent = isClamped ? "Read more" : "Read less";
+    };
 
     container.appendChild(card);
   });
