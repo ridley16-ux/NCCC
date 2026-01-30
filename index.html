@@ -223,12 +223,10 @@ function calcRobScore(film) {
   film.scoreLabel = "🎙️ Kev’s Score";
 }
 
-/* ✅ NEW: keep filter button highlight in sync with currentFilter */
-function updateActiveFilter() {
-  document.querySelectorAll(".filter button").forEach(btn => {
-    btn.classList.remove("active");
-  });
-  document.getElementById(currentFilter).classList.add("active");
+/* ✅ NEW: set active class based on the button actually clicked */
+function setActiveButton(clickedBtn) {
+  document.querySelectorAll(".filter button").forEach(btn => btn.classList.remove("active"));
+  clickedBtn.classList.add("active");
 }
 
 function render() {
@@ -323,19 +321,19 @@ async function loadFilms() {
   }
 }
 
-document.getElementById("all").onclick = () => {
+document.getElementById("all").onclick = (e) => {
   currentFilter = "all";
-  updateActiveFilter();
+  setActiveButton(e.currentTarget);
   render();
 };
-document.getElementById("rob").onclick = () => {
+document.getElementById("rob").onclick = (e) => {
   currentFilter = "rob";
-  updateActiveFilter();
+  setActiveButton(e.currentTarget);
   render();
 };
-document.getElementById("real").onclick = () => {
+document.getElementById("real").onclick = (e) => {
   currentFilter = "real";
-  updateActiveFilter();
+  setActiveButton(e.currentTarget);
   render();
 };
 
@@ -343,9 +341,6 @@ document.getElementById("sortSelect").onchange = (e) => {
   currentSort = e.target.value;
   render();
 };
-
-/* ✅ NEW: ensure initial highlight matches default filter */
-updateActiveFilter();
 
 loadFilms();
 </script>
