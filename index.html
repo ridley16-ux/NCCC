@@ -22,13 +22,15 @@ h1 { text-align: center; margin-bottom: 6px; }
   font-size: 14px;
 }
 
-.filter {
+/* Filters + Sort */
+.controls {
   display: flex;
   justify-content: center;
-  gap: 10px;
+  gap: 12px;
   margin-bottom: 30px;
   flex-wrap: wrap;
 }
+
 .filter button {
   background: #2c2c2c;
   color: #fff;
@@ -40,6 +42,17 @@ h1 { text-align: center; margin-bottom: 6px; }
 }
 .filter button.active { background: #d1632e; }
 
+.sort select {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  padding: 10px 14px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
+}
+
+/* Film list */
 .films-list {
   max-width: 900px;
   margin: 0 auto;
@@ -83,7 +96,7 @@ h1 { text-align: center; margin-bottom: 6px; }
 .flag.rob { background: #3e5f3e; color: #d8f0d8; }
 .flag.real { background: #444; color: #fff; }
 
-/* Rosettes under flag (right) */
+/* Rosettes */
 .rosettes {
   position: absolute;
   top: 46px;
@@ -91,7 +104,6 @@ h1 { text-align: center; margin-bottom: 6px; }
   display: flex;
   flex-direction: column;
   gap: 6px;
-  align-items: flex-end;
 }
 .rosette {
   font-size: 12px;
@@ -109,8 +121,6 @@ h1 { text-align: center; margin-bottom: 6px; }
   height: 210px;
   object-fit: cover;
   border-radius: 8px;
-  background: #333;
-  flex-shrink: 0;
 }
 
 .film-title { font-size: 20px; font-weight: bold; margin-bottom: 6px; }
@@ -155,38 +165,15 @@ h1 { text-align: center; margin-bottom: 6px; }
   border-radius: 6px;
   font-size: 14px;
   font-weight: bold;
-  display: inline-block;
 }
 .links a.rt { background: #FBE1B3; color: #000; }
 .links a.podcast { background: #D1632E; color: #fff; }
 
 .status {
-  max-width: 900px;
-  margin: 18px auto 0;
-  color: #aaaaaa;
+  text-align: center;
+  margin-top: 20px;
+  color: #aaa;
   font-size: 14px;
-  line-height: 1.4;
-}
-
-.status details {
-  margin-top: 10px;
-  background: #1b1b1b;
-  padding: 12px;
-  border-radius: 10px;
-  border: 1px solid #2a2a2a;
-}
-
-.status code {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-  font-size: 12px;
-  color: #FBE1B3;
-}
-
-@media (max-width: 600px) {
-  .film-card { flex-direction: column; align-items: center; text-align: center; }
-  .poster { width: 60%; height: auto; }
-  .flag { right: 50%; transform: translateX(50%); }
-  .rosettes { right: 50%; transform: translateX(50%); align-items: center; }
 }
 </style>
 </head>
@@ -196,10 +183,19 @@ h1 { text-align: center; margin-bottom: 6px; }
 <h1>No Context Cinema Club</h1>
 <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
 
-<div class="filter">
-  <button id="all" class="active">All Films</button>
-  <button id="rob">Rob’s Films</button>
-  <button id="real">Real Films</button>
+<div class="controls">
+  <div class="filter">
+    <button id="all" class="active">All Films</button>
+    <button id="rob">Rob’s Films</button>
+    <button id="real">Real Films</button>
+  </div>
+
+  <div class="sort">
+    <select id="sortSelect">
+      <option value="score">Sort by score</option>
+      <option value="newest">Sort by newest</option>
+    </select>
+  </div>
 </div>
 
 <div id="films" class="films-list"></div>
@@ -210,6 +206,7 @@ const MANIFEST_URL = "./films/manifest.json";
 
 let allFilms = [];
 let currentFilter = "all";
+let currentSort = "score";
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
@@ -220,45 +217,31 @@ function safeDate(d) {
 }
 
 function calcRobScore(film) {
-  const c = Number(film.coherence ?? 0);
-  const e = Number(film.entertainment ?? 0);
-  const o = Number(film.originality ?? 0);
-  const total = c + e + o;
+  const total = film.coherence + film.entertainment + film.originality;
   film.totalScore = total;
   film.score = Math.ceil((total / 30) * 100);
   film.scoreLabel = "🎙️ Kev’s Score";
-}
-
-function formatPodcastDate(iso) {
-  const d = safeDate(iso);
-  if (!d) return iso || "";
-  return d.toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" });
-}
-
-function computeRosettes(all) {
-  const robLive = all.filter(f => f.rob && f.active);
-  if (!robLive.length) return { newestId: null, bestId: null };
-
-  const newest = robLive
-    .filter(f => safeDate(f.podcastDate))
-    .sort((a, b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
-
-  const best = [...robLive].sort((a, b) => (b.score ?? 0) - (a.score ?? 0))[0];
-
-  return { newestId: newest?.id ?? null, bestId: best?.id ?? null };
 }
 
 function render() {
   container.innerHTML = "";
 
   let films = allFilms.filter(f => f.active);
-
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
 
-  films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  if (currentSort === "newest") {
+    films.sort((a, b) =>
+      (safeDate(b.podcastDate)?.getTime() || 0) -
+      (safeDate(a.podcastDate)?.getTime() || 0)
+    );
+  } else {
+    films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+  }
 
-  const { newestId, bestId } = computeRosettes(allFilms);
+  const robFilms = allFilms.filter(f => f.rob && f.active);
+  const newest = robFilms.sort((a,b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
+  const best = robFilms.sort((a,b) => b.score - a.score)[0];
 
   films.forEach((film, index) => {
     const card = document.createElement("div");
@@ -266,39 +249,37 @@ function render() {
 
     card.innerHTML = `
       <div class="rank">#${index + 1}</div>
-
       <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
 
       ${film.rob ? `
         <div class="rosettes">
-          ${film.id === newestId ? '<div class="rosette new">NEW</div>' : ''}
-          ${film.id === bestId ? '<div class="rosette best">BEST</div>' : ''}
-        </div>
-      ` : ""}
+          ${film === newest ? '<div class="rosette new">NEW</div>' : ''}
+          ${film === best ? '<div class="rosette best">BEST</div>' : ''}
+        </div>` : ""}
 
-      <img src="${film.poster}" alt="${film.title} poster" class="poster" />
+      <img src="${film.poster}" class="poster" />
 
       <div>
         <div class="film-title">
           ${film.title} ${film.rob ? '<span class="rob-tag">[Rob’s Version]</span>' : ""}
         </div>
 
-        ${(!film.rob && film.director) ? `<div class="director">Directed by ${film.director}</div>` : ""}
-        <div class="starring">Starring: ${film.starring || ""}</div>
+        ${film.director ? `<div class="director">Directed by ${film.director}</div>` : ''}
+        <div class="starring">Starring: ${film.starring}</div>
 
-        <div class="score">${film.scoreLabel || ""}: ${film.score ?? ""}%</div>
+        <div class="score">${film.scoreLabel}: ${film.score}%</div>
 
         ${film.rob ? `
           <div class="score-breakdown">
             Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
           </div>
-          <div class="podcast-date">Podcasted: ${formatPodcastDate(film.podcastDate)}</div>
-        ` : ""}
+          <div class="podcast-date">Podcasted: ${film.podcastDate}</div>
+        ` : ''}
 
-        <div class="summary">${film.summary || ""}</div>
+        <div class="summary">${film.summary}</div>
 
         <div class="links">
-          <a class="${film.linkType}" href="${film.link}" target="_blank" rel="noopener">
+          <a class="${film.linkType}" href="${film.link}" target="_blank">
             ${film.linkType === "rt" ? "Rotten Tomatoes" : "Podcast Episode"}
           </a>
         </div>
@@ -310,90 +291,36 @@ function render() {
 }
 
 async function loadFilms() {
-  statusEl.textContent = "Loading films…";
-
-  const failures = [];
-  const loaded = [];
-
   try {
-    const manifestRes = await fetch(MANIFEST_URL, { cache: "no-store" });
-    if (!manifestRes.ok) throw new Error(`Manifest fetch failed: ${manifestRes.status}`);
-
+    const manifestRes = await fetch(MANIFEST_URL);
     const manifest = await manifestRes.json();
-    if (!manifest?.films || !Array.isArray(manifest.films)) {
-      throw new Error("Manifest is missing a 'films' array");
-    }
+
+    const films = [];
 
     for (const entry of manifest.films) {
-      try {
-        const res = await fetch(entry.path, { cache: "no-store" });
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-
-        // If JSON is invalid, this throws — and we’ll catch it and report it
-        const data = await res.json();
-
-        const film = { ...data, ...entry };
-        film.active = Boolean(film.active);
-        film.rob = Boolean(film.rob);
-
-        if (!film.id) {
-          film.id = `${film.rob ? "rob" : "real"}-${(film.title || "").toLowerCase().replace(/[^a-z0-9]+/g, "-")}`;
-        }
-
-        if (film.rob) calcRobScore(film);
-
-        loaded.push(film);
-      } catch (e) {
-        failures.push({ path: entry.path, error: String(e) });
-      }
+      const res = await fetch(entry.path);
+      const film = await res.json();
+      film.active = entry.active;
+      if (film.rob) calcRobScore(film);
+      films.push(film);
     }
 
-    allFilms = loaded;
+    allFilms = films;
     render();
-
-    if (failures.length) {
-      statusEl.innerHTML = `
-        Loaded <strong>${loaded.length}</strong> film(s). <strong>${failures.length}</strong> failed.
-        <details>
-          <summary>Show failed files (click)</summary>
-          <div style="margin-top:10px;">
-            ${failures.map(f => `<div>❌ <code>${f.path}</code><br><span style="opacity:0.8;">${f.error}</span></div>`).join("<hr style='border:0;border-top:1px solid #2a2a2a;margin:10px 0;'>")}
-          </div>
-        </details>
-        <div style="margin-top:10px;">
-          Tip: open a failed URL in your browser — if it shows a JSON error, the file isn’t valid JSON.
-        </div>
-      `;
-    } else {
-      statusEl.textContent = `Loaded ${loaded.length} film(s).`;
-    }
+    statusEl.textContent = `Loaded ${films.length} film(s).`;
 
   } catch (err) {
-    console.error("Film loading error:", err);
-    statusEl.textContent = "Couldn’t load films. Manifest fetch failed or manifest JSON is invalid.";
+    console.error(err);
+    statusEl.textContent = "Couldn’t load films.";
   }
 }
 
-// Filters
-document.getElementById("all").onclick = () => {
-  currentFilter = "all";
-  document.getElementById("all").classList.add("active");
-  document.getElementById("rob").classList.remove("active");
-  document.getElementById("real").classList.remove("active");
-  render();
-};
-document.getElementById("rob").onclick = () => {
-  currentFilter = "rob";
-  document.getElementById("rob").classList.add("active");
-  document.getElementById("all").classList.remove("active");
-  document.getElementById("real").classList.remove("active");
-  render();
-};
-document.getElementById("real").onclick = () => {
-  currentFilter = "real";
-  document.getElementById("real").classList.add("active");
-  document.getElementById("all").classList.remove("active");
-  document.getElementById("rob").classList.remove("active");
+document.getElementById("all").onclick = () => { currentFilter = "all"; render(); };
+document.getElementById("rob").onclick = () => { currentFilter = "rob"; render(); };
+document.getElementById("real").onclick = () => { currentFilter = "real"; render(); };
+
+document.getElementById("sortSelect").onchange = (e) => {
+  currentSort = e.target.value;
   render();
 };
 
