@@ -240,11 +240,14 @@ h1 { text-align: center; margin-bottom: 6px; }
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const MANIFEST_URL = "./films/manifest.json";
-const SUPABASE_URL = "https://vzaqanclghnonjilngjh.supabase.co";
-const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6YXFhbmNsZ2hub25qaWxuZ2poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODg1MzMsImV4cCI6MjA4NTM2NDUzM30.dLKt8UhyfoBgFRfEkLVa2pnoLxE_eqalQY-_KcrwDhc";
+const VOTES_URL = "./films/votes.json";
+const GITHUB_OWNER = "REPLACE_WITH_OWNER";
+const GITHUB_REPO = "REPLACE_WITH_REPO";
+const GITHUB_BRANCH = "main";
+const GITHUB_FILE_PATH = "films/votes.json";
+const GITHUB_TOKEN_STORAGE_KEY = "nccc-github-token";
 
 let allFilms = [];
 let currentFilter = "all";
@@ -252,9 +255,6 @@ let currentSort = "score";
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
-
-const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const voterId = getVoterId();
 
 function safeDate(d) {
   const dt = new Date(d);
@@ -279,44 +279,84 @@ function formatVoteScore(score) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
-function getVoterId() {
-  const key = "nccc-voter-id";
-  const existing = localStorage.getItem(key);
-  if (existing) return existing;
-  const id = crypto.randomUUID();
-  localStorage.setItem(key, id);
-  return id;
+function getStoredVote(filmId) {
+  const stored = localStorage.getItem(`nccc-vote-${filmId}`);
+  return stored !== null ? Number(stored) : 0;
 }
 
-async function hydrateVoteTotals(films) {
-  const filmIds = films.filter(film => film.rob).map(film => film.id);
-  if (filmIds.length === 0) return;
+function setStoredVote(filmId, vote) {
+  localStorage.setItem(`nccc-vote-${filmId}`, String(vote));
+}
 
-  const [{ data: totalsData, error: totalsError }, { data: votesData, error: votesError }] = await Promise.all([
-    supabase
-      .from("vote_totals")
-      .select("film_id,total_score")
-      .in("film_id", filmIds),
-    supabase
-      .from("votes")
-      .select("film_id,vote")
-      .eq("voter_id", voterId)
-      .in("film_id", filmIds)
-  ]);
+function getGitHubToken() {
+  const existing = localStorage.getItem(GITHUB_TOKEN_STORAGE_KEY);
+  if (existing) return existing;
+  const token = window.prompt("Enter a GitHub token with repo content write access:");
+  if (!token) return null;
+  localStorage.setItem(GITHUB_TOKEN_STORAGE_KEY, token.trim());
+  return token.trim();
+}
 
-  if (totalsError || votesError) {
-    console.error(totalsError ?? votesError);
-    return;
+async function loadVoteTotals(films) {
+  try {
+    const response = await fetch(`${VOTES_URL}?v=${Date.now()}`);
+    const data = await response.json();
+    const totals = data.totals ?? {};
+    films.forEach(film => {
+      if (!film.rob) return;
+      film.userScore = totals[film.id] ?? 0;
+      film.userVote = getStoredVote(film.id);
+    });
+  } catch (error) {
+    console.error(error);
+    statusEl.textContent = "Couldn’t load visitor scores.";
+  }
+}
+
+async function updateVoteTotalsOnGitHub(filmId, delta) {
+  const token = getGitHubToken();
+  if (!token) {
+    statusEl.textContent = "GitHub token required to submit votes.";
+    return null;
   }
 
-  const totalsMap = new Map(totalsData.map(item => [item.film_id, item.total_score]));
-  const votesMap = new Map(votesData.map(item => [item.film_id, item.vote]));
+  const apiUrl = `https://api.github.com/repos/${GITHUB_OWNER}/${GITHUB_REPO}/contents/${GITHUB_FILE_PATH}?ref=${GITHUB_BRANCH}`;
+  const headers = {
+    Authorization: `token ${token}`,
+    Accept: "application/vnd.github+json"
+  };
 
-  films.forEach(film => {
-    if (!film.rob) return;
-    film.userScore = totalsMap.get(film.id) ?? 0;
-    film.userVote = votesMap.get(film.id) ?? 0;
+  const fileResponse = await fetch(apiUrl, { headers });
+  if (!fileResponse.ok) {
+    statusEl.textContent = "Unable to read vote file from GitHub.";
+    return null;
+  }
+
+  const fileData = await fileResponse.json();
+  const decoded = atob(fileData.content);
+  const json = JSON.parse(decoded);
+  json.totals = json.totals ?? {};
+  json.totals[filmId] = (json.totals[filmId] ?? 0) + delta;
+  json.updatedAt = new Date().toISOString();
+
+  const updatedContent = btoa(JSON.stringify(json, null, 2));
+  const updateResponse = await fetch(apiUrl, {
+    method: "PUT",
+    headers,
+    body: JSON.stringify({
+      message: `Update vote total for ${filmId}`,
+      content: updatedContent,
+      sha: fileData.sha,
+      branch: GITHUB_BRANCH
+    })
   });
+
+  if (!updateResponse.ok) {
+    statusEl.textContent = "Unable to write vote file to GitHub.";
+    return null;
+  }
+
+  return json.totals[filmId] ?? 0;
 }
 
 async function handleVote(film, value) {
@@ -325,28 +365,13 @@ async function handleVote(film, value) {
   const currentVote = film.userVote ?? 0;
   if (currentVote === value) return;
 
-  const { error } = await supabase
-    .from("votes")
-    .upsert({ film_id: film.id, voter_id: voterId, vote: value }, { onConflict: "film_id,voter_id" });
+  const delta = value - currentVote;
+  const newTotal = await updateVoteTotalsOnGitHub(film.id, delta);
+  if (newTotal === null) return;
 
-  if (error) {
-    console.error(error);
-    return;
-  }
-
-  const { data: totalsData, error: totalsError } = await supabase
-    .from("vote_totals")
-    .select("total_score")
-    .eq("film_id", film.id)
-    .maybeSingle();
-
-  if (totalsError) {
-    console.error(totalsError);
-  } else {
-    film.userScore = totalsData?.total_score ?? 0;
-  }
-
+  film.userScore = newTotal;
   film.userVote = value;
+  setStoredVote(film.id, value);
 
   render();
 }
@@ -452,7 +477,7 @@ async function loadFilms() {
     }
 
     allFilms = films;
-    await hydrateVoteTotals(allFilms);
+    await loadVoteTotals(allFilms);
     render();
     statusEl.textContent = `Loaded ${films.length} film(s).`;
 
