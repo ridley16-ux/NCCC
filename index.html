@@ -240,8 +240,11 @@ h1 { text-align: center; margin-bottom: 6px; }
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const MANIFEST_URL = "./films/manifest.json";
+const SUPABASE_URL = "https://vzaqanclghnonjilngjh.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6YXFhbmNsZ2hub25qaWxuZ2poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODg1MzMsImV4cCI6MjA4NTM2NDUzM30.dLKt8UhyfoBgFRfEkLVa2pnoLxE_eqalQY-_KcrwDhc";
 
 let allFilms = [];
 let currentFilter = "all";
@@ -250,10 +253,8 @@ let currentSort = "score";
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
 
-const voteStorage = {
-  scoreKey: (id) => `nccc-score-${id}`,
-  voteKey: (id) => `nccc-vote-${id}`
-};
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const voterId = getVoterId();
 
 function safeDate(d) {
   const dt = new Date(d);
@@ -278,31 +279,74 @@ function formatVoteScore(score) {
   return value > 0 ? `+${value}` : `${value}`;
 }
 
-function applyStoredVotes(film) {
-  if (!film.rob) {
-    film.userScore = film.userScore ?? 0;
-    film.userVote = 0;
+function getVoterId() {
+  const key = "nccc-voter-id";
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  localStorage.setItem(key, id);
+  return id;
+}
+
+async function hydrateVoteTotals(films) {
+  const filmIds = films.filter(film => film.rob).map(film => film.id);
+  if (filmIds.length === 0) return;
+
+  const [{ data: totalsData, error: totalsError }, { data: votesData, error: votesError }] = await Promise.all([
+    supabase
+      .from("vote_totals")
+      .select("film_id,total_score")
+      .in("film_id", filmIds),
+    supabase
+      .from("votes")
+      .select("film_id,vote")
+      .eq("voter_id", voterId)
+      .in("film_id", filmIds)
+  ]);
+
+  if (totalsError || votesError) {
+    console.error(totalsError ?? votesError);
     return;
   }
 
-  const storedScore = localStorage.getItem(voteStorage.scoreKey(film.id));
-  const storedVote = localStorage.getItem(voteStorage.voteKey(film.id));
-  film.userScore = storedScore !== null ? Number(storedScore) : (film.userScore ?? 0);
-  film.userVote = storedVote !== null ? Number(storedVote) : 0;
+  const totalsMap = new Map(totalsData.map(item => [item.film_id, item.total_score]));
+  const votesMap = new Map(votesData.map(item => [item.film_id, item.vote]));
+
+  films.forEach(film => {
+    if (!film.rob) return;
+    film.userScore = totalsMap.get(film.id) ?? 0;
+    film.userVote = votesMap.get(film.id) ?? 0;
+  });
 }
 
-function handleVote(film, value) {
+async function handleVote(film, value) {
   if (!film.rob) return;
 
   const currentVote = film.userVote ?? 0;
   if (currentVote === value) return;
 
-  const updatedScore = (film.userScore ?? 0) + (value - currentVote);
-  film.userScore = updatedScore;
-  film.userVote = value;
+  const { error } = await supabase
+    .from("votes")
+    .upsert({ film_id: film.id, voter_id: voterId, vote: value }, { onConflict: "film_id,voter_id" });
 
-  localStorage.setItem(voteStorage.scoreKey(film.id), String(updatedScore));
-  localStorage.setItem(voteStorage.voteKey(film.id), String(value));
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const { data: totalsData, error: totalsError } = await supabase
+    .from("vote_totals")
+    .select("total_score")
+    .eq("film_id", film.id)
+    .maybeSingle();
+
+  if (totalsError) {
+    console.error(totalsError);
+  } else {
+    film.userScore = totalsData?.total_score ?? 0;
+  }
+
+  film.userVote = value;
 
   render();
 }
@@ -400,14 +444,15 @@ async function loadFilms() {
     for (const entry of manifest.films) {
       const res = await fetch(entry.path);
       const film = await res.json();
+      film.userScore = 0;
+      film.userVote = 0;
       film.active = entry.active;
-      applyStoredVotes(film);
       if (film.rob) calcRobScore(film);
-      if (!film.rob) film.userScore = film.userScore ?? 0;
       films.push(film);
     }
 
     allFilms = films;
+    await hydrateVoteTotals(allFilms);
     render();
     statusEl.textContent = `Loaded ${films.length} film(s).`;
 
