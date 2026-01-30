@@ -159,6 +159,44 @@ h1 { text-align: center; margin-bottom: 6px; }
   margin-bottom: 14px;
 }
 
+.vote-section {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+
+.vote-score {
+  background: #2c2c2c;
+  padding: 6px 10px;
+  border-radius: 6px;
+  font-size: 13px;
+}
+
+.vote-buttons {
+  display: flex;
+  gap: 8px;
+}
+
+.vote-btn {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+.vote-btn.active {
+  background: #d1632e;
+}
+
+.vote-btn:disabled {
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
 .links a {
   padding: 10px 14px;
   text-decoration: none;
@@ -193,6 +231,7 @@ h1 { text-align: center; margin-bottom: 6px; }
   <div class="sort">
     <select id="sortSelect">
       <option value="score">Sort by score</option>
+      <option value="userScore">Sort by visitor score</option>
       <option value="newest">Sort by newest</option>
     </select>
   </div>
@@ -201,8 +240,11 @@ h1 { text-align: center; margin-bottom: 6px; }
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const MANIFEST_URL = "./films/manifest.json";
+const SUPABASE_URL = "https://vzaqanclghnonjilngjh.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InZ6YXFhbmNsZ2hub25qaWxuZ2poIiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk3ODg1MzMsImV4cCI6MjA4NTM2NDUzM30.dLKt8UhyfoBgFRfEkLVa2pnoLxE_eqalQY-_KcrwDhc";
 
 let allFilms = [];
 let currentFilter = "all";
@@ -210,6 +252,9 @@ let currentSort = "score";
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
+
+const supabase = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+const voterId = getVoterId();
 
 function safeDate(d) {
   const dt = new Date(d);
@@ -229,6 +274,83 @@ function setActiveButton(clickedBtn) {
   clickedBtn.classList.add("active");
 }
 
+function formatVoteScore(score) {
+  const value = Number(score) || 0;
+  return value > 0 ? `+${value}` : `${value}`;
+}
+
+function getVoterId() {
+  const key = "nccc-voter-id";
+  const existing = localStorage.getItem(key);
+  if (existing) return existing;
+  const id = crypto.randomUUID();
+  localStorage.setItem(key, id);
+  return id;
+}
+
+async function hydrateVoteTotals(films) {
+  const filmIds = films.filter(film => film.rob).map(film => film.id);
+  if (filmIds.length === 0) return;
+
+  const [{ data: totalsData, error: totalsError }, { data: votesData, error: votesError }] = await Promise.all([
+    supabase
+      .from("vote_totals")
+      .select("film_id,total_score")
+      .in("film_id", filmIds),
+    supabase
+      .from("votes")
+      .select("film_id,vote")
+      .eq("voter_id", voterId)
+      .in("film_id", filmIds)
+  ]);
+
+  if (totalsError || votesError) {
+    console.error(totalsError ?? votesError);
+    return;
+  }
+
+  const totalsMap = new Map(totalsData.map(item => [item.film_id, item.total_score]));
+  const votesMap = new Map(votesData.map(item => [item.film_id, item.vote]));
+
+  films.forEach(film => {
+    if (!film.rob) return;
+    film.userScore = totalsMap.get(film.id) ?? 0;
+    film.userVote = votesMap.get(film.id) ?? 0;
+  });
+}
+
+async function handleVote(film, value) {
+  if (!film.rob) return;
+
+  const currentVote = film.userVote ?? 0;
+  if (currentVote === value) return;
+
+  const { error } = await supabase
+    .from("votes")
+    .upsert({ film_id: film.id, voter_id: voterId, vote: value }, { onConflict: "film_id,voter_id" });
+
+  if (error) {
+    console.error(error);
+    return;
+  }
+
+  const { data: totalsData, error: totalsError } = await supabase
+    .from("vote_totals")
+    .select("total_score")
+    .eq("film_id", film.id)
+    .maybeSingle();
+
+  if (totalsError) {
+    console.error(totalsError);
+  } else {
+    film.userScore = totalsData?.total_score ?? 0;
+  }
+
+  film.userVote = value;
+
+  render();
+}
+
 function render() {
   container.innerHTML = "";
 
@@ -241,6 +363,8 @@ function render() {
       (safeDate(b.podcastDate)?.getTime() || 0) -
       (safeDate(a.podcastDate)?.getTime() || 0)
     );
+  } else if (currentSort === "userScore") {
+    films.sort((a, b) => (b.userScore ?? 0) - (a.userScore ?? 0));
   } else {
     films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
@@ -279,6 +403,13 @@ function render() {
           <div class="score-breakdown">
             Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
           </div>
+          <div class="vote-section">
+            <div class="vote-score">Visitor Score: ${formatVoteScore(film.userScore)}</div>
+            <div class="vote-buttons">
+              <button class="vote-btn ${film.userVote === 1 ? "active" : ""}" data-vote="1" aria-label="Vote thumbs up">👍</button>
+              <button class="vote-btn ${film.userVote === -1 ? "active" : ""}" data-vote="-1" aria-label="Vote thumbs down">👎</button>
+            </div>
+          </div>
           <div class="podcast-date">Podcasted: ${film.podcastDate}</div>
         ` : ''}
 
@@ -291,6 +422,13 @@ function render() {
         </div>
       </div>
     `;
+
+    if (film.rob) {
+      card.querySelectorAll(".vote-btn").forEach(btn => {
+        const voteValue = Number(btn.dataset.vote);
+        btn.onclick = () => handleVote(film, voteValue);
+      });
+    }
 
     container.appendChild(card);
   });
@@ -312,6 +450,7 @@ async function loadFilms() {
     }
 
     allFilms = films;
+    await hydrateVoteTotals(allFilms);
     render();
     statusEl.textContent = `Loaded ${films.length} film(s).`;
 
