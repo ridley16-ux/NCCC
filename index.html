@@ -223,6 +223,14 @@ function calcRobScore(film) {
   film.scoreLabel = "🎙️ Kev’s Score";
 }
 
+/* ✅ NEW: keep filter button highlight in sync with currentFilter */
+function updateActiveFilter() {
+  document.querySelectorAll(".filter button").forEach(btn => {
+    btn.classList.remove("active");
+  });
+  document.getElementById(currentFilter).classList.add("active");
+}
+
 function render() {
   container.innerHTML = "";
 
@@ -315,14 +323,29 @@ async function loadFilms() {
   }
 }
 
-document.getElementById("all").onclick = () => { currentFilter = "all"; render(); };
-document.getElementById("rob").onclick = () => { currentFilter = "rob"; render(); };
-document.getElementById("real").onclick = () => { currentFilter = "real"; render(); };
+document.getElementById("all").onclick = () => {
+  currentFilter = "all";
+  updateActiveFilter();
+  render();
+};
+document.getElementById("rob").onclick = () => {
+  currentFilter = "rob";
+  updateActiveFilter();
+  render();
+};
+document.getElementById("real").onclick = () => {
+  currentFilter = "real";
+  updateActiveFilter();
+  render();
+};
 
 document.getElementById("sortSelect").onchange = (e) => {
   currentSort = e.target.value;
   render();
 };
+
+/* ✅ NEW: ensure initial highlight matches default filter */
+updateActiveFilter();
 
 loadFilms();
 </script>
