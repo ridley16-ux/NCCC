@@ -256,9 +256,29 @@ let currentSort = "score";
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
 
-function safeDate(d) {
-  const dt = new Date(d);
+function parseLocalDate(d) {
+  if (!d) return null;
+  const [year, month, day] = d.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const dt = new Date(year, month - 1, day);
   return isNaN(dt.getTime()) ? null : dt;
+}
+
+function safeDate(d) {
+  return parseLocalDate(d);
+}
+
+function formatUkDate(d) {
+  const dt = parseLocalDate(d);
+  return dt ? dt.toLocaleDateString("en-GB").replaceAll("/", "-") : d;
+}
+
+function isFilmLive(podcastDate) {
+  const dt = parseLocalDate(podcastDate);
+  if (!dt) return true;
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return dt.getTime() <= todayStart.getTime();
 }
 
 function calcRobScore(film) {
@@ -325,7 +345,7 @@ function render() {
           <div class="score-breakdown">
             Coherence ${film.coherence}/10 · Entertainment ${film.entertainment}/10 · Originality ${film.originality}/10
           </div>
-          <div class="podcast-date">Podcasted: ${film.podcastDate}</div>
+          <div class="podcast-date">Podcasted: ${formatUkDate(film.podcastDate)}</div>
         ` : ''}
 
         <div class="summary">${film.summary}</div>
@@ -352,7 +372,7 @@ async function loadFilms() {
     for (const entry of manifest.films) {
       const res = await fetch(entry.path);
       const film = await res.json();
-      film.active = entry.active;
+      film.active = isFilmLive(film.podcastDate);
       if (film.rob) calcRobScore(film);
       films.push(film);
     }
