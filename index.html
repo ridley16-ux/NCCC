@@ -230,8 +230,8 @@ footer {
 
 <div class="controls">
   <div class="filter">
-    <button id="all" class="active">All Films</button>
-    <button id="rob">Rob’s Films</button>
+    <button id="all">All Films</button>
+    <button id="rob" class="active">Rob’s Films</button>
     <button id="real">Real Films</button>
   </div>
 
@@ -250,7 +250,7 @@ footer {
 <script>
 const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
-let currentFilter = "all";
+let currentFilter = "rob";
 let currentSort = "score";
 
 const container = document.getElementById("films");
@@ -360,6 +360,8 @@ function render() {
 
     container.appendChild(card);
   });
+
+  statusEl.textContent = `Showing ${films.length} film(s).`;
 }
 
 async function loadFilms() {
@@ -379,7 +381,6 @@ async function loadFilms() {
 
     allFilms = films;
     render();
-    statusEl.textContent = `Loaded ${films.length} film(s).`;
 
   } catch (err) {
     console.error(err);
