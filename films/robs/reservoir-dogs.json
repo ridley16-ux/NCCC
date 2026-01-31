@@ -4,12 +4,13 @@
   "title": "Million Dollar Baby",
   "starring": "Andy Allo, John Krasinski",
   "poster": "https://i.postimg.cc/ZnFSs6Dk/MDB-Rob.png",
-  "coherence": 5,
+  "coherence": 3,
   "entertainment": 6,
-  "originality": ,
+  "originality": 6,
 
   "podcastDate": "2026-01-29",
   "summary": "In a future where parents were paid to create soldiers, Hope uncovers that her life was pre-sold to the state and exposes the truth.",
   "link": "#",
   "linkType": "podcast"
 }
+
