@@ -267,7 +267,7 @@ footer {
 const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
 let currentFilter = "rob";
-let currentSort = "podcast";
+let currentSort = "score";
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
@@ -318,7 +318,7 @@ function render() {
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
 
-  if (currentSort === "podcast" || currentSort === "newest") {
+  if (currentSort === "newest") {
     films.sort((a, b) =>
       (safeDate(b.podcastDate)?.getTime() || 0) -
       (safeDate(a.podcastDate)?.getTime() || 0)
@@ -430,6 +430,7 @@ loadFilms();
 
 </body>
 </html>
+
 
 
 
