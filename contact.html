@@ -12,29 +12,6 @@ body {
   color: #ffffff;
   margin: 0;
   padding: 30px 16px;
-  position: relative;
-  overflow-x: hidden;
-}
-
-body > * {
-  position: relative;
-  z-index: 1;
-}
-
-.film-rain {
-  position: fixed;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-  opacity: 0.18;
-  z-index: 0;
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .film-rain {
-    opacity: 0.1;
-  }
 }
 
 nav {
@@ -108,7 +85,6 @@ footer {
 </head>
 
 <body>
-<canvas class="film-rain" id="film-rain" aria-hidden="true"></canvas>
 <h1>No Context Cinema Club</h1>
 <div class="subtitle">Get in touch with film ideas, feedback, or collabs.</div>
 
@@ -142,111 +118,5 @@ footer {
 </div>
 
 <footer>Copyright No Context Cinema Club 2026</footer>
-
-<script>
-const rainCanvas = document.getElementById("film-rain");
-const rainCtx = rainCanvas.getContext("2d");
-const rainDrops = [];
-let rainWidth = 0;
-let rainHeight = 0;
-let rainAnimationId = null;
-
-const prefersReducedMotion = window.matchMedia("(prefers-reduced-motion: reduce)");
-
-const createDrop = () => ({
-  x: Math.random() * rainWidth,
-  y: Math.random() * rainHeight,
-  speed: 0.3 + Math.random() * 0.8,
-  size: 14 + Math.random() * 18,
-  rotation: Math.random() * Math.PI,
-  sway: 0.2 + Math.random() * 0.6,
-  offset: Math.random() * Math.PI * 2
-});
-
-const drawFilmIcon = (x, y, size, rotation, alpha) => {
-  const width = size;
-  const height = size * 1.4;
-  const sprocketCount = 3;
-  const sprocketSize = width * 0.14;
-  const sprocketGap = height / (sprocketCount + 1);
-
-  rainCtx.save();
-  rainCtx.translate(x, y);
-  rainCtx.rotate(rotation);
-  rainCtx.strokeStyle = `rgba(245, 190, 140, ${alpha})`;
-  rainCtx.fillStyle = `rgba(245, 190, 140, ${alpha})`;
-  rainCtx.lineWidth = 1;
-
-  rainCtx.strokeRect(-width / 2, -height / 2, width, height);
-  rainCtx.strokeRect(-width * 0.28, -height * 0.3, width * 0.56, height * 0.6);
-
-  for (let i = 1; i <= sprocketCount; i += 1) {
-    const sprocketY = -height / 2 + sprocketGap * i - sprocketSize / 2;
-    rainCtx.fillRect(-width / 2 - sprocketSize * 0.1, sprocketY, sprocketSize, sprocketSize);
-    rainCtx.fillRect(width / 2 - sprocketSize * 0.9, sprocketY, sprocketSize, sprocketSize);
-  }
-
-  rainCtx.restore();
-};
-
-const resizeRain = () => {
-  const dpr = window.devicePixelRatio || 1;
-  rainWidth = window.innerWidth;
-  rainHeight = window.innerHeight;
-  rainCanvas.width = rainWidth * dpr;
-  rainCanvas.height = rainHeight * dpr;
-  rainCanvas.style.width = `${rainWidth}px`;
-  rainCanvas.style.height = `${rainHeight}px`;
-  rainCtx.setTransform(dpr, 0, 0, dpr, 0, 0);
-
-  const targetCount = Math.max(22, Math.floor((rainWidth * rainHeight) / 30000));
-  rainDrops.length = 0;
-  for (let i = 0; i < targetCount; i += 1) {
-    rainDrops.push(createDrop());
-  }
-};
-
-const stepRain = () => {
-  rainCtx.clearRect(0, 0, rainWidth, rainHeight);
-  rainDrops.forEach(drop => {
-    drop.y += drop.speed;
-    drop.x += Math.sin((drop.y + drop.offset) / 50) * drop.sway;
-    if (drop.y - drop.size * 2 > rainHeight) {
-      drop.y = -drop.size * 2;
-      drop.x = Math.random() * rainWidth;
-    }
-
-    const fade = Math.max(0, 1 - drop.y / rainHeight);
-    const alpha = 0.25 * fade;
-    drawFilmIcon(drop.x, drop.y, drop.size, drop.rotation, alpha);
-  });
-
-  rainAnimationId = requestAnimationFrame(stepRain);
-};
-
-const startRain = () => {
-  resizeRain();
-  if (rainAnimationId) cancelAnimationFrame(rainAnimationId);
-  if (prefersReducedMotion.matches) {
-    rainCtx.clearRect(0, 0, rainWidth, rainHeight);
-    rainDrops.forEach(drop => {
-      const fade = Math.max(0, 1 - drop.y / rainHeight);
-      drawFilmIcon(drop.x, drop.y, drop.size, drop.rotation, 0.2 * fade);
-    });
-    return;
-  }
-  stepRain();
-};
-
-window.addEventListener("resize", () => {
-  startRain();
-});
-
-prefersReducedMotion.addEventListener("change", () => {
-  startRain();
-});
-
-startRain();
-</script>
 </body>
 </html>
