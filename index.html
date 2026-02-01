@@ -257,6 +257,7 @@ footer {
 
     <div class="sort">
       <select id="sortSelect">
+        <option value="podcast">Sort by podcast date</option>
         <option value="score">Sort by score</option>
         <option value="newest">Sort by newest</option>
       </select>
@@ -272,7 +273,7 @@ footer {
 const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
 let currentFilter = "rob";
-let currentSort = "score";
+let currentSort = "podcast";
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
@@ -323,7 +324,7 @@ function render() {
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
 
-  if (currentSort === "newest") {
+  if (currentSort === "podcast" || currentSort === "newest") {
     films.sort((a, b) =>
       (safeDate(b.podcastDate)?.getTime() || 0) -
       (safeDate(a.podcastDate)?.getTime() || 0)
@@ -347,7 +348,7 @@ function render() {
       ${film.rob ? `
         <div class="rosettes">
           ${film === newest ? '<div class="rosette new">NEW</div>' : ''}
-          ${film === best ? '<div class="rosette best">BEST</div>' : ''}
+          ${film === best ? '<div class="rosette best">Kev&#39;s Favourite</div>' : ''}
         </div>` : ""}
 
       <img src="${film.poster}" class="poster" />
