@@ -47,9 +47,7 @@ nav a {
   font-weight: bold;
 }
 
-nav a.active {
-  background: #d1632e;
-}
+nav a.active { background: #d1632e; }
 
 .site-title {
   text-align: center;
@@ -501,12 +499,11 @@ function calcRobScore(film) {
   film.scoreLabel = "🎙️ Kev’s Score";
 }
 
-/* ✅ NEW: set active class based on the button actually clicked */
+/* ✅ set active class based on the button actually clicked */
 function setActiveButton(clickedBtn) {
   document.querySelectorAll(".filter button").forEach(btn => btn.classList.remove("active"));
   clickedBtn.classList.add("active");
 }
-
 
 function render() {
   container.innerHTML = "";
@@ -685,10 +682,3 @@ loadFilms();
 
 </body>
 </html>
-
-
-
-
-
-
-
