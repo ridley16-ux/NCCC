@@ -11,7 +11,7 @@ body {
   background: #0f0f0f;
   color: #ffffff;
   margin: 0;
-  padding: 30px 16px;
+  padding: 0;
 }
 
 nav {
@@ -35,14 +35,11 @@ nav a.active {
   background: #d1632e;
 }
 
-h1 { text-align: center; margin-bottom: 6px; }
-.subtitle {
+.site-title {
   text-align: center;
-  color: #aaaaaa;
-  margin-bottom: 20px;
-  font-size: 14px;
-  padding: 0 12px 18px;
-  min-height: 2.8em;
+  margin: 0 0 12px;
+  color: #c06131;
+  font-family: Georgia, "Times New Roman", serif;
 }
 
 .sticky-menu {
@@ -50,8 +47,8 @@ h1 { text-align: center; margin-bottom: 6px; }
   top: 0;
   z-index: 10;
   background: #0f0f0f;
-  padding: 12px 16px 12px;
-  margin: 0 -16px 24px;
+  padding: 16px;
+  margin: 0 0 24px;
 }
 
 .sticky-menu::after {
@@ -100,10 +97,8 @@ footer {
 </head>
 
 <body>
-<h1>No Context Cinema Club</h1>
-<div class="subtitle">Listen to the latest episodes and catch up on the archive.</div>
-
 <div class="sticky-menu">
+  <h1 class="site-title">No Context Cinema Club</h1>
   <nav>
     <a href="index.html">Films</a>
     <a href="listen.html" class="active">Listen Now</a>
