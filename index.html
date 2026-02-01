@@ -16,9 +16,7 @@
   --accent-rob: #d46a2a;
 }
 
-* {
-  box-sizing: border-box;
-}
+* { box-sizing: border-box; }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -139,6 +137,9 @@ nav a.active { background: #d1632e; }
 }
 
 .flag {
+  position: absolute;
+  top: 10px;
+  right: 10px;
   font-size: 12px;
   font-weight: bold;
   padding: 6px 10px;
@@ -148,23 +149,6 @@ nav a.active { background: #d1632e; }
 .flag.rob { background: #3e5f3e; color: #d8f0d8; }
 .flag.real { background: #444; color: #fff; }
 
-/* Rosettes */
-.rosettes {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-}
-.rosette {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 6px 10px;
-  border-radius: 12px;
-  text-transform: uppercase;
-  color: #fff;
-}
-.rosette.new { background: #2e6bd1; }
-.rosette.best { background: #b58b00; }
-
 .poster {
   width: 140px;
   height: 210px;
@@ -172,24 +156,7 @@ nav a.active { background: #d1632e; }
   border-radius: 8px;
 }
 
-.poster-wrap {
-  position: relative;
-  flex-shrink: 0;
-}
-
-.poster-flags {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: none;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-}
-
-.film-details {
-  flex: 1;
-}
+.film-details { flex: 1; }
 
 .detail-row {
   display: grid;
@@ -198,8 +165,9 @@ nav a.active { background: #d1632e; }
   align-items: start;
 }
 
+/* ✅ wider Kev badge column on Rob cards */
 .rob-details .detail-row {
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: 1fr 300px;
 }
 
 .detail-title {
@@ -215,18 +183,14 @@ nav a.active { background: #d1632e; }
   color: var(--muted);
 }
 
-.meta-line + .meta-line {
-  margin-top: 4px;
-}
+.meta-line + .meta-line { margin-top: 4px; }
 
 .variant {
   color: #bfe8bf;
   font-weight: 800;
 }
 
-.dot {
-  opacity: 0.7;
-}
+.dot { opacity: 0.7; }
 
 .badge {
   border-radius: 18px;
@@ -250,37 +214,39 @@ nav a.active { background: #d1632e; }
   gap: 8px;
 }
 
-.badge-content {
-  display: flex;
-  justify-content: space-between;
-  gap: 12px;
-}
-
-.badge-flags {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
-}
-
 .rt-badge {
   border: 1px solid rgba(245, 197, 107, 0.35);
   background: rgba(245, 197, 107, 0.14);
-  min-width: 240px;
 }
-
-.rt-badge .badge-label {
-  color: #ffe4b3;
-}
+.rt-badge .badge-label { color: #ffe4b3; }
 
 .kev-badge {
   border: 1px solid rgba(212, 106, 42, 0.35);
   background: rgba(212, 106, 42, 0.12);
 }
+.kev-badge .badge-label { color: #ffd7bf; }
 
-.kev-badge .badge-label {
-  color: #ffd7bf;
+/* ✅ Flags inside Kev badge */
+.badge-flags {
+  margin-top: 10px;
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
 }
+
+.badge-flag {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  border: 1px solid rgba(255,255,255,0.18);
+  color: #fff;
+}
+
+.badge-flag.new { background: rgba(46, 107, 209, 0.22); }
+.badge-flag.best { background: rgba(181, 139, 0, 0.22); }
 
 .divider {
   height: 1px;
@@ -326,15 +292,9 @@ nav a.active { background: #d1632e; }
   outline: 3px solid rgba(245, 197, 107, 0.45);
   outline-offset: 2px;
 }
+.btn.podcast:focus { outline-color: rgba(212, 106, 42, 0.35); }
 
-.btn.podcast:focus {
-  outline-color: rgba(212, 106, 42, 0.35);
-}
-
-.bars {
-  display: grid;
-  gap: 10px;
-}
+.bars { display: grid; gap: 10px; }
 
 .bar-row {
   display: grid;
@@ -369,13 +329,6 @@ nav a.active { background: #d1632e; }
   text-align: right;
 }
 
-.badge-group {
-  display: flex;
-  align-items: flex-start;
-  justify-content: flex-end;
-  gap: 10px;
-}
-
 .status {
   text-align: center;
   margin-top: 20px;
@@ -391,18 +344,9 @@ footer {
 }
 
 @media (max-width: 700px) {
-  .films-list {
-    padding: 0 16px;
-  }
-
-  .film-card {
-    flex-direction: column;
-  }
-
-  .poster {
-    width: 100%;
-    height: auto;
-  }
+  .films-list { padding: 0 16px; }
+  .film-card { flex-direction: column; }
+  .poster { width: 100%; height: auto; }
 }
 
 @media (max-width: 760px) {
@@ -410,20 +354,10 @@ footer {
   .rob-details .detail-row {
     grid-template-columns: 1fr;
   }
-
-  .poster-flags {
-    display: flex;
-  }
-
-  .badge-flags {
-    display: none;
-  }
 }
 
 @media (max-width: 520px) {
-  .bar-row {
-    grid-template-columns: 110px 1fr 40px;
-  }
+  .bar-row { grid-template-columns: 110px 1fr 40px; }
 }
 </style>
 </head>
@@ -531,43 +465,30 @@ function render() {
 
     card.innerHTML = `
       <div class="rank">#${index + 1}</div>
+      <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
 
-      <div class="poster-wrap">
-        <img src="${film.poster}" class="poster" />
-        ${film.rob ? `
-          <div class="poster-flags">
-            <div class="flag rob">Rob’s Film</div>
-            <div class="rosettes">
-              ${film === newest ? '<div class="rosette new">NEW</div>' : ''}
-              ${film === best ? '<div class="rosette best">Kev&#39;s Favourite</div>' : ''}
-            </div>
-          </div>
-        ` : ""}
-      </div>
+      <img src="${film.poster}" class="poster" />
 
       ${film.rob ? `
         <div class="film-details rob-details">
           <div class="detail-row">
             <div>
               <h2 class="detail-title">
-                ${film.title} <span class="variant">[Rob’s Version]</span>
+                ${film.title}<br>
+                <span class="variant">[Rob’s Version]</span>
               </h2>
-              <p class="meta-line">Starring: ${film.starring}</p>
-              <p class="meta-line">Podcasted: ${formatUkDate(film.podcastDate)}</p>
+              <p class="meta-line">
+                Starring: ${film.starring} <span class="dot">•</span> Podcasted: ${formatUkDate(film.podcastDate)}
+              </p>
             </div>
+
             <aside class="badge kev-badge" aria-label="Kev's score">
-              <div class="badge-content">
-                <div>
-                  <div class="badge-label">Kev’s Score</div>
-                  <div class="badge-value">${film.score}%</div>
-                </div>
-                <div class="badge-flags">
-                  <div class="flag rob">Rob’s Film</div>
-                  <div class="rosettes">
-                    ${film === newest ? '<div class="rosette new">NEW</div>' : ''}
-                    ${film === best ? '<div class="rosette best">Kev&#39;s Favourite</div>' : ''}
-                  </div>
-                </div>
+              <div class="badge-label">Kev’s Score</div>
+              <div class="badge-value">${film.score}%</div>
+
+              <div class="badge-flags" aria-label="Episode flags">
+                ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
+                ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
               </div>
             </aside>
           </div>
@@ -606,13 +527,10 @@ function render() {
               ${film.director ? `<p class="meta-line">Directed by ${film.director}</p>` : ""}
               <p class="meta-line">Starring: ${film.starring}</p>
             </div>
-            <div class="badge-group">
-              <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
-                <div class="badge-label">Rotten Tomatoes</div>
-                <div class="badge-value">🍅 ${film.score}%</div>
-              </aside>
-              <div class="flag real">Real Film</div>
-            </div>
+            <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
+              <div class="badge-label">Rotten Tomatoes</div>
+              <div class="badge-value">🍅 ${film.score}%</div>
+            </aside>
           </div>
 
           <div class="divider"></div>
