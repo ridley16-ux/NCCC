@@ -136,10 +136,17 @@ nav a.active { background: #d1632e; }
   border-radius: 20px;
 }
 
-.flag {
+.flag-stack {
   position: absolute;
   top: 10px;
   right: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+}
+
+.flag {
   font-size: 12px;
   font-weight: bold;
   padding: 6px 10px;
@@ -226,12 +233,12 @@ nav a.active { background: #d1632e; }
 }
 .kev-badge .badge-label { color: #ffd7bf; }
 
-/* ✅ Flags inside Kev badge */
+/* ✅ Rosettes under Rob's flag */
 .badge-flags {
-  margin-top: 10px;
   display: flex;
-  gap: 8px;
-  flex-wrap: wrap;
+  flex-direction: column;
+  gap: 6px;
+  align-items: flex-end;
 }
 
 .badge-flag {
@@ -243,6 +250,7 @@ nav a.active { background: #d1632e; }
   letter-spacing: 0.06em;
   border: 1px solid rgba(255,255,255,0.18);
   color: #fff;
+  white-space: nowrap;
 }
 
 .badge-flag.new { background: rgba(46, 107, 209, 0.22); }
@@ -465,7 +473,15 @@ function render() {
 
     card.innerHTML = `
       <div class="rank">#${index + 1}</div>
-      <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
+      <div class="flag-stack">
+        <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
+        ${film.rob ? `
+          <div class="badge-flags" aria-label="Episode rosettes">
+            ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
+            ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
+          </div>
+        ` : ''}
+      </div>
 
       <img src="${film.poster}" class="poster" />
 
@@ -486,10 +502,6 @@ function render() {
               <div class="badge-label">Kev’s Score</div>
               <div class="badge-value">${film.score}%</div>
 
-              <div class="badge-flags" aria-label="Episode flags">
-                ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
-                ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
-              </div>
             </aside>
           </div>
 
