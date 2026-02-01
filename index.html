@@ -41,18 +41,7 @@ h1 { text-align: center; margin-bottom: 6px; }
   color: #aaaaaa;
   margin-bottom: 20px;
   font-size: 14px;
-  padding: 0 12px 18px;
-  min-height: 2.8em;
 }
-
- .sticky-menu {
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #0f0f0f;
-  padding: 12px 0 18px;
-  border-bottom: 4px solid #ffffff;
- }
 
 /* Filters + Sort */
 .controls {
@@ -233,26 +222,24 @@ footer {
 <h1>No Context Cinema Club</h1>
 <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
 
-<div class="sticky-menu">
-  <nav>
-    <a href="index.html" class="active">Films</a>
-    <a href="listen.html">Listen Now</a>
-    <a href="contact.html">Contact Us</a>
-  </nav>
+<nav>
+  <a href="index.html" class="active">Films</a>
+  <a href="listen.html">Listen Now</a>
+  <a href="contact.html">Contact Us</a>
+</nav>
 
-  <div class="controls">
-    <div class="filter">
-      <button id="all">All Films</button>
-      <button id="rob" class="active">Rob’s Films</button>
-      <button id="real">Real Films</button>
-    </div>
+<div class="controls">
+  <div class="filter">
+    <button id="all">All Films</button>
+    <button id="rob" class="active">Rob’s Films</button>
+    <button id="real">Real Films</button>
+  </div>
 
-    <div class="sort">
-      <select id="sortSelect">
-        <option value="score">Sort by score</option>
-        <option value="newest">Sort by newest</option>
-      </select>
-    </div>
+  <div class="sort">
+    <select id="sortSelect">
+      <option value="score">Sort by score</option>
+      <option value="newest">Sort by newest</option>
+    </select>
   </div>
 </div>
 
