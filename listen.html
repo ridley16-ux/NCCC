@@ -45,6 +45,35 @@ h1 { text-align: center; margin-bottom: 6px; }
   min-height: 2.8em;
 }
 
+.hero {
+  position: relative;
+  margin: 0 -16px 0;
+  padding: 18px 16px 0;
+}
+
+.hero-content {
+  position: relative;
+  z-index: 2;
+}
+
+.hero-decor {
+  position: absolute;
+  width: clamp(70px, 12vw, 150px);
+  height: auto;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.hero-decor--top-right {
+  top: 10px;
+  right: 12px;
+}
+
+.hero-decor--bottom-left {
+  bottom: -10px;
+  left: 12px;
+}
+
 .sticky-menu {
   position: sticky;
   top: 0;
@@ -96,19 +125,39 @@ footer {
   color: #888;
   font-size: 13px;
 }
+
+@media (max-width: 700px) {
+  .hero-decor {
+    width: clamp(60px, 18vw, 120px);
+  }
+}
 </style>
 </head>
 
 <body>
-<h1>No Context Cinema Club</h1>
-<div class="subtitle">Listen to the latest episodes and catch up on the archive.</div>
+<div class="hero">
+  <img
+    src="https://i.postimg.cc/PrngDxfP/orange-face.png"
+    alt="Orange face icon"
+    class="hero-decor hero-decor--top-right"
+  />
+  <img
+    src="https://i.postimg.cc/dtRzjYDs/black-icon-face.png"
+    alt="Black icon face"
+    class="hero-decor hero-decor--bottom-left"
+  />
+  <div class="hero-content">
+    <h1>No Context Cinema Club</h1>
+    <div class="subtitle">Listen to the latest episodes and catch up on the archive.</div>
 
-<div class="sticky-menu">
-  <nav>
-    <a href="index.html">Films</a>
-    <a href="listen.html" class="active">Listen Now</a>
-    <a href="contact.html">Contact Us</a>
-  </nav>
+    <div class="sticky-menu">
+      <nav>
+        <a href="index.html">Films</a>
+        <a href="listen.html" class="active">Listen Now</a>
+        <a href="contact.html">Contact Us</a>
+      </nav>
+    </div>
+  </div>
 </div>
 
 <div class="content">
