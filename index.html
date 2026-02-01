@@ -21,19 +21,36 @@ body > * {
   z-index: 1;
 }
 
-.film-rain {
+body::before {
+  content: "";
   position: fixed;
   inset: 0;
-  width: 100%;
-  height: 100%;
   pointer-events: none;
-  opacity: 0.18;
   z-index: 0;
+  background-color: #0f0f0f;
+  background-image:
+    radial-gradient(circle at 20% 0%, rgba(255, 255, 255, 0.06), transparent 55%),
+    linear-gradient(180deg, rgba(24, 24, 24, 0.9) 0%, #0f0f0f 60%),
+    url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='320' height='320' viewBox='0 0 320 320'%3E%3Cg opacity='0.08' fill='none' stroke='%23d16b2a' stroke-width='2'%3E%3Crect x='28' y='36' width='56' height='40' rx='4'/%3E%3Cpath d='M28 48h56M36 36l8-14M52 36l8-14M68 36l8-14'/%3E%3Ccircle cx='230' cy='60' r='20'/%3E%3Ccircle cx='230' cy='60' r='6'/%3E%3Cpath d='M206 60h48M230 36v48'/%3E%3Crect x='40' y='210' width='66' height='36' rx='6'/%3E%3Cpath d='M40 222h66M54 210l-8-18h42l-8 18'/%3E%3Crect x='210' y='198' width='64' height='46' rx='6'/%3E%3Cpath d='M210 210h64M226 198v46M258 198v46'/%3E%3Cpath d='M120 108l36-20 36 20v42l-36 20-36-20z'/%3E%3Ccircle cx='156' cy='128' r='10'/%3E%3C/g%3E%3C/svg%3E");
+  background-repeat: no-repeat, no-repeat, repeat;
+  background-size: cover, cover, 320px 320px;
+  background-position: center, center, top center;
 }
 
-@media (prefers-reduced-motion: reduce) {
-  .film-rain {
-    opacity: 0.1;
+@supports (mask-image: linear-gradient(#000, transparent)) {
+  body::before {
+    mask-image: linear-gradient(to bottom, #000 0%, #000 32%, transparent 68%);
+  }
+}
+
+@supports not (mask-image: linear-gradient(#000, transparent)) {
+  body::after {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    z-index: 0;
+    background: linear-gradient(to bottom, rgba(15, 15, 15, 0) 0%, #0f0f0f 55%, #0f0f0f 100%);
   }
 }
 
@@ -240,17 +257,11 @@ footer {
 </style>
 </head>
 
-<<<<<<< HEAD
 <body>
 
 <canvas class="film-rain" id="film-rain" aria-hidden="true"></canvas>
 
 <h1>No Context Cinema Club</h1>
-=======
-<body>
-
-<h1>No Context Cinema Club</h1>
->>>>>>> parent of 9602dfc (Merge branch 'main' into codex/create-dynamic-rain-animation-for-background-z9lc4f)
 <div class="subtitle">Reality vs Rob. Ranked by percentage. Kev remains unconvinced.</div>
 
 <nav>
@@ -274,7 +285,6 @@ footer {
   </div>
 </div>
 
-<<<<<<< HEAD
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
 <footer>Copyright No Context Cinema Club 2026</footer>
@@ -388,15 +398,6 @@ startRain();
 <script>
 const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
-=======
-<div id="films" class="films-list"></div>
-<div id="status" class="status"></div>
-<footer>Copyright No Context Cinema Club 2026</footer>
-
-<script>
-const MANIFEST_URL = "./films/manifest.json";
-let allFilms = [];
->>>>>>> parent of 9602dfc (Merge branch 'main' into codex/create-dynamic-rain-animation-for-background-z9lc4f)
 let currentFilter = "rob";
 let currentSort = "score";
 
