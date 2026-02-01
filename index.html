@@ -193,13 +193,13 @@ nav a.active { background: #d1632e; }
 
 .detail-row {
   display: grid;
-  grid-template-columns: 1fr 240px;
+  grid-template-columns: 1fr 290px;
   gap: 14px;
   align-items: start;
 }
 
 .rob-details .detail-row {
-  grid-template-columns: 1fr 220px;
+  grid-template-columns: 1fr 320px;
 }
 
 .detail-title {
@@ -222,6 +222,8 @@ nav a.active { background: #d1632e; }
 .variant {
   color: #bfe8bf;
   font-weight: 800;
+  display: block;
+  margin-top: 6px;
 }
 
 .dot {
@@ -258,15 +260,25 @@ nav a.active { background: #d1632e; }
 
 .badge-flags {
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
+  flex-direction: row;
+  align-items: center;
+  gap: 6px;
+}
+
+.badge-flags .flag,
+.badge-flags .rosette {
+  white-space: nowrap;
+}
+
+.badge-flags .rosettes {
+  flex-direction: row;
   gap: 6px;
 }
 
 .rt-badge {
   border: 1px solid rgba(245, 197, 107, 0.35);
   background: rgba(245, 197, 107, 0.14);
-  min-width: 240px;
+  min-width: 290px;
 }
 
 .rt-badge .badge-label {
@@ -276,6 +288,7 @@ nav a.active { background: #d1632e; }
 .kev-badge {
   border: 1px solid rgba(212, 106, 42, 0.35);
   background: rgba(212, 106, 42, 0.12);
+  min-width: 320px;
 }
 
 .kev-badge .badge-label {
@@ -542,7 +555,11 @@ function render() {
               ${film === best ? '<div class="rosette best">Kev&#39;s Favourite</div>' : ''}
             </div>
           </div>
-        ` : ""}
+        ` : `
+          <div class="poster-flags">
+            <div class="flag real">Real Film</div>
+          </div>
+        `}
       </div>
 
       ${film.rob ? `
@@ -608,10 +625,16 @@ function render() {
             </div>
             <div class="badge-group">
               <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
-                <div class="badge-label">Rotten Tomatoes</div>
-                <div class="badge-value">🍅 ${film.score}%</div>
+                <div class="badge-content">
+                  <div>
+                    <div class="badge-label">Rotten Tomatoes</div>
+                    <div class="badge-value">🍅 ${film.score}%</div>
+                  </div>
+                  <div class="badge-flags">
+                    <div class="flag real">Real Film</div>
+                  </div>
+                </div>
               </aside>
-              <div class="flag real">Real Film</div>
             </div>
           </div>
 
