@@ -47,11 +47,27 @@ nav a {
 
 nav a.active { background: #d1632e; }
 
+.title-banner {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-bottom: 12px;
+  flex-wrap: wrap;
+}
+
+.title-logo {
+  height: 32px;
+  width: auto;
+  display: block;
+}
+
 .site-title {
   text-align: center;
-  margin: 0 0 12px;
+  margin: 0;
   color: #c06131;
   font-family: Georgia, "Times New Roman", serif;
+  font-size: 32px;
 }
 
 .sticky-menu {
@@ -459,6 +475,23 @@ footer {
   font-size: 13px;
 }
 
+.footer-divider {
+  height: 10px;
+  background: #3a3a3a;
+  margin-top: 32px;
+}
+
+.footer-logo {
+  display: flex;
+  justify-content: center;
+  padding: 16px 0 20px;
+}
+
+.footer-logo img {
+  height: 48px;
+  width: auto;
+}
+
 @media (max-width: 700px) {
   .films-list { padding: 0 16px; }
   .film-card { flex-direction: column; }
@@ -481,7 +514,11 @@ footer {
 <body>
 
 <div class="sticky-menu">
-  <h1 class="site-title">No Context Cinema Club</h1>
+  <div class="title-banner">
+    <img class="title-logo" src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" />
+    <h1 class="site-title">No Context Cinema Club</h1>
+    <img class="title-logo" src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" />
+  </div>
   <nav>
     <a href="index.html" class="active">Films</a>
     <a href="listen.html">Listen Now</a>
@@ -507,7 +544,11 @@ footer {
 
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
+<div class="footer-divider"></div>
 <footer>Copyright No Context Cinema Club 2026</footer>
+<div class="footer-logo">
+  <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" />
+</div>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
