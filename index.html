@@ -608,6 +608,23 @@ footer img {
     width: 100%;
   }
 }
+#overflow-debug {
+  position: fixed;
+  left: 10px;
+  right: 10px;
+  bottom: 10px;
+  z-index: 9999;
+  background: rgba(0,0,0,0.85);
+  border: 1px solid rgba(255,255,255,0.2);
+  color: #fff;
+  padding: 10px 12px;
+  border-radius: 12px;
+  font-size: 12px;
+  line-height: 1.35;
+  display: none;
+  pointer-events: none;
+}
+#overflow-debug b { color: #f5c56b; }
 </style>
 </head>
 
@@ -1151,6 +1168,99 @@ initInfiniteScroll();
 loadFilms();
 </script>
 
+<script>
+(function () {
+  const PANEL_ID = "overflow-debug";
+  const OUTLINE_STYLE = "2px solid red";
+  let lastOutlined = null;
+
+  function clearLastOutline() {
+    if (lastOutlined) {
+      lastOutlined.style.outline = "";
+      lastOutlined = null;
+    }
+  }
+
+  function findWorstOffender() {
+    const vw = document.documentElement.clientWidth;
+    let worst = null;
+
+    document.querySelectorAll("body *").forEach(el => {
+      const r = el.getBoundingClientRect();
+      const spillRight = r.right - vw;
+      const spillLeft = -r.left;
+      const spill = Math.max(spillRight, spillLeft, 0);
+
+      if (spill > 1) {
+        if (!worst || spill > worst.spill) {
+          worst = { el, r, spill };
+        }
+      }
+    });
+
+    const panel = document.getElementById(PANEL_ID);
+    if (!panel) return;
+
+    clearLastOutline();
+
+    if (worst) {
+      lastOutlined = worst.el;
+      worst.el.style.outline = OUTLINE_STYLE;
+
+      panel.style.display = "block";
+      panel.innerHTML =
+        `Overflow detected: <b>${worst.el.tagName.toLowerCase()}</b><br>` +
+        `Class: <b>${(worst.el.className && String(worst.el.className).trim()) || "(none)"}</b><br>` +
+        `Spill: <b>${Math.round(worst.spill)}px</b>`;
+    } else {
+      panel.style.display = "none";
+      panel.innerHTML = "";
+    }
+  }
+
+  function runAfterPaint() {
+    requestAnimationFrame(() => requestAnimationFrame(findWorstOffender));
+  }
+
+  // 1) Run after load (delayed, because content is injected)
+  window.addEventListener("load", () => {
+    setTimeout(runAfterPaint, 1500);
+    setTimeout(runAfterPaint, 3000);
+  });
+
+  // 2) Try to wrap existing render() if it exists globally
+  try {
+    if (typeof window.render === "function") {
+      const originalRender = window.render;
+      window.render = async function (...args) {
+        const result = await originalRender.apply(this, args);
+        runAfterPaint();
+        return result;
+      };
+    } else {
+      // Fallback: run a few times in case render isn't global
+      let tries = 0;
+      const timer = setInterval(() => {
+        runAfterPaint();
+        tries++;
+        if (tries >= 8) clearInterval(timer);
+      }, 800);
+    }
+  } catch (e) {
+    // Last resort: periodic checks
+    let tries = 0;
+    const timer = setInterval(() => {
+      runAfterPaint();
+      tries++;
+      if (tries >= 8) clearInterval(timer);
+    }, 800);
+  }
+
+  // Run if viewport changes
+  window.addEventListener("resize", runAfterPaint);
+})();
+</script>
+
 <!-- Debug overflow: uncomment to find the offender -->
 <script>
   // Uncomment to debug horizontal overflow elements:
@@ -1163,9 +1273,8 @@ loadFilms();
   // });
 </script>
 
+<div id="overflow-debug" aria-hidden="true"></div>
 
-
-  
 </body>
 </html>
 
