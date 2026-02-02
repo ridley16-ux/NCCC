@@ -16,9 +16,31 @@
   --accent-rob: #d46a2a;
 }
 
-* { box-sizing: border-box; }
+/* Prevent horizontal scroll (iOS/Safari friendly) */
+html, body {
+  width: 100%;
+  max-width: 100%;
+  overflow-x: hidden;     /* fallback */
+}
 
+/* Prefer clip when supported (less likely to interfere with sticky) */
+@supports (overflow: clip) {
+  body {
+    overflow-x: clip;
+  }
+}
+
+/* Keep sticky behavior stable */
 html { overflow-x: visible; }
+
+/* Ensure padding/borders don't create overflow */
+*, *::before, *::after { box-sizing: border-box; }
+
+/* Any media should never exceed viewport */
+img, video, canvas, svg {
+  max-width: 100%;
+  height: auto;
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -26,7 +48,6 @@ body {
   color: var(--text);
   margin: 0;
   padding: 0;
-  overflow-x: clip;
   overflow-y: scroll;
   scrollbar-gutter: stable;
 }
@@ -68,6 +89,10 @@ nav a.active { background: #d1632e; }
 .sticky-menu {
   position: sticky;
   top: 0;
+  left: 0;
+  right: 0;
+  width: 100%;
+  max-width: 100%;
   z-index: 1000;
   background: #0f0f0f;
   padding: 16px 16px 12px;
@@ -1109,6 +1134,18 @@ function initInfiniteScroll() {
 
 initInfiniteScroll();
 loadFilms();
+</script>
+
+<!-- Debug overflow: uncomment to find the offender -->
+<script>
+  // Uncomment to debug horizontal overflow elements:
+  // [...document.querySelectorAll('*')].forEach(el => {
+  //   const r = el.getBoundingClientRect();
+  //   if (r.right > window.innerWidth + 1) {
+  //     console.log('Overflowing:', el, r);
+  //     el.style.outline = '2px solid red';
+  //   }
+  // });
 </script>
 
 </body>
