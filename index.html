@@ -85,7 +85,7 @@ nav a.active { background: #d1632e; }
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   margin-bottom: 30px;
 
   flex-wrap: nowrap;          /* ✅ keep on ONE line */
@@ -114,7 +114,7 @@ white-space: nowrap;        /* ✅ avoids “Sort by” wrapping */
   background: #2c2c2c;
   color: #fff;
   border: none;
-  padding: 10px 16px;
+  padding: 10px 14px;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
@@ -538,16 +538,16 @@ footer {
 
   <div class="controls">
     <div class="filter">
-      <button id="all">All Films</button>
+      <button id="all">All</button>
       <button id="rob" class="active">Rob’s Films</button>
       <button id="real">Real Films</button>
     </div>
 
     <div class="sort">
       <select id="sortSelect">
-        <option value="score">Sort by Score</option>
-        <option value="newest">Sort by Recent</option>
-        <option value="listener">Sort by Votes</option>
+        <option value="score">↑↓ by Score</option>
+        <option value="newest">↑↓ by Recent</option>
+        <option value="listener">↑↓ by Votes</option>
       </select>
     </div>
   </div>
@@ -979,6 +979,7 @@ loadFilms();
 
 </body>
 </html>
+
 
 
 
