@@ -18,6 +18,8 @@
 
 * { box-sizing: border-box; }
 
+html, body { overflow-x: hidden; }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: var(--bg);
@@ -275,6 +277,9 @@ nav a.active { background: #d1632e; }
   gap: 12px;
 }
 
+.cta { flex-wrap: wrap; }
+.cta > * { min-width: 0; }
+
 .btn {
   display: inline-flex;
   align-items: center;
@@ -463,6 +468,12 @@ footer {
   .films-list { padding: 0 16px; }
   .film-card { flex-direction: column; }
   .poster { width: 100%; height: auto; }
+  .rank { left: 10px; top: 10px; }
+  .vote-panel {
+    margin-left: 0;
+    width: 100%;
+    align-items: flex-start;
+  }
 }
 
 @media (max-width: 760px) {
