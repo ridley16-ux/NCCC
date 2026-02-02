@@ -5,11 +5,14 @@
     { "path": "./films/robs/minority-report.json", "active": true },
     { "path": "./films/robs/good-will-hunting.json", "active": true },
     { "path": "./films/robs/face-off.json", "active": true },
+    { "path": "./films/robs/blank", "active": true },
 
     { "path": "./films/real/face-off.json", "active": true },
     { "path": "./films/real/million-dollar-baby.json", "active": true },
     { "path": "./films/real/minority-report.json", "active": true },
     { "path": "./films/real/reservoir-dogs.json", "active": true },
     { "path": "./films/real/good-will-hunting.json", "active": true }
+    { "path": "./films/real/blank", "active": true }
   ]
 }
+
