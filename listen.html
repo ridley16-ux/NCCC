@@ -6,6 +6,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
+* { box-sizing: border-box; }
+
+html, body { overflow-x: hidden; }
+
 body {
   font-family: Arial, Helvetica, sans-serif;
   background: #0f0f0f;
@@ -102,12 +106,41 @@ footer {
   font-size: 13px;
 }
 
+footer .quick-links {
+  margin: 32px auto 12px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: center;
+}
+
+footer .quick-links a {
+  color: #d1632e;
+  text-decoration: none;
+  font-weight: bold;
+}
+
+footer .quick-links nav {
+  margin: 0;
+}
+
 footer img {
   display: block;
   margin: 12px auto 0;
   max-width: 240px;
   width: 100%;
   height: auto;
+}
+
+@media (max-width: 520px) {
+  .site-title img {
+    max-width: 100%;
+    width: 100%;
+  }
+
+  footer .quick-links nav {
+    flex-direction: column;
+  }
 }
 </style>
 </head>
@@ -145,6 +178,14 @@ footer img {
   </div>
 </div>
 <footer>
+  <div class="quick-links">
+    <strong>Quick Links</strong>
+    <nav>
+      <a href="index.html">Films</a>
+      <a href="listen.html">Listen Now</a>
+      <a href="contact.html">Contact Us</a>
+    </nav>
+  </div>
   Copyright No Context Cinema Club 2026
   <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" />
 </footer>
