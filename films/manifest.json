@@ -5,6 +5,7 @@
     { "path": "./films/robs/minority-report.json", "active": true },
     { "path": "./films/robs/good-will-hunting.json", "active": true },
     { "path": "./films/robs/face-off.json", "active": true },
+    { "path": "./films/robs/blank.json", "active": true },
 
     { "path": "./films/real/face-off.json", "active": true },
     { "path": "./films/real/million-dollar-baby.json", "active": true },
@@ -14,6 +15,7 @@
 
   ]
 }
+
 
 
 
