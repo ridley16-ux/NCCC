@@ -86,9 +86,7 @@ nav a.active { background: #d1632e; }
   justify-content: center;
   gap: 12px;
   margin-bottom: 30px;
-  flex-wrap: nowrap;
-  align-items: center;
-  overflow-x: hidden;
+  flex-wrap: wrap;
 }
 
 .filter {
@@ -97,11 +95,7 @@ nav a.active { background: #d1632e; }
   flex-wrap: nowrap;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
-  scrollbar-width: none;
-  flex: 1 1 auto;
-  min-width: 0;
 }
-.filter::-webkit-scrollbar { display: none; }
 
 .filter button {
   background: #2c2c2c;
@@ -115,9 +109,6 @@ nav a.active { background: #d1632e; }
 }
 .filter button.active { background: #d1632e; }
 
-.sort {
-  flex: 0 0 auto;
-}
 .sort select {
   background: #2c2c2c;
   color: #fff;
@@ -126,36 +117,6 @@ nav a.active { background: #d1632e; }
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
-}
-.sort-btn {
-  background: #2c2c2c;
-  color: #fff;
-  border: none;
-  width: 44px;
-  height: 44px;
-  border-radius: 14px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  font-weight: 900;
-  line-height: 1;
-}
-.sort-btn:focus {
-  outline: 3px solid rgba(245, 197, 107, 0.45);
-  outline-offset: 2px;
-}
-.sort-icon {
-  font-size: 18px;
-  opacity: 0.95;
-}
-
-@media (max-width: 520px) {
-  .filter button {
-    padding: 9px 12px;
-    border-radius: 18px;
-    font-size: 13px;
-  }
 }
 
 /* Film list */
@@ -570,9 +531,11 @@ footer {
     </div>
 
     <div class="sort">
-      <button id="sortBtn" class="sort-btn" type="button" aria-label="Change sort" title="Sort">
-        <span class="sort-icon" aria-hidden="true">⇅</span>
-      </button>
+      <select id="sortSelect">
+        <option value="score">Sort by Score</option>
+        <option value="newest">Sort by Most Recent</option>
+        <option value="listener">Sort by Listener Score</option>
+      </select>
     </div>
   </div>
 </div>
@@ -886,27 +849,10 @@ document.getElementById("real").onclick = (e) => {
   render();
 };
 
-const sortBtn = document.getElementById("sortBtn");
-const SORT_ORDER = ["score", "newest", "listener"];
-const SORT_LABELS = {
-  score: "Sort: Score",
-  newest: "Sort: Most Recent",
-  listener: "Sort: Listener Score"
-};
-
-function updateSortButtonLabel() {
-  sortBtn.setAttribute("aria-label", `Change sort (${SORT_LABELS[currentSort]})`);
-  sortBtn.title = SORT_LABELS[currentSort];
-}
-
-sortBtn.addEventListener("click", () => {
-  const idx = SORT_ORDER.indexOf(currentSort);
-  currentSort = SORT_ORDER[(idx + 1) % SORT_ORDER.length];
-  updateSortButtonLabel();
+document.getElementById("sortSelect").onchange = (e) => {
+  currentSort = e.target.value;
   render();
-});
-
-updateSortButtonLabel();
+};
 
 container.addEventListener("click", async (event) => {
   const button = event.target.closest(".vote-button");
