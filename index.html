@@ -25,13 +25,10 @@ html, body {
 
 /* Prefer clip when supported (less likely to interfere with sticky) */
 @supports (overflow: clip) {
-  body {
+  html, body {
     overflow-x: clip;
   }
 }
-
-/* Keep sticky behavior stable */
-html { overflow-x: visible; }
 
 /* Ensure padding/borders don't create overflow */
 *, *::before, *::after { box-sizing: border-box; }
@@ -570,6 +567,13 @@ footer img {
   .film-card { flex-direction: column; }
   .poster { width: 100%; height: auto; }
   .rank { left: 10px; top: 10px; }
+  .controls,
+  .filter {
+    flex-wrap: wrap;
+  }
+  .sort {
+    width: 100%;
+  }
   .vote-panel {
     margin-left: auto;
     width: auto;
