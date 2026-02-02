@@ -11,10 +11,11 @@
     { "path": "./films/real/million-dollar-baby.json", "active": true },
     { "path": "./films/real/minority-report.json", "active": true },
     { "path": "./films/real/reservoir-dogs.json", "active": true },
-    { "path": "./films/real/blank.json", "active": true }
+    { "path": "./films/real/good-will-hunting.json", "active": true }
 
   ]
 }
+
 
 
 
