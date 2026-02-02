@@ -83,85 +83,53 @@ nav a.active { background: #d1632e; }
 /* Filters + Sort */
 .controls {
   display: flex;
+  justify-content: center;
   align-items: center;
   gap: 12px;
   margin-bottom: 30px;
-  flex-wrap: nowrap;
+
+  flex-wrap: nowrap;          /* ✅ keep on ONE line */
   width: 100%;
 }
 
-.tabs-wrap {
-  flex: 1 1 auto;
-  min-width: 0;
-  overflow: hidden;
-}
-
-.tabs {
+.filter {
   display: flex;
-  align-items: flex-end;
-  gap: 6px;
-  background: #2c2c2c;
-  border-radius: 14px;
-  padding: 6px;
-  position: relative;
-  overflow-x: auto;
-  scrollbar-width: thin;
-  -webkit-overflow-scrolling: touch;
-}
+  gap: 10px;
+  flex-wrap: nowrap;
+  align-items: center;
 
-.tabs::after {
-  content: "";
-  position: absolute;
-  left: 6px;
-  right: 6px;
-  bottom: 6px;
-  height: 2px;
-  background: rgba(255, 255, 255, 0.08);
-  border-radius: 999px;
-  pointer-events: none;
-}
-
-.tabs button {
-  background: #2c2c2c;
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 14px;
-  border-radius: 12px 12px 0 0;
-  font-weight: bold;
-  cursor: pointer;
-  white-space: nowrap;
-  position: relative;
-  z-index: 1;
-  min-height: 36px;
-}
-.tabs button.active {
-  background: var(--bg);
-  border-color: #d1632e;
-  border-bottom-color: transparent;
-  color: #fff;
-  z-index: 2;
-}
-
-.tabs button:focus-visible,
-.sort select:focus-visible {
-  outline: 2px solid #d1632e;
-  outline-offset: 2px;
+  overflow: hidden;           /* ✅ stops it forcing a new row */
+  min-width: 0;               /* ✅ important for flex shrink */
 }
 
 .sort {
-  flex: 0 0 auto;
+flex: 0 0 auto;             /* ✅ dropdown keeps its size */
+}
+
+.sort select {
+white-space: nowrap;        /* ✅ avoids “Sort by” wrapping */
+}
+
+.filter button {
+  background: #2c2c2c;
+  color: #fff;
+  border: none;
+  padding: 10px 16px;
+  border-radius: 20px;
+  font-weight: bold;
+  cursor: pointer;
   white-space: nowrap;
 }
+.filter button.active { background: #d1632e; }
 
 .sort select {
   background: #2c2c2c;
   color: #fff;
   border: none;
-  padding: 8px 14px;
-  border-radius: 12px;
+  padding: 10px 14px;
+  border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
-  min-height: 36px;
 }
 
 /* Film list */
@@ -569,12 +537,10 @@ footer {
   </nav>
 
   <div class="controls">
-    <div class="tabs-wrap">
-      <div class="tabs" role="tablist" aria-label="Film filters">
-        <button id="all">All Films</button>
-        <button id="rob" class="active">Rob’s Films</button>
-        <button id="real">Real Films</button>
-      </div>
+    <div class="filter">
+      <button id="all">All Films</button>
+      <button id="rob" class="active">Rob’s Films</button>
+      <button id="real">Real Films</button>
     </div>
 
     <div class="sort">
