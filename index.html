@@ -17,7 +17,7 @@
 }
 
 /* Prevent horizontal scroll (iOS/Safari friendly) */
-html, body {
+html {
   width: 100%;
   max-width: 100%;
   overflow-x: hidden;     /* fallback */
@@ -25,7 +25,7 @@ html, body {
 
 /* Prefer clip when supported (less likely to interfere with sticky) */
 @supports (overflow: clip) {
-  html, body {
+  html {
     overflow-x: clip;
   }
 }
@@ -45,6 +45,7 @@ body {
   color: var(--text);
   margin: 0;
   padding: 0;
+  overflow-x: visible;
   overflow-y: scroll;
   scrollbar-gutter: stable;
 }
@@ -567,12 +568,16 @@ footer img {
   .film-card { flex-direction: column; }
   .poster { width: 100%; height: auto; }
   .rank { left: 10px; top: 10px; }
-  .controls,
-  .filter {
-    flex-wrap: wrap;
+  .controls {
+    gap: 6px;
   }
-  .sort {
-    width: 100%;
+  .filter {
+    gap: 6px;
+  }
+  .filter button,
+  .sort select {
+    padding: 8px 10px;
+    font-size: 13px;
   }
   .vote-panel {
     margin-left: auto;
