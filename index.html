@@ -308,6 +308,71 @@ nav a.active { background: #d1632e; }
   margin: 8px 0 0;
   font-size: 14px;
   color: #fff;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.listener-info-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+}
+
+.listener-info {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  background: rgba(255, 255, 255, 0.08);
+  color: var(--muted);
+  font-size: 11px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  padding: 0;
+}
+
+.listener-info:hover,
+.listener-info:focus-visible {
+  color: #fff;
+  border-color: rgba(255, 255, 255, 0.45);
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
+}
+
+.listener-tooltip {
+  position: absolute;
+  top: calc(100% + 8px);
+  left: 0;
+  z-index: 5;
+  background: #1f1f1f;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #e6e6e6;
+  padding: 10px 12px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 240px;
+  width: max-content;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+}
+
+.listener-tooltip.align-right {
+  left: auto;
+  right: 0;
+}
+
+.listener-info-wrap.open .listener-tooltip {
+  opacity: 1;
+  pointer-events: auto;
+  transform: translateY(0);
 }
 
 .vote-panel {
@@ -463,6 +528,7 @@ if (!supabaseClient) {
 }
 const deviceId = getOrCreateDeviceId();
 const localVotes = loadLocalVotes();
+let openTooltip = null;
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
@@ -578,6 +644,7 @@ async function refreshListenerScores(films) {
 
 async function render(options = {}) {
   container.innerHTML = "";
+  closeOpenTooltip();
 
   let films = getFilteredFilms();
 
@@ -663,7 +730,15 @@ async function render(options = {}) {
                 <button class="vote-button ${storedVote === 1 ? "selected" : ""}" data-film-id="${film.id}" data-vote="1" aria-pressed="${storedVote === 1}">👍</button>
                 <button class="vote-button ${storedVote === -1 ? "selected" : ""}" data-film-id="${film.id}" data-vote="-1" aria-pressed="${storedVote === -1}">👎</button>
               </div>
-              <p class="listener-score" data-listener-score="${film.id}">Listeners Score: ${formatListenerScore(listenerScore)}</p>
+              <p class="listener-score" data-listener-score="${film.id}">
+                <span class="listener-score-text">Listeners Score: ${formatListenerScore(listenerScore)}</span>
+                <span class="listener-info-wrap">
+                  <button class="listener-info" type="button" aria-label="Listener score info" aria-expanded="false" aria-controls="listener-tooltip-${film.id}">i</button>
+                  <span class="listener-tooltip" id="listener-tooltip-${film.id}" role="tooltip">
+                    This is an aggregate listener score. Thumbs up adds +1, thumbs down adds -1 across all visitors.
+                  </span>
+                </span>
+              </p>
             </div>
           </div>
         </div>
@@ -783,6 +858,43 @@ container.addEventListener("click", async (event) => {
   render({ skipScoreRefresh: true });
 });
 
+container.addEventListener("click", (event) => {
+  const infoButton = event.target.closest(".listener-info");
+  if (!infoButton) return;
+  const wrapper = infoButton.closest(".listener-info-wrap");
+  if (!wrapper) return;
+  event.stopPropagation();
+  if (openTooltip && openTooltip !== wrapper) {
+    closeOpenTooltip();
+  }
+  const isOpen = wrapper.classList.toggle("open");
+  infoButton.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) {
+    openTooltip = wrapper;
+    requestAnimationFrame(() => setTooltipAlignment(wrapper));
+  } else {
+    openTooltip = null;
+  }
+});
+
+document.addEventListener("click", (event) => {
+  if (!openTooltip) return;
+  if (event.target.closest(".listener-info-wrap")) return;
+  closeOpenTooltip();
+});
+
+document.addEventListener("keydown", (event) => {
+  if (event.key === "Escape") {
+    closeOpenTooltip();
+  }
+});
+
+window.addEventListener("resize", () => {
+  if (openTooltip) {
+    setTooltipAlignment(openTooltip);
+  }
+});
+
 function updateVoteUI(filmId, listenerScore, yourVote) {
   document.querySelectorAll(`.vote-button[data-film-id="${filmId}"]`).forEach(btn => {
     const btnVote = Number(btn.dataset.vote);
@@ -790,9 +902,28 @@ function updateVoteUI(filmId, listenerScore, yourVote) {
     btn.classList.toggle("selected", isSelected);
     btn.setAttribute("aria-pressed", String(isSelected));
   });
-  document.querySelectorAll(`[data-listener-score="${filmId}"]`).forEach(el => {
+  document.querySelectorAll(`[data-listener-score="${filmId}"] .listener-score-text`).forEach(el => {
     el.textContent = `Listeners Score: ${formatListenerScore(listenerScore)}`;
   });
+}
+
+function closeOpenTooltip() {
+  if (!openTooltip) return;
+  const button = openTooltip.querySelector(".listener-info");
+  openTooltip.classList.remove("open");
+  if (button) button.setAttribute("aria-expanded", "false");
+  openTooltip = null;
+}
+
+function setTooltipAlignment(wrapper) {
+  if (!wrapper) return;
+  const tooltip = wrapper.querySelector(".listener-tooltip");
+  if (!tooltip) return;
+  tooltip.classList.remove("align-right");
+  const rect = tooltip.getBoundingClientRect();
+  if (rect.right > window.innerWidth - 8) {
+    tooltip.classList.add("align-right");
+  }
 }
 
 loadFilms();
