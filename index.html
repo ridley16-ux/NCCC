@@ -84,17 +84,30 @@ nav a.active { background: #d1632e; }
 .controls {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 12px;
   margin-bottom: 30px;
-  flex-wrap: wrap;
+
+  flex-wrap: nowrap;          /* ✅ keep on ONE line */
+  width: 100%;
 }
 
 .filter {
   display: flex;
   gap: 10px;
   flex-wrap: nowrap;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
+  align-items: center;
+
+  overflow: hidden;           /* ✅ stops it forcing a new row */
+  min-width: 0;               /* ✅ important for flex shrink */
+}
+
+.sort {
+flex: 0 0 auto;             /* ✅ dropdown keeps its size */
+}
+
+.sort select {
+white-space: nowrap;        /* ✅ avoids “Sort by” wrapping */
 }
 
 .filter button {
@@ -966,6 +979,7 @@ loadFilms();
 
 </body>
 </html>
+
 
 
 
