@@ -219,13 +219,17 @@ nav a.active { background: #d1632e; }
   border-radius: 8px;
 }
 
-.film-details { flex: 1; }
+.film-details {
+  flex: 1;
+  min-width: 0;
+}
 
 .detail-row {
   display: grid;
   grid-template-columns: 1fr 240px;
   gap: 14px;
   align-items: start;
+  min-width: 0;
 }
 
 /* ✅ wider Kev badge column on Rob cards */
@@ -238,6 +242,7 @@ nav a.active { background: #d1632e; }
   font-size: 28px;
   letter-spacing: -0.02em;
   line-height: 1.15;
+  overflow-wrap: anywhere;
 }
 
 .meta-line {
@@ -322,6 +327,7 @@ nav a.active { background: #d1632e; }
   line-height: 1.6;
   font-size: 16px;
   color: rgba(255, 255, 255, 0.92);
+  overflow-wrap: anywhere;
 }
 
 .cta {
