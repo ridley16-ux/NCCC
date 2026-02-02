@@ -25,10 +25,13 @@ html, body {
 
 /* Prefer clip when supported (less likely to interfere with sticky) */
 @supports (overflow: clip) {
-  html, body {
+  body {
     overflow-x: clip;
   }
 }
+
+/* Keep sticky behavior stable */
+html { overflow-x: visible; }
 
 /* Ensure padding/borders don't create overflow */
 *, *::before, *::after { box-sizing: border-box; }
