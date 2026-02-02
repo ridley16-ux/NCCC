@@ -421,7 +421,7 @@ nav a.active { background: #d1632e; }
   font-size: 12px;
   line-height: 1.4;
   max-width: 240px;
-  width: max-content;
+  width: auto;
   opacity: 0;
   pointer-events: none;
   transform: translateY(-4px);
@@ -618,7 +618,7 @@ footer img {
     <img src="https://i.postimg.cc/BQqdVY8W/No-Con-Cin-Club-Web-Title-Large.png" alt="No Context Cinema Club" />
   </h1>
   <nav>
-    <a href="index.html" class="active">Films</a>
+    <a href="index.html" class="active">Films 1.0</a>
     <a href="listen.html">Listen Now</a>
     <a href="contact.html">Contact Us</a>
   </nav>
@@ -627,7 +627,7 @@ footer img {
     <div class="filter">
       <button id="all">All</button>
       <button id="rob" class="active">Rob’s Films</button>
-      <button id="real">Real Films 1</button>
+      <button id="real">Real Films</button>
     </div>
 
     <div class="sort">
@@ -1163,30 +1163,12 @@ loadFilms();
   // });
 </script>
 
-<script>
-  function logHorizontalOverflowOffenders() {
-    const offenders = [];
-    const vw = document.documentElement.clientWidth;
-    document.querySelectorAll("body *").forEach(el => {
-      const r = el.getBoundingClientRect();
-      if (r.right > vw + 1 || r.left < -1) offenders.push({ el, r });
-    });
 
-    if (offenders.length) {
-      console.log("⚠️ Horizontal overflow offenders:", offenders);
-      offenders.slice(0, 10).forEach(o => o.el.style.outline = "2px solid red");
-    } else {
-      console.log("✅ No horizontal overflow offenders detected.");
-    }
-  }
-
-  // run after films are likely rendered
-  window.addEventListener("load", () => setTimeout(logHorizontalOverflowOffenders, 1200));
-</script>
 
   
 </body>
 </html>
+
 
 
 
