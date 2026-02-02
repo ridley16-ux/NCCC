@@ -63,18 +63,21 @@ nav a.active { background: #d1632e; }
   margin: 0 auto;
 }
 
+/* ✅ Sticky header (everything above the grey line stays) */
 .sticky-menu {
   position: sticky;
   top: 0;
   z-index: 1000;
   background: #0f0f0f;
-  padding: 16px;
+  padding: 16px 16px 12px;
   margin: 0 0 24px;
+
+  /* ✅ helps separate header from scrolling content */
+  box-shadow: 0 10px 24px rgba(0,0,0,0.55);
 }
 
-.sticky-menu::after {
-  content: "";
-  display: block;
+/* ✅ grey line lives INSIDE the sticky header and stays pinned */
+.sticky-divider {
   height: 10px;
   margin-top: 12px;
   background: linear-gradient(to bottom, #59615b 30%, #1a1a1a 30%);
@@ -86,8 +89,7 @@ nav a.active { background: #d1632e; }
   justify-content: center;
   align-items: center;
   gap: 8px;
-  margin-bottom: 30px;
-
+  margin-bottom: 0;           /* ✅ header owns spacing now */
   flex-wrap: nowrap;          /* ✅ keep on ONE line */
   width: 100%;
 }
@@ -97,17 +99,16 @@ nav a.active { background: #d1632e; }
   gap: 10px;
   flex-wrap: nowrap;
   align-items: center;
-
   overflow: hidden;           /* ✅ stops it forcing a new row */
   min-width: 0;               /* ✅ important for flex shrink */
 }
 
 .sort {
-flex: 0 0 auto;             /* ✅ dropdown keeps its size */
+  flex: 0 0 auto;             /* ✅ dropdown keeps its size */
 }
 
 .sort select {
-white-space: nowrap;        /* ✅ avoids “Sort by” wrapping */
+  white-space: nowrap;        /* ✅ avoids wrapping */
 }
 
 .filter button {
@@ -581,10 +582,14 @@ footer img {
       </select>
     </div>
   </div>
+
+  <!-- ✅ the grey line that stays with the header -->
+  <div class="sticky-divider"></div>
 </div>
 
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
+
 <footer>
   <div class="quick-links">
     <strong>Quick Links</strong>
@@ -1020,16 +1025,3 @@ loadFilms();
 
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
