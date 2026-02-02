@@ -228,8 +228,8 @@ nav a.active { background: #d1632e; }
 .rt-badge .badge-label { color: #ffe4b3; }
 
 .kev-badge {
-  border: 1px solid rgba(212, 106, 42, 0.35);
-  background: rgba(212, 106, 42, 0.12);
+  border: 1px solid #e08a58;
+  background: #d46a2a;
 }
 .kev-badge .badge-label { color: #ffd7bf; }
 
@@ -253,8 +253,8 @@ nav a.active { background: #d1632e; }
   white-space: nowrap;
 }
 
-.badge-flag.new { background: rgba(46, 107, 209, 0.22); }
-.badge-flag.best { background: rgba(181, 139, 0, 0.22); }
+.badge-flag.new { background: #2e6bd1; }
+.badge-flag.best { background: #b58b00; }
 
 .divider {
   height: 1px;
@@ -307,7 +307,7 @@ nav a.active { background: #d1632e; }
 .listener-score {
   margin: 8px 0 0;
   font-size: 14px;
-  color: var(--muted);
+  color: #fff;
 }
 
 .vote-panel {
@@ -343,7 +343,7 @@ nav a.active { background: #d1632e; }
   border-color: rgba(245, 197, 107, 0.6);
 }
 
-.badge-flag.listener { background: rgba(91, 136, 255, 0.28); }
+.badge-flag.listener { background: #5b88ff; }
 
 .bars { display: grid; gap: 10px; }
 
@@ -606,7 +606,7 @@ async function render(options = {}) {
           <div class="badge-flags" aria-label="Episode rosettes">
             ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
             ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
-            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listener&#39;s Favourite</span>' : ''}
+            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Favourite</span>' : ''}
           </div>
         ` : ''}
       </div>
