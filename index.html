@@ -488,6 +488,16 @@ nav a.active { background: #d1632e; }
   font-size: 14px;
 }
 
+.loading {
+  color: #f5c56b;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+#scroll-sentinel {
+  height: 1px;
+}
+
 footer {
   text-align: center;
   margin-top: 32px;
@@ -595,6 +605,8 @@ footer img {
 
 <div id="films" class="films-list"></div>
 <div id="status" class="status"></div>
+<div id="loading" class="status loading" aria-live="polite" hidden></div>
+<div id="scroll-sentinel" aria-hidden="true"></div>
 
 <footer>
   <div class="quick-links">
@@ -632,8 +644,14 @@ const deviceId = getOrCreateDeviceId();
 const localVotes = loadLocalVotes();
 let openTooltip = null;
 
+const PAGE_SIZE = 10;
+let visibleCount = PAGE_SIZE;
+let loadingMore = false;
+let currentTotal = 0;
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
+const loadingEl = document.getElementById("loading");
+const sentinelEl = document.getElementById("scroll-sentinel");
 
 function parseLocalDate(d) {
   if (!d) return null;
@@ -700,6 +718,26 @@ function setActiveButton(clickedBtn) {
   clickedBtn.classList.add("active");
 }
 
+function resetPagination() {
+  visibleCount = PAGE_SIZE;
+}
+
+function updateLoadingState(isLoading) {
+  loadingMore = isLoading;
+  if (!loadingEl) return;
+  loadingEl.textContent = isLoading ? "Loading More..." : "";
+  loadingEl.hidden = !isLoading;
+}
+
+function updateStatus(visible, total) {
+  statusEl.textContent = `Showing ${visible} films of ${total}.`;
+}
+
+function updateSentinelVisibility() {
+  if (!sentinelEl) return;
+  sentinelEl.hidden = visibleCount >= currentTotal;
+}
+
 function getFilteredFilms() {
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
@@ -761,7 +799,10 @@ async function render(options = {}) {
   const robFilmsInView = films.filter(f => f.rob);
   const listenerBest = [...robFilmsInView].sort((a, b) => (listenerScores[b.id] ?? 0) - (listenerScores[a.id] ?? 0))[0];
 
-  films.forEach((film, index) => {
+  currentTotal = films.length;
+  const visibleFilms = films.slice(0, visibleCount);
+
+  visibleFilms.forEach((film, index) => {
     const listenerScore = listenerScores[film.id] ?? 0;
     const storedVote = localVotes[film.id] ?? null;
     const card = document.createElement("div");
@@ -872,7 +913,9 @@ async function render(options = {}) {
     container.appendChild(card);
   });
 
-  statusEl.textContent = `Showing ${films.length} film(s).`;
+  updateStatus(visibleFilms.length, currentTotal);
+  updateLoadingState(false);
+  updateSentinelVisibility();
 }
 
 async function loadFilms() {
@@ -892,6 +935,7 @@ async function loadFilms() {
 
     allFilms = films;
     lastScoreFetchKey = "";     // force a fetch on first render
+    resetPagination();
     await render();
 
   } catch (err) {
@@ -903,21 +947,25 @@ async function loadFilms() {
 document.getElementById("all").onclick = (e) => {
   currentFilter = "all";
   setActiveButton(e.currentTarget);
+  resetPagination();
   render();
 };
 document.getElementById("rob").onclick = (e) => {
   currentFilter = "rob";
   setActiveButton(e.currentTarget);
+  resetPagination();
   render();
 };
 document.getElementById("real").onclick = (e) => {
   currentFilter = "real";
   setActiveButton(e.currentTarget);
+  resetPagination();
   render();
 };
 
 document.getElementById("sortSelect").onchange = (e) => {
   currentSort = e.target.value;
+  resetPagination();
   render();
 };
 
@@ -1028,6 +1076,38 @@ function setTooltipAlignment(wrapper) {
   }
 }
 
+function loadMoreFilms() {
+  if (loadingMore) return;
+  if (visibleCount >= currentTotal) return;
+  updateLoadingState(true);
+  window.setTimeout(() => {
+    visibleCount = Math.min(visibleCount + PAGE_SIZE, currentTotal);
+    render({ skipScoreRefresh: true });
+  }, 400);
+}
+
+function handleScrollFallback() {
+  if (loadingMore) return;
+  if (visibleCount >= currentTotal) return;
+  const nearBottom = window.innerHeight + window.scrollY >= document.body.offsetHeight - 200;
+  if (nearBottom) loadMoreFilms();
+}
+
+function initInfiniteScroll() {
+  if (!sentinelEl) return;
+  if ("IntersectionObserver" in window) {
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) {
+        loadMoreFilms();
+      }
+    }, { rootMargin: "200px" });
+    observer.observe(sentinelEl);
+  } else {
+    window.addEventListener("scroll", handleScrollFallback, { passive: true });
+  }
+}
+
+initInfiniteScroll();
 loadFilms();
 </script>
 
