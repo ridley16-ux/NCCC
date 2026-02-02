@@ -627,7 +627,7 @@ footer img {
     <div class="filter">
       <button id="all">All</button>
       <button id="rob" class="active">Rob’s Films</button>
-      <button id="real">Real Films</button>
+      <button id="real">Real Films 1.0</button>
     </div>
 
     <div class="sort">
@@ -1163,8 +1163,31 @@ loadFilms();
   // });
 </script>
 
+<script>
+  function logHorizontalOverflowOffenders() {
+    const offenders = [];
+    const vw = document.documentElement.clientWidth;
+    document.querySelectorAll("body *").forEach(el => {
+      const r = el.getBoundingClientRect();
+      if (r.right > vw + 1 || r.left < -1) offenders.push({ el, r });
+    });
+
+    if (offenders.length) {
+      console.log("⚠️ Horizontal overflow offenders:", offenders);
+      offenders.slice(0, 10).forEach(o => o.el.style.outline = "2px solid red");
+    } else {
+      console.log("✅ No horizontal overflow offenders detected.");
+    }
+  }
+
+  // run after films are likely rendered
+  window.addEventListener("load", () => setTimeout(logHorizontalOverflowOffenders, 1200));
+</script>
+
+  
 </body>
 </html>
+
 
 
 
