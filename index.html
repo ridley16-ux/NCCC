@@ -450,6 +450,10 @@ const DEVICE_ID_KEY = "nccc_device_id";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+console.log("Supabase client:", supabaseClient ? "OK" : "MISSING");
+if (!supabaseClient) {
+  console.error("Supabase library not loaded. Check the supabase-js script tag.");
+}
 const deviceId = getOrCreateDeviceId();
 const localVotes = loadLocalVotes();
 
@@ -554,6 +558,7 @@ async function refreshListenerScores(films) {
 
   if (error) {
     console.error("Failed to fetch listener scores.", error);
+    statusEl.textContent = `Score fetch failed: ${error.message || "Unknown error"}`;
     return;
   }
 
@@ -746,8 +751,10 @@ container.addEventListener("click", async (event) => {
 
   if (error) {
     console.error("Vote update failed.", error);
+    statusEl.textContent = `Vote failed: ${error.message || "Unknown error"}`;
     return;
   }
+  statusEl.textContent = "";
 
   const response = Array.isArray(data) ? data[0] : data;
   if (!response) return;
