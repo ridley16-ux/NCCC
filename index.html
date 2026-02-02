@@ -704,6 +704,7 @@ async function loadFilms() {
     }
 
     allFilms = films;
+    lastScoreFetchKey = "";     // force a fetch on first render
     await render();
 
   } catch (err) {
@@ -789,3 +790,4 @@ loadFilms();
 
 </body>
 </html>
+
