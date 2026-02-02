@@ -271,6 +271,8 @@ nav a.active { background: #d1632e; }
 .cta {
   margin-top: 16px;
   display: flex;
+  align-items: center;
+  gap: 12px;
 }
 
 .btn {
@@ -301,6 +303,40 @@ nav a.active { background: #d1632e; }
   outline-offset: 2px;
 }
 .btn.podcast:focus { outline-color: rgba(212, 106, 42, 0.35); }
+
+.listener-score {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.vote-actions {
+  margin-left: auto;
+  display: inline-flex;
+  gap: 8px;
+  align-items: center;
+}
+
+.vote-button {
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  cursor: pointer;
+}
+
+.vote-button.selected {
+  background: rgba(245, 197, 107, 0.25);
+  border-color: rgba(245, 197, 107, 0.6);
+}
+
+.badge-flag.listener { background: rgba(91, 136, 255, 0.28); }
 
 .bars { display: grid; gap: 10px; }
 
@@ -391,6 +427,7 @@ footer {
       <select id="sortSelect">
         <option value="score">Sort by score</option>
         <option value="newest">Sort by recent</option>
+        <option value="listener">Listener score</option>
       </select>
     </div>
   </div>
@@ -400,11 +437,25 @@ footer {
 <div id="status" class="status"></div>
 <footer>Copyright No Context Cinema Club 2026</footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
 const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
 let currentFilter = "rob";
 let currentSort = "score";
+let lastScoreFetchKey = "";
+const listenerScores = {};
+const VOTE_STORAGE_KEY = "nccc_film_votes";
+const DEVICE_ID_KEY = "nccc_device_id";
+const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
+const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+console.log("Supabase client:", supabaseClient ? "OK" : "MISSING");
+if (!supabaseClient) {
+  console.error("Supabase library not loaded. Check the supabase-js script tag.");
+}
+const deviceId = getOrCreateDeviceId();
+const localVotes = loadLocalVotes();
 
 const container = document.getElementById("films");
 const statusEl = document.getElementById("status");
@@ -441,15 +492,40 @@ function calcRobScore(film) {
   film.scoreLabel = "🎙️ Kev’s Score";
 }
 
+function getOrCreateDeviceId() {
+  const existing = localStorage.getItem(DEVICE_ID_KEY);
+  if (existing) return existing;
+  const created = crypto.randomUUID();
+  localStorage.setItem(DEVICE_ID_KEY, created);
+  return created;
+}
+
+function loadLocalVotes() {
+  try {
+    const stored = localStorage.getItem(VOTE_STORAGE_KEY);
+    return stored ? JSON.parse(stored) : {};
+  } catch (error) {
+    console.warn("Failed to load local votes.", error);
+    return {};
+  }
+}
+
+function saveLocalVotes() {
+  localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(localVotes));
+}
+
+function formatListenerScore(score) {
+  const safeScore = Number(score) || 0;
+  return safeScore >= 0 ? `+${safeScore}` : `${safeScore}`;
+}
+
 /* ✅ set active class based on the button actually clicked */
 function setActiveButton(clickedBtn) {
   document.querySelectorAll(".filter button").forEach(btn => btn.classList.remove("active"));
   clickedBtn.classList.add("active");
 }
 
-function render() {
-  container.innerHTML = "";
-
+function getFilteredFilms() {
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
@@ -459,15 +535,59 @@ function render() {
       (safeDate(b.podcastDate)?.getTime() || 0) -
       (safeDate(a.podcastDate)?.getTime() || 0)
     );
+  } else if (currentSort === "listener") {
+    films.sort((a, b) => (listenerScores[b.id] ?? 0) - (listenerScores[a.id] ?? 0));
   } else {
     films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
 
+  return films;
+}
+
+async function refreshListenerScores(films) {
+  const robIds = films.filter(f => f.rob).map(f => f.id);
+  if (!supabaseClient || robIds.length === 0) return;
+  const fetchKey = [...robIds].sort().join("|");
+  if (fetchKey === lastScoreFetchKey) return;
+  lastScoreFetchKey = fetchKey;
+
+  const { data, error } = await supabaseClient
+    .from("film_listener_scores")
+    .select("film_id, listener_score")
+    .in("film_id", robIds);
+
+  if (error) {
+    console.error("Failed to fetch listener scores.", error);
+    statusEl.textContent = `Score fetch failed: ${error.message || "Unknown error"}`;
+    return;
+  }
+
+  data.forEach(row => {
+    listenerScores[row.film_id] = row.listener_score ?? 0;
+    const film = allFilms.find(entry => entry.id === row.film_id);
+    if (film) film.listener_score = row.listener_score ?? 0;
+  });
+}
+
+async function render(options = {}) {
+  container.innerHTML = "";
+
+  let films = getFilteredFilms();
+
+  if (!options.skipScoreRefresh) {
+    await refreshListenerScores(films);
+    films = getFilteredFilms();
+  }
+
   const robFilms = allFilms.filter(f => f.rob && f.active);
-  const newest = robFilms.sort((a,b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
-  const best = robFilms.sort((a,b) => b.score - a.score)[0];
+  const newest = [...robFilms].sort((a,b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
+  const best = [...robFilms].sort((a,b) => b.score - a.score)[0];
+  const robFilmsInView = films.filter(f => f.rob);
+  const listenerBest = [...robFilmsInView].sort((a, b) => (listenerScores[b.id] ?? 0) - (listenerScores[a.id] ?? 0))[0];
 
   films.forEach((film, index) => {
+    const listenerScore = listenerScores[film.id] ?? 0;
+    const storedVote = localVotes[film.id] ?? null;
     const card = document.createElement("div");
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
 
@@ -479,6 +599,7 @@ function render() {
           <div class="badge-flags" aria-label="Episode rosettes">
             ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
             ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
+            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listener&#39;s Favourite</span>' : ''}
           </div>
         ` : ''}
       </div>
@@ -496,6 +617,7 @@ function render() {
               <p class="meta-line">
                 Starring: ${film.starring} <span class="dot">•</span> Podcasted: ${formatUkDate(film.podcastDate)}
               </p>
+              <p class="listener-score" data-listener-score="${film.id}">Listeners: ${formatListenerScore(listenerScore)}</p>
             </div>
 
             <aside class="badge kev-badge" aria-label="Kev's score">
@@ -529,6 +651,10 @@ function render() {
 
           <div class="cta">
             <a class="btn podcast" href="${film.link}" target="_blank">▶ Podcast Episode</a>
+            <div class="vote-actions" aria-label="Listener voting">
+              <button class="vote-button ${storedVote === 1 ? "selected" : ""}" data-film-id="${film.id}" data-vote="1" aria-pressed="${storedVote === 1}">👍</button>
+              <button class="vote-button ${storedVote === -1 ? "selected" : ""}" data-film-id="${film.id}" data-vote="-1" aria-pressed="${storedVote === -1}">👎</button>
+            </div>
           </div>
         </div>
       ` : `
@@ -578,7 +704,7 @@ async function loadFilms() {
     }
 
     allFilms = films;
-    render();
+    await render();
 
   } catch (err) {
     console.error(err);
@@ -606,6 +732,57 @@ document.getElementById("sortSelect").onchange = (e) => {
   currentSort = e.target.value;
   render();
 };
+
+container.addEventListener("click", async (event) => {
+  const button = event.target.closest(".vote-button");
+  if (!button) return;
+  if (!supabaseClient) return;
+  const filmId = button.dataset.filmId;
+  const voteValue = Number(button.dataset.vote);
+  const film = allFilms.find(entry => entry.id === filmId);
+  if (!film) return;
+
+  const { data, error } = await supabaseClient.rpc("toggle_film_vote", {
+    p_film_id: filmId,
+    p_device_id: deviceId,
+    p_vote: voteValue,
+    p_title: film.title ?? null
+  });
+
+  if (error) {
+    console.error("Vote update failed.", error);
+    statusEl.textContent = `Vote failed: ${error.message || "Unknown error"}`;
+    return;
+  }
+  statusEl.textContent = "";
+
+  const response = Array.isArray(data) ? data[0] : data;
+  if (!response) return;
+
+  listenerScores[filmId] = response.listener_score ?? 0;
+  film.listener_score = response.listener_score ?? 0;
+
+  if (response.your_vote === null) {
+    delete localVotes[filmId];
+  } else {
+    localVotes[filmId] = response.your_vote;
+  }
+  saveLocalVotes();
+  updateVoteUI(filmId, response.listener_score, response.your_vote);
+  render({ skipScoreRefresh: true });
+});
+
+function updateVoteUI(filmId, listenerScore, yourVote) {
+  document.querySelectorAll(`.vote-button[data-film-id="${filmId}"]`).forEach(btn => {
+    const btnVote = Number(btn.dataset.vote);
+    const isSelected = yourVote === btnVote;
+    btn.classList.toggle("selected", isSelected);
+    btn.setAttribute("aria-pressed", String(isSelected));
+  });
+  document.querySelectorAll(`[data-listener-score="${filmId}"]`).forEach(el => {
+    el.textContent = `Listeners: ${formatListenerScore(listenerScore)}`;
+  });
+}
 
 loadFilms();
 </script>
