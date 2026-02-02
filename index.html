@@ -735,7 +735,7 @@ async function render(options = {}) {
                 <span class="listener-info-wrap">
                   <button class="listener-info" type="button" aria-label="Listener score info" aria-expanded="false" aria-controls="listener-tooltip-${film.id}">i</button>
                   <span class="listener-tooltip" id="listener-tooltip-${film.id}" role="tooltip">
-                    This is an aggregate listener score. Thumbs up adds +1, thumbs down adds -1 across all visitors.
+                    This score is the combined total of all listener votes (+1 for 👍, -1 for 👎)
                   </span>
                 </span>
               </p>
@@ -931,4 +931,5 @@ loadFilms();
 
 </body>
 </html>
+
 
