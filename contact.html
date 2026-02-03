@@ -12,7 +12,7 @@
 </script>
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Contact Us</title>
-  <meta name="website-version" content="0.06" />
+  <meta name="website-version" content="1.82" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
@@ -351,20 +351,18 @@ footer img {
   </div>
 </div>
 
-<footer>
-  <div class="quick-links">
-    <strong>Quick Links</strong>
-    <nav>
-      <a href="index.html">Films</a>
-      <span class="separator"> | </span>
-      <a href="listen.html">Listen Now</a>
-      <span class="separator"> | </span>
-      <a href="contact.html">Contact Us</a>
-    </nav>
-  </div>
-  Copyright No Context Cinema Club 2026
-  <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" style="padding-bottom: 40px;" />
-</footer>
+<div id="site-footer"></div>
+<script>
+  const footerContainer = document.getElementById("site-footer");
+  fetch("assets/footer.html")
+    .then((response) => response.text())
+    .then((html) => {
+      footerContainer.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Failed to load footer:", error);
+    });
+</script>
 <script>
   const copyButtons = document.querySelectorAll(".copy-btn");
 

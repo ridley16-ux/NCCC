@@ -678,20 +678,18 @@ footer img {
 <div id="loading" class="status loading" aria-live="polite" hidden></div>
 <div id="scroll-sentinel" aria-hidden="true"></div>
 
-<footer>
-  <div class="quick-links">
-    <strong>Quick Links</strong>
-    <nav>
-      <a href="index.html">Films</a>
-      <span class="separator"> | </span>
-      <a href="listen.html">Listen Now</a>
-      <span class="separator"> | </span>
-      <a href="contact.html">Contact Us</a>
-    </nav>
-  </div>
-  Copyright No Context Cinema Club 2026 | Website Version 1.81
-  <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" style="padding-bottom: 40px;"/>
-</footer>
+<div id="site-footer"></div>
+<script>
+  const footerContainer = document.getElementById("site-footer");
+  fetch("assets/footer.html")
+    .then((response) => response.text())
+    .then((html) => {
+      footerContainer.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Failed to load footer:", error);
+    });
+</script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
