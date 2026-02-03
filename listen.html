@@ -200,49 +200,52 @@ nav a.active {
 .upcoming-banner {
   display: flex;
   gap: 18px;
-  align-items: stretch;
+  align-items: center;
   background: #171717;
   border: 1px solid rgba(255, 255, 255, 0.12);
   border-radius: 16px;
   padding: 18px;
   box-shadow: 0 10px 20px rgba(0, 0, 0, 0.35);
+  flex-wrap: nowrap;
 }
 
 .upcoming-banner__calendar {
   flex: 0 0 120px;
-  background: #111;
-  border: 1px solid rgba(255, 255, 255, 0.08);
-  border-radius: 14px;
-  padding: 12px;
+  background: #fff;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  padding: 0;
   text-align: center;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 6px;
+  justify-content: space-between;
+  gap: 4px;
+  height: 120px;
+  overflow: hidden;
 }
 
 .upcoming-banner__month {
-  display: inline-block;
+  display: block;
   font-size: 12px;
   font-weight: 700;
-  letter-spacing: 1.4px;
-  padding: 4px 8px;
-  border-radius: 999px;
-  background: rgba(209, 99, 46, 0.2);
-  color: #f5b689;
+  letter-spacing: 1.6px;
+  padding: 6px 8px 5px;
+  background: #d94b3b;
+  color: #fff;
 }
 
 .upcoming-banner__day {
-  font-size: 36px;
+  font-size: 34px;
   font-weight: 800;
   line-height: 1;
-  color: #fff;
+  color: #111;
 }
 
 .upcoming-banner__weekday {
   font-size: 12px;
   letter-spacing: 1.2px;
-  color: rgba(255, 255, 255, 0.7);
+  color: rgba(17, 17, 17, 0.7);
+  padding-bottom: 10px;
 }
 
 .upcoming-banner__content {
@@ -250,6 +253,8 @@ nav a.active {
   flex-direction: column;
   gap: 10px;
   flex: 1;
+  min-height: 120px;
+  justify-content: center;
 }
 
 .upcoming-banner__label {
@@ -262,47 +267,20 @@ nav a.active {
 .upcoming-banner__title {
   font-size: 20px;
   margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  overflow: hidden;
 }
 
 .upcoming-banner__copy {
   margin: 0;
   font-size: 14px;
   color: rgba(255, 255, 255, 0.75);
-}
-
-.upcoming-banner__actions {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.upcoming-banner__button {
-  background: var(--accent-rob, #f59a4f);
-  color: #111;
-  text-decoration: none;
-  font-weight: 700;
-  padding: 10px 18px;
-  border-radius: 999px;
-  border: none;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 40px;
-}
-
-.upcoming-banner__button:hover {
-  filter: brightness(1.05);
-}
-
-.upcoming-banner__rss {
-  color: #d1632e;
-  font-weight: 700;
-  text-decoration: none;
-}
-
-.upcoming-banner__rss:hover {
-  text-decoration: underline;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 1;
+  overflow: hidden;
 }
 
 @media (min-width: 768px) {
@@ -364,17 +342,6 @@ footer img {
   }
 }
 
-@media (max-width: 640px) {
-  .upcoming-banner {
-    flex-direction: column;
-    align-items: stretch;
-  }
-
-  .upcoming-banner__calendar {
-    width: 100%;
-    flex: 0 0 auto;
-  }
-}
 </style>
 </head>
 
@@ -453,9 +420,6 @@ footer img {
   <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" style="padding-bottom: 40px;" />
 </footer>
 <script>
-const SUBSCRIBE_APPLE = "https://podcasts.apple.com/podcast/idXXXXXXXXX";
-const SUBSCRIBE_SPOTIFY = "https://open.spotify.com/show/XXXXXXXXX";
-const SUBSCRIBE_RSS = "https://nocontextcinemaclub.com/rss.xml";
 const MANIFEST_URL = "./films/manifest.json";
 
 function parseLocalDate(dateString) {
@@ -471,15 +435,6 @@ function getTodayStart() {
   return new Date(now.getFullYear(), now.getMonth(), now.getDate());
 }
 
-function getSubscribeUrl() {
-  const ua = navigator.userAgent;
-  const isAppleDevice = /iPad|iPhone|iPod/.test(ua);
-  const isMacSafari = /Macintosh/.test(ua) && /Safari/.test(ua) && !/Chrome|Chromium|Edg/.test(ua);
-  if (isAppleDevice || isMacSafari) return SUBSCRIBE_APPLE;
-  if (/Android/.test(ua)) return SUBSCRIBE_SPOTIFY;
-  return SUBSCRIBE_RSS;
-}
-
 function formatUpper(value) {
   return value ? value.toUpperCase() : "";
 }
@@ -490,8 +445,6 @@ function buildBanner(episode) {
   const month = formatUpper(date.toLocaleDateString("en-GB", { month: "short" }));
   const weekday = formatUpper(date.toLocaleDateString("en-GB", { weekday: "long" }));
   const day = date.getDate();
-  const subscribeUrl = getSubscribeUrl();
-  const rssLink = SUBSCRIBE_RSS;
   return `
     <div class="upcoming-banner">
       <div class="upcoming-banner__calendar">
@@ -503,10 +456,6 @@ function buildBanner(episode) {
         <span class="upcoming-banner__label">COMING SOON</span>
         <h3 class="upcoming-banner__title">${episode.title}</h3>
         <p class="upcoming-banner__copy">Subscribe now so you don't miss out</p>
-        <div class="upcoming-banner__actions">
-          <a class="upcoming-banner__button" href="${subscribeUrl}" target="_blank" rel="noopener">Subscribe</a>
-          <a class="upcoming-banner__rss" href="${rssLink}" target="_blank" rel="noopener">RSS</a>
-        </div>
       </div>
     </div>
   `;
