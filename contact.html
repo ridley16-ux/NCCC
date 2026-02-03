@@ -12,7 +12,7 @@
 </script>
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Contact Us</title>
-<meta name="website-version" content="0.01" />
+<meta name="website-version" content="0.02" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
@@ -104,48 +104,109 @@ nav a.active {
   padding: 16px;
 }
 
-.contact-icon-row {
-  display: grid;
-  gap: 12px;
+.contact-stack {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
   margin-top: 16px;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
+  max-width: 720px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
-.contact-icon-card {
-  display: grid;
-  gap: 10px;
+.contact-tile {
+  display: flex;
+  gap: 16px;
+  align-items: center;
   background: #2c2c2c;
-  border-radius: 10px;
+  border-radius: 12px;
   padding: 18px;
-  text-align: center;
+  border: 1px solid #3a3a3a;
+  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
 }
 
-.contact-icon-card img {
-  width: 64px;
-  height: 64px;
-  object-fit: contain;
-  margin: 0 auto;
+.contact-avatar {
+  width: 72px;
+  height: 72px;
+  border-radius: 14px;
+  object-fit: cover;
+  flex-shrink: 0;
+  background: #1a1a1a;
 }
 
-.contact-card h3 {
-  margin: 0 0 8px;
-  font-size: 16px;
+.contact-body {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
 }
 
-.contact-icon-card h3 {
+.contact-name {
   margin: 0;
   font-size: 18px;
 }
 
-.contact-icon-card p {
+.contact-role {
   margin: 0;
   color: #d4d4d4;
 }
 
-.contact-icon-card a {
+.contact-email-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.contact-email {
   color: #d1632e;
   text-decoration: none;
   font-weight: bold;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.copy-btn {
+  border: 1px solid #3f3f3f;
+  background: #1f1f1f;
+  color: #f1f1f1;
+  border-radius: 999px;
+  padding: 4px 8px;
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  cursor: pointer;
+  transition: border-color 0.2s ease, background 0.2s ease, transform 0.2s ease;
+}
+
+.copy-btn:hover {
+  border-color: #5a5a5a;
+  background: #2a2a2a;
+}
+
+.copy-btn:focus-visible {
+  outline: 2px solid #d1632e;
+  outline-offset: 2px;
+}
+
+.copy-ico {
+  width: 14px;
+  height: 14px;
+  display: block;
+  fill: currentColor;
+}
+
+.copy-toast {
+  font-size: 12px;
+  color: #bcbcbc;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+}
+
+.contact-tile.copied .copy-toast {
+  opacity: 1;
 }
 
 footer {
@@ -197,15 +258,20 @@ footer img {
   }
 }
 
-@media (max-width: 800px) {
-  .contact-icon-row {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
+@media (max-width: 700px) {
+  .contact-tile {
+    align-items: flex-start;
+  }
+
+  .contact-avatar {
+    width: 60px;
+    height: 60px;
   }
 }
 
-@media (max-width: 560px) {
-  .contact-icon-row {
-    grid-template-columns: minmax(0, 1fr);
+@media (max-width: 520px) {
+  .contact-email {
+    max-width: 220px;
   }
 }
 </style>
@@ -230,29 +296,53 @@ footer img {
     at your headphones.
   </p>
 
-  <div class="contact-icon-row">
-    <div class="contact-icon-card">
-      <img src="Images/Web%20Icons/Kev%20Icon.png" alt="Kev icon" />
-      <div>
-        <h3>Kev</h3>
-        <p>Film suggestion wrangler</p>
-        <p><a href="mailto:kev@nocontextcinemaclub.com">kev@nocontextcinemaclub.com</a></p>
+  <div class="contact-stack">
+    <div class="contact-tile" data-email="kev@nocontextcinemaclub.com">
+      <img class="contact-avatar" src="Images/Web%20Icons/Kev%20Icon.png" alt="Kev icon" />
+      <div class="contact-body">
+        <h3 class="contact-name">Kev</h3>
+        <p class="contact-role">Film suggestion wrangler</p>
+        <div class="contact-email-row">
+          <a class="contact-email" href="mailto:kev@nocontextcinemaclub.com">kev@nocontextcinemaclub.com</a>
+          <button class="copy-btn" type="button" aria-label="Copy Kev email">
+            <svg class="copy-ico" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7zm-4 4V5a2 2 0 0 1 2-2h8v2H6v6H4z"/>
+            </svg>
+          </button>
+          <span class="copy-toast" role="status" aria-live="polite">Copied!</span>
+        </div>
       </div>
     </div>
-    <div class="contact-icon-card">
-      <img src="Images/Web%20Icons/Rob%20Icon.png" alt="Rob icon" />
-      <div>
-        <h3>Rob</h3>
-        <p>Quiz master &amp; trivia vault</p>
-        <p><a href="mailto:rob@nocontextcinemaclub.com">rob@nocontextcinemaclub.com</a></p>
+    <div class="contact-tile" data-email="rob@nocontextcinemaclub.com">
+      <img class="contact-avatar" src="Images/Web%20Icons/Rob%20Icon.png" alt="Rob icon" />
+      <div class="contact-body">
+        <h3 class="contact-name">Rob</h3>
+        <p class="contact-role">Quiz master &amp; trivia vault</p>
+        <div class="contact-email-row">
+          <a class="contact-email" href="mailto:rob@nocontextcinemaclub.com">rob@nocontextcinemaclub.com</a>
+          <button class="copy-btn" type="button" aria-label="Copy Rob email">
+            <svg class="copy-ico" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7zm-4 4V5a2 2 0 0 1 2-2h8v2H6v6H4z"/>
+            </svg>
+          </button>
+          <span class="copy-toast" role="status" aria-live="polite">Copied!</span>
+        </div>
       </div>
     </div>
-    <div class="contact-icon-card">
-      <img src="Images/Web%20Icons/Name%20Icon.png" alt="Show icon" />
-      <div>
-        <h3>Show</h3>
-        <p>Feedback hotline &amp; story keeper</p>
-        <p><a href="mailto:show@nocontextcinemaclub.com">show@nocontextcinemaclub.com</a></p>
+    <div class="contact-tile" data-email="show@nocontextcinemaclub.com">
+      <img class="contact-avatar" src="Images/Web%20Icons/Name%20Icon.png" alt="Show icon" />
+      <div class="contact-body">
+        <h3 class="contact-name">Show</h3>
+        <p class="contact-role">Feedback hotline &amp; story keeper</p>
+        <div class="contact-email-row">
+          <a class="contact-email" href="mailto:show@nocontextcinemaclub.com">show@nocontextcinemaclub.com</a>
+          <button class="copy-btn" type="button" aria-label="Copy Show email">
+            <svg class="copy-ico" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M8 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7zm-4 4V5a2 2 0 0 1 2-2h8v2H6v6H4z"/>
+            </svg>
+          </button>
+          <span class="copy-toast" role="status" aria-live="polite">Copied!</span>
+        </div>
       </div>
     </div>
   </div>
@@ -272,5 +362,60 @@ footer img {
   Copyright No Context Cinema Club 2026
   <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" style="padding-bottom: 40px;" />
 </footer>
+<script>
+  const copyButtons = document.querySelectorAll(".copy-btn");
+
+  const fallbackCopy = (text) => {
+    const textArea = document.createElement("textarea");
+    textArea.value = text;
+    textArea.setAttribute("readonly", "");
+    textArea.style.position = "absolute";
+    textArea.style.left = "-9999px";
+    document.body.appendChild(textArea);
+    textArea.select();
+    try {
+      return document.execCommand("copy");
+    } catch (error) {
+      return false;
+    } finally {
+      document.body.removeChild(textArea);
+    }
+  };
+
+  const setCopiedState = (tile) => {
+    tile.classList.add("copied");
+    window.setTimeout(() => {
+      tile.classList.remove("copied");
+    }, 1200);
+  };
+
+  copyButtons.forEach((button) => {
+    button.addEventListener("click", async () => {
+      const tile = button.closest(".contact-tile");
+      if (!tile) {
+        return;
+      }
+      const email = tile.dataset.email || "";
+      if (!email) {
+        return;
+      }
+      let copied = false;
+      if (navigator.clipboard && window.isSecureContext) {
+        try {
+          await navigator.clipboard.writeText(email);
+          copied = true;
+        } catch (error) {
+          copied = false;
+        }
+      }
+      if (!copied) {
+        copied = fallbackCopy(email);
+      }
+      if (copied) {
+        setCopiedState(tile);
+      }
+    });
+  });
+</script>
 </body>
 </html>
