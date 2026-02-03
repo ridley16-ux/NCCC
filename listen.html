@@ -195,6 +195,8 @@ nav a.active {
 .upcoming-banner-wrap {
   margin: 0 auto 20px;
   max-width: 800px;
+  display: flex;
+  justify-content: center;
 }
 
 .upcoming-banner {
@@ -210,9 +212,9 @@ nav a.active {
 }
 
 .upcoming-banner__calendar {
-  flex: 0 0 120px;
+  flex: 0 0 90px;
   background: #fff;
-  border: 1px solid rgba(0, 0, 0, 0.08);
+  border: none;
   border-radius: 12px;
   padding: 0;
   text-align: center;
@@ -220,32 +222,32 @@ nav a.active {
   flex-direction: column;
   justify-content: space-between;
   gap: 4px;
-  height: 120px;
+  height: 90px;
   overflow: hidden;
 }
 
 .upcoming-banner__month {
   display: block;
-  font-size: 12px;
+  font-size: 9px;
   font-weight: 700;
-  letter-spacing: 1.6px;
-  padding: 6px 8px 5px;
+  letter-spacing: 1.2px;
+  padding: 4px 6px 3px;
   background: #d94b3b;
   color: #fff;
 }
 
 .upcoming-banner__day {
-  font-size: 34px;
+  font-size: 26px;
   font-weight: 800;
   line-height: 1;
   color: #111;
 }
 
 .upcoming-banner__weekday {
-  font-size: 12px;
-  letter-spacing: 1.2px;
+  font-size: 9px;
+  letter-spacing: 1px;
   color: rgba(17, 17, 17, 0.7);
-  padding-bottom: 10px;
+  padding-bottom: 6px;
 }
 
 .upcoming-banner__content {
@@ -253,8 +255,9 @@ nav a.active {
   flex-direction: column;
   gap: 10px;
   flex: 1;
-  min-height: 120px;
+  min-height: 90px;
   justify-content: center;
+  text-align: left;
 }
 
 .upcoming-banner__label {
