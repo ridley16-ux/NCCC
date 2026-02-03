@@ -12,13 +12,17 @@
 </script>
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Contact Us</title>
-<meta name="website-version" content="0.01" />
+<meta name="website-version" content="0.02" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
 * { box-sizing: border-box; }
 
 html { overflow-x: visible; }
+
+:root {
+  --accent: #F59A4F;
+}
 
 body {
   font-family: Arial, Helvetica, sans-serif;
@@ -148,6 +152,53 @@ nav a.active {
   font-weight: bold;
 }
 
+.contact-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-top: 12px;
+}
+
+.contact-actions .btn-primary {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 10px 14px;
+  border-radius: 999px;
+  font-weight: 700;
+  background: #d1632e;
+  color: #ffffff;
+  text-decoration: none;
+  border: 1px solid transparent;
+}
+
+.contact-actions .btn-primary:hover {
+  background: #b95627;
+}
+
+.btn-copy{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding:10px 14px;
+  border-radius:999px;
+  font-weight:700;
+  background: transparent;
+  color: var(--accent, #F59A4F);
+  border:1px solid rgba(255,255,255,0.25);
+  cursor:pointer;
+}
+
+.btn-copy:hover{
+  background: rgba(255,255,255,0.06);
+}
+
+.btn-copy.copied{
+  background: rgba(245,154,79,0.15);
+  border-color: var(--accent, #F59A4F);
+  color: var(--accent, #F59A4F);
+}
+
 footer {
   text-align: center;
   margin-top: 32px;
@@ -237,6 +288,10 @@ footer img {
         <h3>Kev</h3>
         <p>Film suggestion wrangler</p>
         <p><a href="mailto:kev@nocontextcinemaclub.com">kev@nocontextcinemaclub.com</a></p>
+        <div class="contact-actions">
+          <a class="btn-primary" href="mailto:kev@nocontextcinemaclub.com">Email Kev</a>
+          <button class="btn-copy" data-email="kev@nocontextcinemaclub.com">Copy email</button>
+        </div>
       </div>
     </div>
     <div class="contact-icon-card">
@@ -245,6 +300,10 @@ footer img {
         <h3>Rob</h3>
         <p>Quiz master &amp; trivia vault</p>
         <p><a href="mailto:rob@nocontextcinemaclub.com">rob@nocontextcinemaclub.com</a></p>
+        <div class="contact-actions">
+          <a class="btn-primary" href="mailto:rob@nocontextcinemaclub.com">Email Rob</a>
+          <button class="btn-copy" data-email="rob@nocontextcinemaclub.com">Copy email</button>
+        </div>
       </div>
     </div>
     <div class="contact-icon-card">
@@ -253,6 +312,10 @@ footer img {
         <h3>Show</h3>
         <p>Feedback hotline &amp; story keeper</p>
         <p><a href="mailto:show@nocontextcinemaclub.com">show@nocontextcinemaclub.com</a></p>
+        <div class="contact-actions">
+          <a class="btn-primary" href="mailto:show@nocontextcinemaclub.com">Email The Show</a>
+          <button class="btn-copy" data-email="show@nocontextcinemaclub.com">Copy email</button>
+        </div>
       </div>
     </div>
   </div>
@@ -272,5 +335,42 @@ footer img {
   Copyright No Context Cinema Club 2026
   <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" style="padding-bottom: 40px;" />
 </footer>
+<script>
+document.addEventListener('click', function(e){
+  const btn = e.target.closest('.btn-copy');
+  if(!btn) return;
+
+  const email = btn.dataset.email;
+  const originalText = btn.textContent;
+
+  function showCopied(){
+    btn.textContent = 'Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = originalText;
+      btn.classList.remove('copied');
+    }, 1500);
+  }
+
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(email).then(showCopied);
+  } else {
+    const temp = document.createElement('textarea');
+    temp.value = email;
+    temp.style.position = 'fixed';
+    temp.style.opacity = '0';
+    document.body.appendChild(temp);
+    temp.focus();
+    temp.select();
+    try {
+      document.execCommand('copy');
+      showCopied();
+    } catch (err) {
+      console.error('Copy failed', err);
+    }
+    document.body.removeChild(temp);
+  }
+});
+</script>
 </body>
 </html>
