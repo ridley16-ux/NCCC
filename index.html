@@ -421,8 +421,9 @@ nav a.active { background: #d1632e; }
 .listener-tooltip {
   position: absolute;
   top: 50%;
-  right: 100%;
-  z-index: 5;
+  /* Tooltip now opens to the left of the icon with a small horizontal gap. */
+  right: calc(100% + 10px);
+  z-index: 10;
   background: #1f1f1f;
   border: 1px solid rgba(255, 255, 255, 0.12);
   color: #e6e6e6;
@@ -434,20 +435,59 @@ nav a.active { background: #d1632e; }
   width: auto;
   opacity: 0;
   pointer-events: none;
-  transform: translateY(-4px);
+  transform: translate(-6px, -50%);
   transition: opacity 0.15s ease, transform 0.15s ease;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
 }
 
 .listener-tooltip.align-right {
-  left: auto;
-  right: 0;
+  right: auto;
+  left: calc(100% + 10px);
+  transform: translate(6px, -50%);
 }
 
 .listener-info-wrap.open .listener-tooltip {
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
+  transform: translate(0, -50%);
+}
+
+.listener-tooltip::before {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -7px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 6px 0 6px 6px;
+  border-color: transparent transparent transparent rgba(255, 255, 255, 0.12);
+}
+
+.listener-tooltip::after {
+  content: "";
+  position: absolute;
+  top: 50%;
+  right: -6px;
+  transform: translateY(-50%);
+  border-style: solid;
+  border-width: 6px 0 6px 6px;
+  border-color: transparent transparent transparent #1f1f1f;
+}
+
+.listener-tooltip.align-right::before,
+.listener-tooltip.align-right::after {
+  right: auto;
+  left: -7px;
+  border-width: 6px 6px 6px 0;
+}
+
+.listener-tooltip.align-right::before {
+  border-color: transparent rgba(255, 255, 255, 0.12) transparent transparent;
+}
+
+.listener-tooltip.align-right::after {
+  left: -6px;
+  border-color: transparent #1f1f1f transparent transparent;
 }
 
 .vote-panel {
@@ -686,7 +726,7 @@ footer img {
       <a href="contact.html">Contact Us</a>
     </nav>
   </div>
-  Copyright No Context Cinema Club 2026 | Website Version 1.61
+  Copyright No Context Cinema Club 2026 | Website Version 1.62
   <img src="https://i.postimg.cc/W3TFQFxB/No-Con-Cin-Club(Caps).jpg" alt="No Context Cinema Club logo" style="padding-bottom: 40px;"/>
 </footer>
 
@@ -1138,7 +1178,7 @@ function setTooltipAlignment(wrapper) {
   if (!tooltip) return;
   tooltip.classList.remove("align-right");
   const rect = tooltip.getBoundingClientRect();
-  if (rect.right > window.innerWidth - 8) {
+  if (rect.left < 8) {
     tooltip.classList.add("align-right");
   }
 }
