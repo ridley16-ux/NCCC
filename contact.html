@@ -12,6 +12,7 @@
 </script>
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Contact Us</title>
+<meta name="website-version" content="0.01" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
@@ -103,76 +104,27 @@ nav a.active {
   padding: 16px;
 }
 
-.contact-form-card {
-  background: #2c2c2c;
-  border-radius: 10px;
-  padding: 20px;
-  margin: 20px 0 24px;
-}
-
-.contact-form-card h3 {
-  margin-top: 0;
-}
-
-.contact-form {
-  display: grid;
-  gap: 12px;
-}
-
-.contact-form label {
-  font-weight: bold;
-}
-
-.contact-form input,
-.contact-form select,
-.contact-form textarea {
-  width: 100%;
-  padding: 10px 12px;
-  border-radius: 8px;
-  border: 1px solid #444;
-  background: #1a1a1a;
-  color: #fff;
-  font-size: 14px;
-}
-
-.contact-form textarea {
-  min-height: 120px;
-  resize: vertical;
-}
-
-.contact-form button {
-  background: #d1632e;
-  border: none;
-  color: #fff;
-  font-weight: bold;
-  padding: 12px 16px;
-  border-radius: 8px;
-  cursor: pointer;
-}
-
-.contact-form button:hover {
-  background: #e0703a;
-}
-
 .contact-icon-row {
   display: grid;
   gap: 12px;
   margin-top: 16px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 .contact-icon-card {
-  display: flex;
-  align-items: center;
-  gap: 14px;
+  display: grid;
+  gap: 10px;
   background: #2c2c2c;
   border-radius: 10px;
-  padding: 16px;
+  padding: 18px;
+  text-align: center;
 }
 
 .contact-icon-card img {
-  width: 48px;
-  height: 48px;
+  width: 64px;
+  height: 64px;
   object-fit: contain;
+  margin: 0 auto;
 }
 
 .contact-card h3 {
@@ -180,7 +132,17 @@ nav a.active {
   font-size: 16px;
 }
 
-.contact-card a {
+.contact-icon-card h3 {
+  margin: 0;
+  font-size: 18px;
+}
+
+.contact-icon-card p {
+  margin: 0;
+  color: #d4d4d4;
+}
+
+.contact-icon-card a {
   color: #d1632e;
   text-decoration: none;
   font-weight: bold;
@@ -234,6 +196,18 @@ footer img {
     width: 100%;
   }
 }
+
+@media (max-width: 800px) {
+  .contact-icon-row {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 560px) {
+  .contact-icon-row {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
 </style>
 </head>
 
@@ -256,79 +230,33 @@ footer img {
     at your headphones.
   </p>
 
-  <div class="contact-form-card">
-    <h3>Send a message</h3>
-    <form class="contact-form" id="contact-form">
-      <div>
-        <label for="recipient">Pick a host (required)</label>
-        <select id="recipient" name="recipient" required>
-          <option value="" disabled selected>Select a host</option>
-          <option value="kev@nocontextcinemaclub.com">Kev</option>
-          <option value="rob@nocontextcinemaclub.com">Rob</option>
-          <option value="show@nocontextcinemaclub.com">Show</option>
-        </select>
-      </div>
-      <div>
-        <label for="sender-name">Your name</label>
-        <input type="text" id="sender-name" name="sender-name" required />
-      </div>
-      <div>
-        <label for="sender-email">Your email</label>
-        <input type="email" id="sender-email" name="sender-email" required />
-      </div>
-      <div>
-        <label for="message">Message</label>
-        <textarea id="message" name="message" required></textarea>
-      </div>
-      <button type="submit">Send message</button>
-    </form>
-  </div>
-
   <div class="contact-icon-row">
     <div class="contact-icon-card">
       <img src="Images/Web%20Icons/Kev%20Icon.png" alt="Kev icon" />
       <div>
-        <h3>Film suggestions</h3>
+        <h3>Kev</h3>
+        <p>Film suggestion wrangler</p>
         <p><a href="mailto:kev@nocontextcinemaclub.com">kev@nocontextcinemaclub.com</a></p>
       </div>
     </div>
     <div class="contact-icon-card">
       <img src="Images/Web%20Icons/Rob%20Icon.png" alt="Rob icon" />
       <div>
-        <h3>Quiz suggestions</h3>
+        <h3>Rob</h3>
+        <p>Quiz master &amp; trivia vault</p>
         <p><a href="mailto:rob@nocontextcinemaclub.com">rob@nocontextcinemaclub.com</a></p>
       </div>
     </div>
     <div class="contact-icon-card">
       <img src="Images/Web%20Icons/Name%20Icon.png" alt="Show icon" />
       <div>
-        <h3>Feedback, stories, questions</h3>
+        <h3>Show</h3>
+        <p>Feedback hotline &amp; story keeper</p>
         <p><a href="mailto:show@nocontextcinemaclub.com">show@nocontextcinemaclub.com</a></p>
       </div>
     </div>
   </div>
 </div>
-
-<script>
-  const contactForm = document.getElementById('contact-form');
-  contactForm.addEventListener('submit', (event) => {
-    event.preventDefault();
-    const recipient = contactForm.elements['recipient'].value;
-    const name = contactForm.elements['sender-name'].value.trim();
-    const email = contactForm.elements['sender-email'].value.trim();
-    const message = contactForm.elements['message'].value.trim();
-
-    if (!recipient) {
-      return;
-    }
-
-    const subject = `Contact from ${name}`;
-    const body = `Name: ${name}\nEmail: ${email}\n\n${message}`;
-    const mailtoLink = `mailto:${recipient}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
-
-    window.location.href = mailtoLink;
-  });
-</script>
 
 <footer>
   <div class="quick-links">
