@@ -15,19 +15,32 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
 <style>
+:root {
+  --bg: #0f0f0f;
+  --card: #1b1b1b;
+  --text: #ffffff;
+  --line: rgba(255, 255, 255, 0.1);
+  --accent-rob: #d1632e;
+}
+
 * { box-sizing: border-box; }
 
 html { overflow-x: visible; }
 
 body {
   font-family: Arial, Helvetica, sans-serif;
-  background: #0f0f0f;
-  color: #ffffff;
+  background: var(--bg);
+  color: var(--text);
   margin: 0;
   padding: 0;
   overflow-x: clip;
   overflow-y: scroll;
   scrollbar-gutter: stable;
+}
+
+img, svg {
+  max-width: 100%;
+  height: auto;
 }
 
 nav {
@@ -91,23 +104,102 @@ nav a.active {
   line-height: 1.6;
 }
 
-.listen-links {
+.listen {
+  margin-top: 12px;
+}
+
+.listen-intro {
+  margin: 12px 0 16px;
+}
+
+.listen-grid {
   display: grid;
+  grid-template-columns: 1fr;
   gap: 12px;
-  margin-top: 16px;
 }
 
-.listen-links a {
-  background: #2c2c2c;
-  color: #fff;
+.listen-btn {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--card, #1b1b1b);
+  color: var(--text, #fff);
   text-decoration: none;
-  padding: 12px 16px;
-  border-radius: 8px;
-  font-weight: bold;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 64px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.listen-links a.primary {
-  background: #d1632e;
+.listen-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
+}
+
+.listen-btn:focus-visible {
+  outline: 3px solid rgba(245, 154, 79, 0.6);
+  outline-offset: 2px;
+}
+
+.listen-logo,
+.listen-icon {
+  height: 26px;
+  width: 26px;
+  flex: 0 0 auto;
+}
+
+.listen-icon {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.listen-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
+}
+
+.listen-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.listen-subtitle {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 4px;
+}
+
+.listen-btn--cta {
+  background: var(--accent-rob, #f59a4f);
+  color: #111;
+  border: none;
+}
+
+.listen-btn--cta:hover {
+  filter: brightness(1.03);
+}
+
+.listen-btn--cta .listen-subtitle {
+  opacity: 0.8;
+}
+
+@media (min-width: 768px) {
+  .listen-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .listen-btn--cta {
+    grid-column: 1 / -1;
+  }
 }
 
 footer {
@@ -181,17 +273,43 @@ footer img {
     charset="utf-8"
     src="https://www.buzzsprout.com/2591128.js?artist=Kev+%26+Rob&container_id=buzzsprout-large-player-artist-kev-rob&player=large"
   ></script>
-  <p>
-    Stream the newest episode or jump into the backlog. Replace the links below with your
-    actual podcast destinations (Spotify, Apple Podcasts, YouTube, etc.).
-  </p>
+  <section class="listen">
+    <p class="listen-intro">Stream the newest episode or jump into the backlog.</p>
 
-  <div class="listen-links">
-    <a class="primary" href="#" target="_blank" rel="noreferrer">Latest Episode</a>
-    <a href="#" target="_blank" rel="noreferrer">Spotify</a>
-    <a href="#" target="_blank" rel="noreferrer">Apple Podcasts</a>
-    <a href="#" target="_blank" rel="noreferrer">YouTube</a>
-  </div>
+    <div class="listen-grid">
+      <a class="listen-btn listen-btn--cta" href="REPLACE_WITH_LATEST_EPISODE_LINK" target="_blank" rel="noreferrer">
+        <span class="listen-icon" aria-hidden="true">▶</span>
+        <span class="listen-text">
+          <span class="listen-title">Latest Episode</span>
+          <span class="listen-subtitle">Opens in your preferred app</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="REPLACE_WITH_SPOTIFY_LINK" target="_blank" rel="noreferrer">
+        <img class="listen-logo" src="assets/logos/spotify.svg" alt="Spotify logo">
+        <span class="listen-text">
+          <span class="listen-title">Spotify</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="REPLACE_WITH_APPLE_LINK" target="_blank" rel="noreferrer">
+        <img class="listen-logo" src="assets/logos/apple-podcasts.svg" alt="Apple Podcasts logo">
+        <span class="listen-text">
+          <span class="listen-title">Apple Podcasts</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="REPLACE_WITH_YOUTUBE_LINK" target="_blank" rel="noreferrer">
+        <img class="listen-logo" src="assets/logos/youtube.svg" alt="YouTube logo">
+        <span class="listen-text">
+          <span class="listen-title">YouTube</span>
+          <span class="listen-subtitle">Watch</span>
+        </span>
+      </a>
+    </div>
+  </section>
 </div>
 <footer>
   <div class="quick-links">
