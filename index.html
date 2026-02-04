@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
 <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BHEJTM2PGH"></script>
@@ -18,8 +18,32 @@
   
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Films</title>
+<meta name="description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://nocontextcinemaclub.com/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.85" />
+<meta name="website-version" content="1.9.0" />
+<meta property="og:title" content="No Context Cinema Club – Films" />
+<meta property="og:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
+<meta property="og:url" content="https://nocontextcinemaclub.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="No Context Cinema Club – Films" />
+<meta name="twitter:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
+<meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<script type="module">
+  import { buildPodcastSeriesSchema, injectJsonLd } from "./assets/seo/seo.js";
+
+  injectJsonLd(
+    "podcast-series-schema",
+    buildPodcastSeriesSchema({
+      pageTitle: "No Context Cinema Club – Films",
+      pageDescription: "Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites.",
+      pageUrl: "https://nocontextcinemaclub.com/"
+    })
+  );
+</script>
 
 <style>
 :root {
@@ -639,7 +663,10 @@ nav a.active { background: #d1632e; }
 </script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-<script>
+<script type="module">
+import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "./assets/seo/seo.js";
+
+const BASE_URL = "https://nocontextcinemaclub.com/";
 const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
 let currentFilter = "rob";
@@ -747,6 +774,16 @@ function updateStatus(visible, total) {
 function updateSentinelVisibility() {
   if (!sentinelEl) return;
   sentinelEl.hidden = visibleCount >= currentTotal;
+}
+
+function updatePodcastEpisodeSchema() {
+  const activeFilms = allFilms.filter(film => film.active);
+  const episodes = activeFilms
+    .map(film => buildPodcastEpisodeSchemaFromFilm(film, { baseUrl: BASE_URL }))
+    .filter(Boolean);
+  if (episodes.length) {
+    injectJsonLd("podcast-episode-schema", episodes);
+  }
 }
 
 function getFilteredFilms() {
@@ -948,6 +985,7 @@ async function loadFilms() {
     lastScoreFetchKey = "";     // force a fetch on first render
     resetPagination();
     await render();
+    updatePodcastEpisodeSchema();
 
   } catch (err) {
     console.error(err);

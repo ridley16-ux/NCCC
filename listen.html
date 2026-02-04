@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en-GB">
 <head>
   <!-- Google tag (gtag.js) -->
 <script async src="https://www.googletagmanager.com/gtag/js?id=G-BHEJTM2PGH"></script>
@@ -12,8 +12,32 @@
 </script>
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Listen Now</title>
+<meta name="description" content="Listen to No Context Cinema Club — stream the latest episode, follow on your favourite app, and catch upcoming drops." />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://nocontextcinemaclub.com/listen.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.85" />
+<meta name="website-version" content="1.9.0" />
+<meta property="og:title" content="No Context Cinema Club – Listen Now" />
+<meta property="og:description" content="Listen to No Context Cinema Club — stream the latest episode, follow on your favourite app, and catch upcoming drops." />
+<meta property="og:url" content="https://nocontextcinemaclub.com/listen.html" />
+<meta property="og:type" content="website" />
+<meta property="og:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="No Context Cinema Club – Listen Now" />
+<meta name="twitter:description" content="Listen to No Context Cinema Club — stream the latest episode, follow on your favourite app, and catch upcoming drops." />
+<meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<script type="module">
+  import { buildPodcastSeriesSchema, injectJsonLd } from "./assets/seo/seo.js";
+
+  injectJsonLd(
+    "podcast-series-schema",
+    buildPodcastSeriesSchema({
+      pageTitle: "No Context Cinema Club – Listen Now",
+      pageDescription: "Listen to No Context Cinema Club — stream the latest episode, follow on your favourite app, and catch upcoming drops.",
+      pageUrl: "https://nocontextcinemaclub.com/listen.html"
+    })
+  );
+</script>
 
 <style>
 :root {
@@ -385,7 +409,10 @@ nav a.active {
       console.error("Failed to load footer:", error);
     });
 </script>
-<script>
+<script type="module">
+import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "./assets/seo/seo.js";
+
+const BASE_URL = "https://nocontextcinemaclub.com/";
 const MANIFEST_URL = "./films/manifest.json";
 
 function parseLocalDate(dateString) {
@@ -451,6 +478,10 @@ async function loadUpcomingEpisodeBanner() {
       return;
     }
     banner.innerHTML = buildBanner(upcoming);
+    const episodeSchema = buildPodcastEpisodeSchemaFromFilm(upcoming, { baseUrl: BASE_URL });
+    if (episodeSchema) {
+      injectJsonLd("podcast-upcoming-episode-schema", episodeSchema);
+    }
   } catch (error) {
     console.error("Unable to load upcoming episode banner", error);
     banner.innerHTML = "";
