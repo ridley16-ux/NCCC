@@ -44,15 +44,15 @@ img, svg {
   height: auto;
 }
 
-.primary-nav {
+nav {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin: 0;
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
-.primary-nav a {
+nav a {
   background: #2c2c2c;
   color: #fff;
   text-decoration: none;
@@ -61,34 +61,22 @@ img, svg {
   font-weight: bold;
 }
 
-.primary-nav a.active {
+nav a.active {
   background: #d1632e;
 }
 
-.site-header {
-  width: 100%;
-}
-
-.header-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
-
 .site-title {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
+  text-align: ter;
+  margin: 0 0 12px;
+  color: #c06131;
+  font-family: Georgia, "Times New Roman", serif;
 }
 .site-title img {
   display: block;
-  height: 48px;
-  width: auto;
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
 }
 
 .sticky-menu {
@@ -96,15 +84,16 @@ img, svg {
   top: 0;
   z-index: 1000;
   background: #0f0f0f;
-  padding: 16px 16px 12px;
+  padding: 16px;
   margin: 0 0 24px;
 }
 
-.header-divider {
-  height: 1px;
+.sticky-menu::after {
+  content: "";
+  display: block;
+  height: 10px;
   margin-top: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  width: 100%;
+  background: linear-gradient(to bottom, #59615b 30%, #1a1a1a 30%);
 }
 
 .content {
@@ -309,11 +298,27 @@ img, svg {
 }
 
 
+@media (max-width: 520px) {
+  .site-title img {
+    max-width: 100%;
+    width: 100%;
+  }
+}
+
 </style>
 </head>
 
 <body>
-<div data-include="header"></div>
+<div class="sticky-menu">
+  <h1 class="site-title">
+    <img src="https://i.postimg.cc/BQqdVY8W/No-Con-Cin-Club-Web-Title-Large.png" alt="No Context Cinema Club" />
+  </h1>
+  <nav>
+    <a href="index.html">Films</a>
+    <a href="listen.html" class="active">Listen Now</a>
+    <a href="contact.html">Contact Us</a>
+  </nav>
+</div>
 
 <div id="upcoming-episode-banner" class="upcoming-banner-wrap" aria-live="polite"></div>
 
@@ -375,7 +380,6 @@ img, svg {
       console.error("Failed to load footer:", error);
     });
 </script>
-<script src="assets/js/include-partials.js" defer></script>
 <script>
 const MANIFEST_URL = "./films/manifest.json";
 
