@@ -22,7 +22,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.9.0" />
+<meta name="website-version" content="1.9.1" />
 <meta property="og:title" content="No Context Cinema Club – Films" />
 <meta property="og:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/" />
@@ -56,9 +56,14 @@
   --accent-rob: #d46a2a;
 }
 
+* {
+  font-family: inherit;
+}
+
 /* Prevent horizontal scroll (iOS/Safari friendly) */
 html {
   overflow-x: visible;
+  font-family: Arial, Helvetica, sans-serif;
 }
 
 /* Ensure padding/borders don't create overflow */
@@ -71,7 +76,7 @@ img, video, canvas, svg {
 }
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: inherit;
   background: var(--bg);
   color: var(--text);
   margin: 0;
@@ -86,6 +91,17 @@ body {
   body {
     overflow-x: clip;
   }
+}
+
+button,
+input,
+select,
+textarea,
+option,
+label {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: inherit;
 }
 
 nav {
@@ -113,7 +129,6 @@ nav a.active { background: #d1632e; }
   text-align: center;
   margin: 0 0 12px;
   color: #c06131;
-  font-family: Georgia, "Times New Roman", serif;
 }
 .site-title img {
   display: block;
