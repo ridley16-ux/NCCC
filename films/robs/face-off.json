@@ -3,10 +3,11 @@
   "rob": true,
   "title": "Face/Off",
   "starring": "John Candy",
-  "poster": "https://i.postimg.cc/8cb2mNjs/Face-OFF-Rob.png",
+  "poster": "assets/posters/robs/face-off-rob.webp",
   "coherence": 7,
   "entertainment": 5,
   "originality": 5,
+
 
   "podcastDate": "2026-01-28",
   "summary": "A disgraced NHL coach hiding in witness protection rebuilds his life by coaching desert-bound kids in Arizona, only to face off against his own past and choose ruthless career redemption over the people who saved him.",
