@@ -107,7 +107,9 @@ label {
 nav {
   display: flex;
   justify-content: center;
-  gap: 12px;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 0 20px;
   margin-bottom: 24px;
   flex-wrap: nowrap;
   overflow-x: auto;
@@ -118,11 +120,16 @@ nav a {
   background: #2c2c2c;
   color: #fff;
   text-decoration: none;
-  padding: 10px 16px;
+  padding: 12px 20px;
+  min-width: 120px;
   border-radius: 20px;
   font-weight: bold;
   transition: opacity 0.2s ease;
   white-space: nowrap;
+  text-align: center;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
 
 nav a:hover { opacity: 0.7; }
