@@ -862,9 +862,9 @@ async function render(options = {}) {
         <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
         ${film.rob ? `
           <div class="badge-flags" aria-label="Episode rosettes">
-            ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
-            ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
-            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Favourite</span>' : ''}
+            ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
+            ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick ⭐</span>' : ''}
+            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners' Pick ❤️</span>' : ''}
           </div>
         ` : ''}
       </div>
@@ -1162,6 +1162,7 @@ loadFilms();
 
 </body>
 </html>
+
 
 
 
