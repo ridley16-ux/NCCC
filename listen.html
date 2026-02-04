@@ -16,7 +16,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/listen.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.9.0" />
+<meta name="website-version" content="1.9.1" />
 <meta property="og:title" content="No Context Cinema Club – Listen Now" />
 <meta property="og:description" content="Listen to No Context Cinema Club — stream the latest episode, follow on your favourite app, and catch upcoming drops." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/listen.html" />
@@ -48,12 +48,19 @@
   --accent-rob: #d1632e;
 }
 
+* {
+  font-family: inherit;
+}
+
 * { box-sizing: border-box; }
 
-html { overflow-x: visible; }
+html {
+  overflow-x: visible;
+  font-family: Arial, Helvetica, sans-serif;
+}
 
 body {
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: inherit;
   background: var(--bg);
   color: var(--text);
   margin: 0;
@@ -61,6 +68,17 @@ body {
   overflow-x: clip;
   overflow-y: scroll;
   scrollbar-gutter: stable;
+}
+
+button,
+input,
+select,
+textarea,
+option,
+label {
+  font-family: inherit;
+  font-weight: inherit;
+  font-style: inherit;
 }
 
 img, svg {
@@ -98,7 +116,6 @@ nav a.active {
   text-align: ter;
   margin: 0 0 12px;
   color: #c06131;
-  font-family: Georgia, "Times New Roman", serif;
 }
 .site-title img {
   display: block;
