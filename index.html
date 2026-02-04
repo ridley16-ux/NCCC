@@ -928,54 +928,40 @@ function formatTranscriptTime(time) {
   return base;
 }
 
-function parseVtt(vttText) {
-  const cleaned = vttText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
+function parseTranscriptTxt(text) {
+  const cleaned = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   const lines = cleaned.split("\n");
   const cues = [];
+  const headerPattern = /^([^:]+):\s*(\d{1,2}:\d{2}(?::\d{2})?)/;
   let index = 0;
 
   while (index < lines.length) {
-    let line = lines[index].trim();
+    const line = lines[index].trim();
+    const match = line.match(headerPattern);
 
-    if (!line || line.startsWith("WEBVTT")) {
+    if (!match) {
       index += 1;
       continue;
     }
 
-    if (line.startsWith("NOTE") || line.startsWith("STYLE") || line.startsWith("REGION")) {
-      index += 1;
-      while (index < lines.length && lines[index].trim() !== "") {
-        index += 1;
-      }
-      continue;
-    }
-
-    if (!line.includes("-->") && index + 1 < lines.length && lines[index + 1].includes("-->")) {
-      index += 1;
-      line = lines[index].trim();
-    }
-
-    if (!line.includes("-->")) {
-      index += 1;
-      continue;
-    }
-
-    const [startTimeRaw] = line.split("-->");
-    const startTime = startTimeRaw.trim().split(" ")[0];
+    const speaker = match[1].trim();
+    const startTime = match[2].trim();
     index += 1;
 
     const textLines = [];
-    while (index < lines.length && lines[index].trim() !== "") {
-      textLines.push(lines[index]);
+    while (index < lines.length && !lines[index].trim().match(headerPattern)) {
+      const textLine = lines[index].trim();
+      if (textLine) textLines.push(textLine);
       index += 1;
     }
 
     const text = textLines.join("\n").trim();
-    if (text) {
-      cues.push({ startTime, text });
+    if (text || speaker) {
+      cues.push({
+        startTime,
+        text: speaker ? `${speaker}: ${text}`.trim() : text,
+      });
     }
-
-    index += 1;
   }
 
   return cues;
@@ -1011,7 +997,7 @@ function getFocusableElements() {
 
 let transcriptRequestId = 0;
 
-async function openTranscriptModal({ title, vttUrl, trigger }) {
+async function openTranscriptModal({ title, txtUrl, trigger }) {
   if (!transcriptModal || !transcriptDialog || !transcriptBody) return;
   transcriptTrigger = trigger;
   if (transcriptTitle) {
@@ -1029,11 +1015,11 @@ async function openTranscriptModal({ title, vttUrl, trigger }) {
   const requestId = (transcriptRequestId += 1);
 
   try {
-    const response = await fetch(vttUrl);
+    const response = await fetch(txtUrl);
     if (!response.ok) throw new Error(`Failed to load transcript (${response.status}).`);
     const text = await response.text();
     if (requestId !== transcriptRequestId) return;
-    const cues = parseVtt(text);
+    const cues = parseTranscriptTxt(text);
     if (!cues.length) {
       setTranscriptStatus("Transcript is not available yet.");
       return;
@@ -1209,8 +1195,8 @@ async function render(options = {}) {
   visibleFilms.forEach((film, index) => {
     const listenerScore = listenerScores[film.id] ?? 0;
     const storedVote = localVotes[film.id] ?? null;
-    const transcriptButton = film.transcriptVtt
-      ? `<button class="transcript-link" type="button" data-transcript-vtt="${film.transcriptVtt}" data-transcript-title="${film.title}">View transcript</button>`
+    const transcriptButton = film.transcriptTxt
+      ? `<button class="transcript-link" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
       : "";
     const card = document.createElement("div");
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
@@ -1421,11 +1407,11 @@ container.addEventListener("click", async (event) => {
 container.addEventListener("click", (event) => {
   const trigger = event.target.closest(".transcript-link");
   if (!trigger) return;
-  const vttUrl = trigger.dataset.transcriptVtt;
-  if (!vttUrl) return;
+  const txtUrl = trigger.dataset.transcriptTxt;
+  if (!txtUrl) return;
   openTranscriptModal({
     title: trigger.dataset.transcriptTitle,
-    vttUrl,
+    txtUrl,
     trigger
   });
 });
