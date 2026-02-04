@@ -16,7 +16,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/about.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.12.0" />
+<meta name="website-version" content="1.13.0" />
 <meta property="og:title" content="No Context Cinema Club – About Us" />
 <meta property="og:description" content="Meet the hosts behind No Context Cinema Club and the chaos of weekly film rewrites." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/about.html" />
@@ -142,24 +142,21 @@ nav a.active {
 
 .hero {
   margin-bottom: 28px;
+}
+
+.hero-card {
   display: flex;
-  flex-direction: column;
-  gap: 20px;
-}
-
-.hero-top {
-  display: grid;
-  grid-template-columns: minmax(120px, 1fr) minmax(200px, 260px) minmax(120px, 1fr);
-  gap: 16px;
-  align-items: center;
-}
-
-.hero-image-wrapper {
+  gap: 24px;
+  padding: 20px;
   background: #1a1a1a;
-  border-radius: 16px;
-  padding: 12px;
+  border-radius: 18px;
   border: 1px solid #333333;
   box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+}
+
+.hero-media {
+  flex: 0 0 260px;
+  max-width: 260px;
 }
 
 .hero-image {
@@ -167,22 +164,54 @@ nav a.active {
   height: auto;
   aspect-ratio: 1 / 1;
   object-fit: cover;
-  border-radius: 12px;
+  border-radius: 14px;
   display: block;
+  background: #0f0f0f;
+  border: 1px solid #2a2a2a;
+}
+
+.hero-content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.hero-stats {
+  display: inline-flex;
+  gap: 12px;
+  align-self: flex-end;
+  flex-wrap: wrap;
 }
 
 .hero-stat {
-  background: #2c2c2c;
+  background: #232323;
   border-radius: 12px;
-  padding: 16px;
+  padding: 12px 16px;
   border: 1px solid #3a3a3a;
-  box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
-  text-align: center;
+  text-align: left;
+  min-width: 120px;
+}
+
+.hero-stat-link {
+  text-decoration: none;
+  color: inherit;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.hero-stat-link:hover {
+  opacity: 0.85;
+  transform: translateY(-1px);
+}
+
+.hero-stat-link:focus-visible {
+  outline: 2px solid rgba(209, 99, 46, 0.6);
+  outline-offset: 3px;
 }
 
 .hero-label {
   display: block;
-  font-size: 13px;
+  font-size: 12px;
   text-transform: uppercase;
   letter-spacing: 0.08em;
   color: #cfcfcf;
@@ -190,7 +219,7 @@ nav a.active {
 
 .hero-value {
   display: block;
-  font-size: 28px;
+  font-size: 24px;
   font-weight: bold;
   color: #f4f4f4;
   margin-top: 6px;
@@ -204,6 +233,12 @@ nav a.active {
 .hero-copy p {
   margin: 0;
   color: #d9d9d9;
+}
+
+.hero-premise {
+  margin: 10px 0 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.6);
 }
 
 .section-title {
@@ -317,12 +352,18 @@ nav a.active {
     padding: 22px;
   }
 
-  .hero-top {
-    grid-template-columns: 1fr;
+  .hero-card {
+    flex-direction: column;
+    padding: 18px;
   }
 
-  .hero-stat {
-    text-align: left;
+  .hero-media {
+    width: 100%;
+    max-width: none;
+  }
+
+  .hero-stats {
+    align-self: flex-start;
   }
 }
 </style>
@@ -343,12 +384,8 @@ nav a.active {
 
 <main class="content">
   <section class="hero">
-    <div class="hero-top">
-      <div class="hero-stat">
-        <span class="hero-label">Since</span>
-        <span class="hero-value">2026</span>
-      </div>
-      <div class="hero-image-wrapper">
+    <div class="hero-card">
+      <div class="hero-media">
         <img
           class="hero-image"
           src="https://storage.buzzsprout.com/q8mrrpi20y1d4ni87d7r8ofmqz67"
@@ -356,17 +393,26 @@ nav a.active {
           loading="lazy"
         />
       </div>
-      <div class="hero-stat">
-        <span class="hero-label">Episodes</span>
-        <span class="hero-value" id="episodeCount">—</span>
+      <div class="hero-content">
+        <div class="hero-stats">
+          <div class="hero-stat">
+            <span class="hero-label">Since</span>
+            <span class="hero-value">2026</span>
+          </div>
+          <a class="hero-stat hero-stat-link" href="listen.html">
+            <span class="hero-label">Episodes</span>
+            <span class="hero-value" id="episodeCount">—</span>
+          </a>
+        </div>
+        <div class="hero-copy">
+          <h1>About No Context Cinema Club</h1>
+          <p>
+            We take a film title, ignore the actual plot, and build a brand-new story from scratch.
+            Every week Rob rewrites, Kev reacts, and the chaos writes itself.
+          </p>
+          <p class="hero-premise">Premise: We don’t look it up.</p>
+        </div>
       </div>
-    </div>
-    <div class="hero-copy">
-      <h1>About No Context Cinema Club</h1>
-      <p>
-        We take a film title, ignore the actual plot, and build a brand-new story from scratch.
-        Every week Rob rewrites, Kev reacts, and the chaos writes itself.
-      </p>
     </div>
   </section>
 
@@ -434,30 +480,10 @@ nav a.active {
       console.error("Failed to load footer:", error);
     });
 </script>
-<script>
+<script type="module">
+  import { getRobsFilmsCount } from "./assets/js/films-data.js";
+
   const EPISODE_COUNT_FALLBACK = "—";
-
-  const isLiveEpisode = (episode, today) => {
-    if (!episode || episode.linkType !== "podcast") {
-      return false;
-    }
-
-    if (!episode.link || episode.link === "#") {
-      return false;
-    }
-
-    if (!episode.podcastDate) {
-      return false;
-    }
-
-    const dateParts = episode.podcastDate.split("-").map(Number);
-    if (dateParts.length !== 3 || dateParts.some(Number.isNaN)) {
-      return false;
-    }
-
-    const episodeDate = new Date(dateParts[0], dateParts[1] - 1, dateParts[2]);
-    return episodeDate <= today;
-  };
 
   const updateEpisodeCount = async () => {
     const countEl = document.getElementById("episodeCount");
@@ -465,34 +491,9 @@ nav a.active {
       return;
     }
 
-    const today = new Date();
-    const todayLocal = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-
     try {
-      const manifestResponse = await fetch("./films/manifest.json");
-      if (!manifestResponse.ok) {
-        throw new Error("Failed to load manifest");
-      }
-      const manifest = await manifestResponse.json();
-      const entries = (manifest.films || []).filter((entry) => entry.active);
-
-      let liveCount = 0;
-      for (const entry of entries) {
-        try {
-          const episodeResponse = await fetch(entry.path);
-          if (!episodeResponse.ok) {
-            continue;
-          }
-          const episode = await episodeResponse.json();
-          if (isLiveEpisode(episode, todayLocal)) {
-            liveCount += 1;
-          }
-        } catch (error) {
-          console.warn("Skipping episode entry due to fetch error", error);
-        }
-      }
-
-      countEl.textContent = String(liveCount);
+      const count = await getRobsFilmsCount();
+      countEl.textContent = String(count);
     } catch (error) {
       console.error("Failed to load episode count:", error);
       countEl.textContent = EPISODE_COUNT_FALLBACK;

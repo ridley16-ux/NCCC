@@ -1,0 +1,45 @@
+const DEFAULT_MANIFEST_URL = "./films/manifest.json";
+
+function parseLocalDate(dateString) {
+  if (!dateString) return null;
+  const [year, month, day] = dateString.split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const date = new Date(year, month - 1, day);
+  return Number.isNaN(date.getTime()) ? null : date;
+}
+
+export function isFilmLive(podcastDate) {
+  const date = parseLocalDate(podcastDate);
+  if (!date) return true;
+  const today = new Date();
+  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+  return date.getTime() <= todayStart.getTime();
+}
+
+export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL } = {}) {
+  const manifestRes = await fetch(manifestUrl);
+  if (!manifestRes.ok) {
+    throw new Error("Failed to load films manifest");
+  }
+  const manifest = await manifestRes.json();
+  const entries = Array.isArray(manifest.films) ? manifest.films : [];
+
+  const films = [];
+  for (const entry of entries) {
+    if (!entry?.path) continue;
+    const res = await fetch(entry.path);
+    if (!res.ok) {
+      continue;
+    }
+    const film = await res.json();
+    film.active = Boolean(entry.active) && isFilmLive(film.podcastDate);
+    films.push(film);
+  }
+
+  return films;
+}
+
+export async function getRobsFilmsCount(options) {
+  const films = await loadFilmsData(options);
+  return films.filter((film) => film.active && film.rob).length;
+}
