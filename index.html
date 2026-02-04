@@ -897,13 +897,35 @@ function formatTranscriptText(text) {
   const lines = text.split("\n");
   return lines
     .map((line) => {
-      const match = line.trim().match(/^([A-Z][A-Z0-9 ]+):\s*(.*)$/);
+      const trimmed = line.trim();
+      const voiceMatch = trimmed.match(/^<v\s+([^>]+)>\s*(.*)$/i);
+      if (voiceMatch) {
+        const speaker = escapeHtml(voiceMatch[1].trim());
+        const remainder = escapeHtml(voiceMatch[2].trim());
+        return remainder
+          ? `<strong>${speaker}:</strong> ${remainder}`
+          : `<strong>${speaker}:</strong>`;
+      }
+      const match = trimmed.match(/^([A-Z][A-Z0-9 ]+):\s*(.*)$/);
       if (!match) return escapeHtml(line);
       const speaker = escapeHtml(match[1]);
       const remainder = escapeHtml(match[2]);
       return `<strong>${speaker}:</strong> ${remainder}`;
     })
     .join("<br>");
+}
+
+function formatTranscriptTime(time) {
+  if (!time) return "";
+  const base = time.split(".")[0];
+  const parts = base.split(":");
+  if (parts.length === 2) {
+    return `00:${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
+  }
+  if (parts.length === 3) {
+    return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}:${parts[2].padStart(2, "0")}`;
+  }
+  return base;
 }
 
 function parseVtt(vttText) {
@@ -971,7 +993,7 @@ function renderTranscript(cues) {
     const cueEl = document.createElement("div");
     cueEl.className = "transcript-cue";
     cueEl.innerHTML = `
-      <div class="transcript-time">${escapeHtml(cue.startTime)}</div>
+      <div class="transcript-time">${escapeHtml(formatTranscriptTime(cue.startTime))}</div>
       <div class="transcript-text">${formatTranscriptText(cue.text)}</div>
     `;
     transcriptBody.appendChild(cueEl);
@@ -993,7 +1015,7 @@ async function openTranscriptModal({ title, vttUrl, trigger }) {
   if (!transcriptModal || !transcriptDialog || !transcriptBody) return;
   transcriptTrigger = trigger;
   if (transcriptTitle) {
-    transcriptTitle.textContent = title ? `Transcript — ${title}` : "Transcript";
+    transcriptTitle.textContent = title ? `Transcript: ${title}` : "Transcript";
   }
   transcriptModal.classList.add("open");
   transcriptModal.setAttribute("aria-hidden", "false");
