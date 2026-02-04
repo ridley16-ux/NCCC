@@ -64,15 +64,15 @@ body {
   }
 }
 
-.primary-nav {
+nav {
   display: flex;
   justify-content: center;
   gap: 12px;
-  margin: 0;
+  margin-bottom: 24px;
   flex-wrap: wrap;
 }
 
-.primary-nav a {
+nav a {
   background: #2c2c2c;
   color: #fff;
   text-decoration: none;
@@ -81,32 +81,20 @@ body {
   font-weight: bold;
 }
 
-.primary-nav a.active { background: #d1632e; }
-
-.site-header {
-  width: 100%;
-}
-
-.header-inner {
-  max-width: 1100px;
-  margin: 0 auto;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 24px;
-  flex-wrap: wrap;
-}
+nav a.active { background: #d1632e; }
 
 .site-title {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  margin: 0;
+  text-align: center;
+  margin: 0 0 12px;
+  color: #c06131;
+  font-family: Georgia, "Times New Roman", serif;
 }
 .site-title img {
   display: block;
-  height: 48px;
-  width: auto;
+  max-width: 320px;
+  width: 100%;
+  height: auto;
+  margin: 0 auto;
 }
 
 /* ✅ Sticky header (everything above the grey line stays) */
@@ -120,26 +108,17 @@ body {
   z-index: 1000;
   background: #0f0f0f;
   padding: 16px 16px 12px;
-  margin: 0;
+  margin: 0 0 24px;
 
   /* ✅ helps separate header from scrolling content */
   box-shadow: 0 10px 24px rgba(0,0,0,0.55);
 }
 
-.header-divider {
-  height: 1px;
+/* ✅ grey line lives INSIDE the sticky header and stays pinned */
+.sticky-divider {
+  height: 10px;
   margin-top: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  width: 100%;
-}
-
-.controls-bar {
-  position: sticky;
-  top: var(--site-header-height, 0px);
-  z-index: 900;
-  background: #0f0f0f;
-  padding: 0 16px 12px;
-  margin: 0 0 24px;
+  background: linear-gradient(to bottom, #59615b 30%, #1a1a1a 30%);
 }
 
 /* Filters + Sort */
@@ -597,14 +576,26 @@ body {
 
 @media (max-width: 520px) {
   .bar-row { grid-template-columns: 110px 1fr 40px; }
+  .site-title img {
+    max-width: 100%;
+    width: 100%;
+  }
 }
 </style>
 </head>
 
 <body>
-<div data-include="header"></div>
 
-<div class="controls-bar">
+<div class="sticky-menu">
+  <h1 class="site-title">
+    <img src="https://i.postimg.cc/BQqdVY8W/No-Con-Cin-Club-Web-Title-Large.png" alt="No Context Cinema Club" />
+  </h1>
+  <nav>
+    <a href="index.html" class="active">Films</a>
+    <a href="listen.html">Listen Now</a>
+    <a href="contact.html">Contact Us</a>
+  </nav>
+
   <div class="controls">
     <div class="filter">
       <button id="all">All</button>
@@ -620,6 +611,9 @@ body {
       </select>
     </div>
   </div>
+
+  <!-- ✅ the grey line that stays with the header -->
+  <div class="sticky-divider"></div>
 </div>
 
 <div id="films" class="films-list"></div>
@@ -639,8 +633,6 @@ body {
       console.error("Failed to load footer:", error);
     });
 </script>
-
-<script src="assets/js/include-partials.js" defer></script>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
