@@ -196,58 +196,6 @@ nav a.active {
   gap: var(--space-3);
 }
 
-.hero-stats {
-  display: flex;
-  gap: var(--space-2);
-  align-self: center;
-  flex-wrap: wrap;
-  justify-content: center;
-  width: 100%;
-  max-width: 320px;
-}
-
-.hero-stat {
-  background: #232323;
-  border-radius: var(--radius-1);
-  padding: var(--space-2) var(--space-3);
-  border: 1px solid #3a3a3a;
-  text-align: center;
-  min-width: 140px;
-  flex: 1;
-}
-
-.hero-stat-link {
-  text-decoration: none;
-  color: inherit;
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-
-.hero-stat-link:hover {
-  opacity: 0.85;
-  transform: translateY(-1px);
-}
-
-.hero-stat-link:focus-visible {
-  outline: 2px solid rgba(209, 99, 46, 0.6);
-  outline-offset: 3px;
-}
-
-.hero-label {
-  display: block;
-  font-size: 12px;
-  text-transform: uppercase;
-  letter-spacing: 0.08em;
-  color: #cfcfcf;
-}
-
-.hero-value {
-  display: block;
-  font-size: 24px;
-  font-weight: bold;
-  color: #f4f4f4;
-  margin-top: var(--space-1);
-}
-
 .hero-title {
   margin: 0;
   font-size: 30px;
@@ -265,32 +213,6 @@ nav a.active {
 .hero-copy p {
   margin: 0;
   color: #d9d9d9;
-}
-
-.hero-premise {
-  width: 100%;
-  max-width: 360px;
-  background: rgba(255, 255, 255, 0.04);
-  border-radius: var(--radius-1);
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: var(--space-2) var(--space-3);
-  display: flex;
-  flex-direction: column;
-  gap: var(--space-1);
-}
-
-.hero-premise-title {
-  margin: 0;
-  font-size: 12px;
-  letter-spacing: 0.08em;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.hero-premise-body {
-  margin: 0;
-  font-size: 14px;
-  color: rgba(255, 255, 255, 0.8);
 }
 
 .section-title {
@@ -414,9 +336,6 @@ nav a.active {
     max-width: none;
   }
 
-  .hero-stats {
-    align-self: center;
-  }
 }
 
 @media (max-width: 520px) {
@@ -457,25 +376,14 @@ nav a.active {
       </div>
       <div class="hero-content">
         <h1 class="hero-title">About No Context Cinema Club</h1>
-        <div class="hero-stats">
-          <div class="hero-stat">
-            <span class="hero-label">Since</span>
-            <span class="hero-value">2026</span>
-          </div>
-          <a class="hero-stat hero-stat-link" href="listen.html">
-            <span class="hero-label">Episodes</span>
-            <span class="hero-value" id="episodeCount">—</span>
-          </a>
-        </div>
         <div class="hero-copy">
           <p>
-            We take a film title, ignore the actual plot, and build a brand-new story from scratch.
-            Every week Rob rewrites, Kev reacts, and the chaos writes itself.
+            No Context Cinema Club, a show where an almost unbelievably unqualified person (Rob) rewrites
+            film history by creating plots based only on titles and some (usually) unhelpful clues that
+            Kev provides him about the real films. Each week we'll explore Rob's complete ignorance of
+            film history, testing the limits of what is possible to have missed from pop culture during
+            his 30-something years on this planet, and hopefully having some fun along the way.
           </p>
-        </div>
-        <div class="hero-premise">
-          <p class="hero-premise-title">Premise</p>
-          <p class="hero-premise-body">We don’t look it up.</p>
         </div>
       </div>
     </div>
@@ -544,28 +452,6 @@ nav a.active {
     .catch((error) => {
       console.error("Failed to load footer:", error);
     });
-</script>
-<script type="module">
-  import { getRobsFilmsCount } from "./assets/js/films-data.js";
-
-  const EPISODE_COUNT_FALLBACK = "—";
-
-  const updateEpisodeCount = async () => {
-    const countEl = document.getElementById("episodeCount");
-    if (!countEl) {
-      return;
-    }
-
-    try {
-      const count = await getRobsFilmsCount();
-      countEl.textContent = String(count);
-    } catch (error) {
-      console.error("Failed to load episode count:", error);
-      countEl.textContent = EPISODE_COUNT_FALLBACK;
-    }
-  };
-
-  updateEpisodeCount();
 </script>
 </body>
 </html>
