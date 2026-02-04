@@ -91,33 +91,6 @@
     color: rgba(255, 255, 255, 0.7);
   }
 
-  .hover-sheen {
-    position: relative;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    gap: 6px;
-  }
-
-  .hover-sheen::after {
-    content: "";
-    position: absolute;
-    left: 50%;
-    bottom: -4px;
-    height: 2px;
-    width: 0;
-    background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.9), transparent);
-    opacity: 0;
-    transition: width 0.25s ease, left 0.25s ease, opacity 0.25s ease;
-  }
-
-  .hover-sheen:hover::after,
-  .hover-sheen:focus-visible::after {
-    width: 100%;
-    left: 0;
-    opacity: 1;
-  }
-
   .footer-nav a:focus-visible {
     outline: 2px solid rgba(255, 255, 255, 0.6);
     outline-offset: 3px;
@@ -135,14 +108,14 @@
       </a>
     </div>
     <p class="footer-text">© No Context Cinema Club 2026</p>
-    <p class="footer-version" id="footer-version">Website version 1.87</p>
+    <p class="footer-version" id="footer-version">Website version 1.86</p>
     <p class="footer-fun">Many films were harmed in the making of these opinions.</p>
     <nav class="footer-nav" aria-label="Footer">
-      <a class="hover-sheen" href="index.html">Films</a>
+      <a href="index.html">Films</a>
       <span aria-hidden="true">|</span>
-      <a class="hover-sheen" href="listen.html">Listen</a>
+      <a href="listen.html">Listen</a>
       <span aria-hidden="true">|</span>
-      <a class="hover-sheen" href="contact.html">Contact</a>
+      <a href="contact.html">Contact</a>
     </nav>
   </div>
 </footer>
