@@ -30,7 +30,7 @@
 <meta property="og:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
 <meta name="twitter:card" content="summary_large_image" />
 <meta name="twitter:title" content="No Context Cinema Club – Films" />
-<meta name="twitter:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
+<meta name="twitter:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted s." />
 <meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
 <script type="module">
   import { buildPodcastSeriesSchema, injectJsonLd } from "./assets/seo/seo.js";
@@ -863,8 +863,8 @@ async function render(options = {}) {
         ${film.rob ? `
           <div class="badge-flags" aria-label="Episode rosettes">
             ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
-            ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick ⭐</span>' : ''}
-            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners' Pick ❤️</span>' : ''}
+            ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
+            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
           </div>
         ` : ''}
       </div>
@@ -1162,6 +1162,7 @@ loadFilms();
 
 </body>
 </html>
+
 
 
 
