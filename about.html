@@ -92,7 +92,9 @@ nav {
   justify-content: center;
   gap: 12px;
   margin-bottom: 24px;
-  flex-wrap: wrap;
+  flex-wrap: nowrap;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
 }
 
 nav a {
@@ -103,6 +105,7 @@ nav a {
   border-radius: 20px;
   font-weight: bold;
   transition: opacity 0.2s ease;
+  white-space: nowrap;
 }
 
 nav a:hover {
@@ -415,6 +418,16 @@ nav a.active {
     align-self: center;
   }
 }
+
+@media (max-width: 520px) {
+  nav {
+    gap: 8px;
+  }
+  nav a {
+    padding: 8px 10px;
+    font-size: 12px;
+  }
+}
 </style>
 </head>
 
@@ -426,8 +439,8 @@ nav a.active {
   <nav>
     <a href="about.html" class="active">About Us</a>
     <a href="index.html">Films</a>
-    <a href="listen.html">Listen Now</a>
-    <a href="contact.html">Contact Us</a>
+    <a href="listen.html">Listen</a>
+    <a href="contact.html">Contact</a>
   </nav>
 </div>
 
