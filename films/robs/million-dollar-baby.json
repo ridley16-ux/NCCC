@@ -3,7 +3,7 @@
   "rob": true,
   "title": "Million Dollar Baby",
   "starring": "Andy Allo, John Krasinski",
-  "poster": "https://i.postimg.cc/ZnFSs6Dk/MDB-Rob.png",
+  "poster": "assets/posters/robs/mdb-rob.webp",
   "coherence": 6,
   "entertainment": 6,
   "originality": 6,
@@ -13,6 +13,7 @@
   "link": "#",
   "linkType": "podcast"
 }
+
 
 
 
