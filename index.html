@@ -22,7 +22,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.11.0" />
+<meta name="website-version" content="1.13.0" />
 <meta property="og:title" content="No Context Cinema Club – Films" />
 <meta property="og:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/" />
@@ -831,9 +831,9 @@ body.modal-open {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
 import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "./assets/seo/seo.js";
+import { loadFilmsData } from "./assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
-const MANIFEST_URL = "./films/manifest.json";
 let allFilms = [];
 let currentFilter = "rob";
 let currentSort = "score";
@@ -877,14 +877,6 @@ function safeDate(d) {
 function formatUkDate(d) {
   const dt = parseLocalDate(d);
   return dt ? dt.toLocaleDateString("en-GB").replaceAll("/", "-") : d;
-}
-
-function isFilmLive(podcastDate) {
-  const dt = parseLocalDate(podcastDate);
-  if (!dt) return true;
-  const today = new Date();
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  return dt.getTime() <= todayStart.getTime();
 }
 
 function calcRobScore(film) {
@@ -1327,18 +1319,10 @@ async function render(options = {}) {
 
 async function loadFilms() {
   try {
-    const manifestRes = await fetch(MANIFEST_URL);
-    const manifest = await manifestRes.json();
-
-    const films = [];
-
-    for (const entry of manifest.films) {
-      const res = await fetch(entry.path);
-      const film = await res.json();
-      film.active = isFilmLive(film.podcastDate);
+    const films = await loadFilmsData();
+    films.forEach((film) => {
       if (film.rob) calcRobScore(film);
-      films.push(film);
-    }
+    });
 
     allFilms = films;
     lastScoreFetchKey = "";     // force a fetch on first render
