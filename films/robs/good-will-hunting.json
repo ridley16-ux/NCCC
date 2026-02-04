@@ -3,7 +3,7 @@
   "rob": true,
   "title": "Good Will Hunting",
   "starring": "Joe Keery (Steve Harrington)",
-  "poster": "https://i.postimg.cc/fbhvDXHQ/GWH-Rob.png",
+  "poster": "assets/posters/robs/gwh-rob.webp",
   "coherence": 5,
   "entertainment": 7,
   "originality": 5,
@@ -13,3 +13,4 @@
   "link": "#",
   "linkType": "podcast"
 }
+
