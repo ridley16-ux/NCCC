@@ -3,7 +3,7 @@
   "rob": true,
   "title": "Reservoir Dogs",
   "starring": "Erik Per Sullivan",
-  "poster": "https://i.postimg.cc/x8YrmcTQ/Resevoir-Dogs-Rob.png",
+  "poster": "assets/posters/robs/resevoir-dogs-rob.webp",
   "coherence": 3,
   "entertainment": 6,
   "originality": 6,
@@ -13,4 +13,5 @@
   "link": "#",
   "linkType": "podcast"
 }
+
 
