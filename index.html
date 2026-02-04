@@ -345,34 +345,19 @@ nav a.active { background: #d1632e; }
 }
 
 .badge-flag {
-  font-size: 10px;
+  font-size: 11px;
   font-weight: 900;
-  padding: 5px 9px;
+  padding: 6px 10px;
   border-radius: 999px;
   text-transform: uppercase;
   letter-spacing: 0.06em;
+  border: 1px solid rgba(255,255,255,0.18);
   color: #fff;
   white-space: nowrap;
-  border: none;
 }
 
-.badge-flag.new {
-  background: linear-gradient(135deg, #2dd4bf, #22d3ee);
-  color: #002b2a;
-}
-
-.badge-flag.best {
-  background: linear-gradient(135deg, #f5c56b, #d4a017);
-  color: #2a1c00;
-  font-size: 11px;
-  box-shadow: 0 6px 18px rgba(245, 197, 107, 0.35);
-}
-
-.badge-flag.listener {
-  background: linear-gradient(135deg, #8b5cf6, #ec4899);
-  color: #fff;
-  font-size: 11px;
-}
+.badge-flag.new { background: #2e6bd1; }
+.badge-flag.best { background: #b58b00; }
 
 .divider {
   height: 1px;
@@ -529,6 +514,8 @@ nav a.active { background: #d1632e; }
   background: rgba(245, 197, 107, 0.25);
   border-color: rgba(245, 197, 107, 0.6);
 }
+
+.badge-flag.listener { background: #5b88ff; }
 
 .bars { display: grid; gap: 10px; }
 
@@ -875,9 +862,9 @@ async function render(options = {}) {
         <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
         ${film.rob ? `
           <div class="badge-flags" aria-label="Episode rosettes">
-            ${film === newest ? '<span class="badge-flag new">🆕 NEW</span>' : ''}
-            ${film === best ? '<span class="badge-flag best">⭐ KEV&#39;S PICK</span>' : ''}
-            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">❤️ LISTENERS&#39; PICK</span>' : ''}
+            ${film === newest ? '<span class="badge-flag new">NEW</span>' : ''}
+            ${film === best ? '<span class="badge-flag best">Kev&#39;s Favourite</span>' : ''}
+            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Favourite</span>' : ''}
           </div>
         ` : ''}
       </div>
