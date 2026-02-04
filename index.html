@@ -565,26 +565,37 @@ nav a.active { background: #d1632e; }
   color: rgba(255, 255, 255, 0.8);
 }
 
-.transcript-cue {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 12px;
-  padding: 12px 0;
+.transcript-turn {
+  padding: 16px 0;
   border-bottom: 1px solid rgba(255, 255, 255, 0.08);
 }
 
-.transcript-cue:last-child {
+.transcript-turn:last-child {
   border-bottom: none;
 }
 
-.transcript-time {
+.transcript-turn-header {
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.transcript-speaker {
+  font-size: 15px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.95);
+}
+
+.transcript-turn-time {
   font-size: 12px;
   color: rgba(255, 255, 255, 0.55);
   letter-spacing: 0.04em;
   text-transform: uppercase;
 }
 
-.transcript-text {
+.transcript-turn-text {
+  margin: 6px 0 0;
   font-size: 15px;
   line-height: 1.6;
   color: rgba(255, 255, 255, 0.92);
@@ -893,28 +904,6 @@ function escapeHtml(value) {
     .replaceAll("'", "&#39;");
 }
 
-function formatTranscriptText(text) {
-  const lines = text.split("\n");
-  return lines
-    .map((line) => {
-      const trimmed = line.trim();
-      const voiceMatch = trimmed.match(/^<v\s+([^>]+)>\s*(.*)$/i);
-      if (voiceMatch) {
-        const speaker = escapeHtml(voiceMatch[1].trim());
-        const remainder = escapeHtml(voiceMatch[2].trim());
-        return remainder
-          ? `<strong>${speaker}:</strong> ${remainder}`
-          : `<strong>${speaker}:</strong>`;
-      }
-      const match = trimmed.match(/^([A-Z][A-Z0-9 ]+):\s*(.*)$/);
-      if (!match) return escapeHtml(line);
-      const speaker = escapeHtml(match[1]);
-      const remainder = escapeHtml(match[2]);
-      return `<strong>${speaker}:</strong> ${remainder}`;
-    })
-    .join("<br>");
-}
-
 function formatTranscriptTime(time) {
   if (!time) return "";
   const base = time.split(".")[0];
@@ -928,11 +917,13 @@ function formatTranscriptTime(time) {
   return base;
 }
 
-function parseVtt(vttText) {
+function parseVttToTurns(vttText) {
   const cleaned = vttText.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
   const lines = cleaned.split("\n");
   const cues = [];
   let index = 0;
+  let previousSpeaker = null;
+  const speakerPattern = /^([A-Za-z][A-Za-z0-9 _-]{0,30}):\s*(.*)$/;
 
   while (index < lines.length) {
     let line = lines[index].trim();
@@ -970,15 +961,32 @@ function parseVtt(vttText) {
       index += 1;
     }
 
-    const text = textLines.join("\n").trim();
-    if (text) {
-      cues.push({ startTime, text });
+    const combinedText = textLines.map((textLine) => textLine.trim()).filter(Boolean).join(" ").trim();
+    if (combinedText) {
+      const speakerMatch = combinedText.match(speakerPattern);
+      const speaker = speakerMatch ? speakerMatch[1].trim() : previousSpeaker;
+      const text = speakerMatch ? speakerMatch[2].trim() : combinedText;
+      const resolvedSpeaker = speaker || "Unknown";
+      if (speakerMatch) {
+        previousSpeaker = speaker;
+      }
+      cues.push({ startTime, speaker: resolvedSpeaker, text });
     }
 
     index += 1;
   }
 
-  return cues;
+  const turns = [];
+  cues.forEach((cue) => {
+    const lastTurn = turns[turns.length - 1];
+    if (lastTurn && lastTurn.speaker === cue.speaker) {
+      lastTurn.text = `${lastTurn.text} ${cue.text}`.trim();
+      return;
+    }
+    turns.push({ speaker: cue.speaker, startTime: cue.startTime, text: cue.text });
+  });
+
+  return turns;
 }
 
 function setTranscriptStatus(message) {
@@ -986,18 +994,41 @@ function setTranscriptStatus(message) {
   transcriptBody.innerHTML = `<p class="transcript-status">${message}</p>`;
 }
 
-function renderTranscript(cues) {
-  if (!transcriptBody) return;
-  transcriptBody.innerHTML = "";
-  cues.forEach((cue) => {
-    const cueEl = document.createElement("div");
-    cueEl.className = "transcript-cue";
-    cueEl.innerHTML = `
-      <div class="transcript-time">${escapeHtml(formatTranscriptTime(cue.startTime))}</div>
-      <div class="transcript-text">${formatTranscriptText(cue.text)}</div>
+function renderTurns(turns, containerEl) {
+  if (!containerEl) return;
+  containerEl.innerHTML = "";
+  turns.forEach((turn) => {
+    const turnEl = document.createElement("div");
+    turnEl.className = "transcript-turn";
+    const timeMarkup = turn.startTime
+      ? `<span class="transcript-turn-time">${escapeHtml(formatTranscriptTime(turn.startTime))}</span>`
+      : "";
+    turnEl.innerHTML = `
+      <div class="transcript-turn-header">
+        <span class="transcript-speaker">${escapeHtml(turn.speaker)}</span>
+        ${timeMarkup}
+      </div>
+      <p class="transcript-turn-text">${escapeHtml(turn.text)}</p>
     `;
-    transcriptBody.appendChild(cueEl);
+    containerEl.appendChild(turnEl);
   });
+}
+
+function runTranscriptDevTest() {
+  const devTestUrl = "/transcripts/face-off.vtt";
+  return fetch(devTestUrl)
+    .then((response) => response.text())
+    .then((text) => {
+      const turns = parseVttToTurns(text);
+      console.assert(turns.length > 0, "Transcript dev test: no turns parsed.");
+      const robTurn = turns.find((turn) => turn.speaker === "Rob");
+      console.assert(robTurn?.text?.length, "Transcript dev test: Rob turn missing.");
+      const uniqueSpeakers = new Set(turns.map((turn) => turn.speaker));
+      console.assert(uniqueSpeakers.size > 1, "Transcript dev test: expected multiple speakers.");
+    })
+    .catch((error) => {
+      console.warn("Transcript dev test failed.", error);
+    });
 }
 
 function getFocusableElements() {
@@ -1033,12 +1064,12 @@ async function openTranscriptModal({ title, vttUrl, trigger }) {
     if (!response.ok) throw new Error(`Failed to load transcript (${response.status}).`);
     const text = await response.text();
     if (requestId !== transcriptRequestId) return;
-    const cues = parseVtt(text);
-    if (!cues.length) {
+    const turns = parseVttToTurns(text);
+    if (!turns.length) {
       setTranscriptStatus("Transcript is not available yet.");
       return;
     }
-    renderTranscript(cues);
+    renderTurns(turns, transcriptBody);
   } catch (error) {
     console.error("Transcript fetch failed:", error);
     if (requestId !== transcriptRequestId) return;
@@ -1535,6 +1566,10 @@ function initInfiniteScroll() {
   } else {
     window.addEventListener("scroll", handleScrollFallback, { passive: true });
   }
+}
+
+if (window.location.search.includes("transcriptDevTest")) {
+  runTranscriptDevTest();
 }
 
 initInfiniteScroll();
