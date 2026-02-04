@@ -194,19 +194,11 @@ nav a.active {
   outline-offset: 2px;
 }
 
-.listen-logo,
-.listen-icon {
-  height: 26px;
-  width: 26px;
+.listen-logo {
+  height: 28px;
+  width: 28px;
   flex: 0 0 auto;
-}
-
-.listen-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 800;
-  font-size: 16px;
+  object-fit: contain;
 }
 
 .listen-text {
@@ -227,19 +219,6 @@ nav a.active {
   margin-top: 4px;
 }
 
-.listen-btn--cta {
-  background: var(--accent-rob, #f59a4f);
-  color: #111;
-  border: none;
-}
-
-.listen-btn--cta:hover {
-  filter: brightness(1.03);
-}
-
-.listen-btn--cta .listen-subtitle {
-  opacity: 0.8;
-}
 
 .upcoming-banner-wrap {
   margin: 0 auto 20px;
@@ -335,13 +314,9 @@ nav a.active {
   overflow: hidden;
 }
 
-@media (min-width: 768px) {
+@media (min-width: 600px) {
   .listen-grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .listen-btn--cta {
-    grid-column: 1 / -1;
   }
 }
 
@@ -379,19 +354,11 @@ nav a.active {
     src="https://www.buzzsprout.com/2591128.js?artist=Kev+%26+Rob&container_id=buzzsprout-large-player-artist-kev-rob&player=large"
   ></script>
   <section class="listen">
-    <p class="listen-intro">Stream the newest episode or jump into the backlog.</p>
+    <p class="listen-intro">Pick your preferred player to start listening.</p>
 
     <div class="listen-grid">
-      <a class="listen-btn listen-btn--cta" href="REPLACE_WITH_LATEST_EPISODE_LINK" target="_blank" rel="noreferrer">
-        <span class="listen-icon" aria-hidden="true">▶</span>
-        <span class="listen-text">
-          <span class="listen-title">Latest Episode</span>
-          <span class="listen-subtitle">Opens in your preferred app</span>
-        </span>
-      </a>
-
       <a class="listen-btn" href="REPLACE_WITH_SPOTIFY_LINK" target="_blank" rel="noreferrer">
-        <img class="listen-logo" src="assets/logos/spotify.svg" alt="Spotify logo">
+        <img class="listen-logo" src="https://static.getpodpage.com/public/images/players-light-v1/icons/spotify-icon@2x.png" alt="Spotify logo">
         <span class="listen-text">
           <span class="listen-title">Spotify</span>
           <span class="listen-subtitle">Listen</span>
@@ -399,18 +366,26 @@ nav a.active {
       </a>
 
       <a class="listen-btn" href="REPLACE_WITH_APPLE_LINK" target="_blank" rel="noreferrer">
-        <img class="listen-logo" src="assets/logos/apple-podcasts.svg" alt="Apple Podcasts logo">
+        <img class="listen-logo" src="https://static.getpodpage.com/public/images/players-light-v1/icons/applepodcasts-icon@2x.png" alt="Apple Podcasts logo">
         <span class="listen-text">
           <span class="listen-title">Apple Podcasts</span>
           <span class="listen-subtitle">Listen</span>
         </span>
       </a>
 
-      <a class="listen-btn" href="REPLACE_WITH_YOUTUBE_LINK" target="_blank" rel="noreferrer">
-        <img class="listen-logo" src="assets/logos/youtube.svg" alt="YouTube logo">
+      <a class="listen-btn" href="REPLACE_WITH_IHEART_LINK" target="_blank" rel="noreferrer">
+        <img class="listen-logo" src="https://static.getpodpage.com/public/images/players-light-v1/icons/iheartradio-icon@2x.png" alt="iHeartRadio logo">
         <span class="listen-text">
-          <span class="listen-title">YouTube</span>
-          <span class="listen-subtitle">Watch</span>
+          <span class="listen-title">iHeartRADIO</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="REPLACE_WITH_OTHER_LINK" target="_blank" rel="noreferrer">
+        <img class="listen-logo" src="https://cdn.masto.host/podcastindexsocial/accounts/avatars/109/542/523/131/331/778/original/37573edc51224463.png" alt="Other podcast platforms">
+        <span class="listen-text">
+          <span class="listen-title">Other</span>
+          <span class="listen-subtitle">Listen</span>
         </span>
       </a>
     </div>
