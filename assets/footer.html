@@ -40,21 +40,15 @@
     transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .footer-logo-link:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.5);
-    outline-offset: 3px;
+  .footer-logo-link:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
   }
 
   .footer-logo {
     height: 48px;
     width: auto;
     display: block;
-    transition: opacity 0.2s ease;
-  }
-
-  .footer-logo-link:hover {
-    opacity: 0.9;
-    transform: translateY(-1px);
   }
 
   .footer-text,
@@ -73,22 +67,34 @@
     color: rgba(255, 255, 255, 0.75);
   }
 
+  /* 🔥 FOOTER NAV – HARD RESET (NO PILLS) */
   .footer-nav {
     display: flex;
     justify-content: center;
+    align-items: center;
+    gap: 6px;
     flex-wrap: wrap;
-    gap: 8px;
     font-size: 15px;
   }
 
   .footer-nav a {
-    color: #fff;
+    background: none !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
+    font-weight: normal !important;
+    color: #ffffff;
     text-decoration: none;
-    transition: color 0.2s ease;
+    transition: opacity 0.2s ease;
   }
 
   .footer-nav a:hover {
-    color: rgba(255, 255, 255, 0.7);
+    opacity: 0.7;
+    text-decoration: underline;
+  }
+
+  .footer-nav span {
+    opacity: 0.5;
+    margin: 0 6px;
   }
 
   .footer-nav a:focus-visible {
@@ -96,8 +102,10 @@
     outline-offset: 3px;
   }
 </style>
+
 <footer class="site-footer">
   <div class="footer-container">
+
     <div class="footer-logo-strip" aria-label="No Context Cinema Club">
       <a class="footer-logo-link" href="index.html" aria-label="No Context Cinema Club home">
         <img
@@ -107,15 +115,24 @@
         />
       </a>
     </div>
+
     <p class="footer-text">© No Context Cinema Club 2026</p>
-    <p class="footer-fun">Many films were harmed in the making of these opinions.</p>
-    <p class="footer-version" id="footer-version">Website version 1.87</p>
-    <nav class="footer-nav" aria-label="Footer">
+
+    <p class="footer-fun">
+      Many films were harmed in the making of these opinions.
+    </p>
+
+    <p class="footer-version" id="footer-version">
+      Website version 1.88
+    </p>
+
+    <nav class="footer-nav" aria-label="Footer navigation">
       <a href="index.html">Films</a>
       <span aria-hidden="true">|</span>
       <a href="listen.html">Listen Now</a>
       <span aria-hidden="true">|</span>
       <a href="contact.html">Contact Us</a>
     </nav>
+
   </div>
 </footer>
