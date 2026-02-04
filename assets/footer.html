@@ -11,58 +11,58 @@
     text-align: center;
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 16px;
   }
 
-  .footer-icon-strip {
+  .footer-logo-strip {
     display: flex;
     align-items: center;
     justify-content: center;
-    gap: 16px;
+    gap: 20px;
     width: 100%;
   }
 
-  .footer-icon-strip::before,
-  .footer-icon-strip::after {
+  .footer-logo-strip::before,
+  .footer-logo-strip::after {
     content: "";
     flex: 1;
     height: 1px;
-    background: rgba(255, 255, 255, 0.15);
+    background: rgba(255, 255, 255, 0.2);
     min-width: 48px;
   }
 
-  .footer-icon-link {
+  .footer-logo-link {
     display: inline-flex;
     align-items: center;
     justify-content: center;
     padding: 6px;
     border-radius: 999px;
-    transition: opacity 0.2s ease;
+    transition: opacity 0.2s ease, transform 0.2s ease;
   }
 
-  .footer-icon-link:focus-visible {
-    outline: 2px solid rgba(255, 255, 255, 0.6);
+  .footer-logo-link:focus-visible {
+    outline: 2px solid rgba(255, 255, 255, 0.5);
     outline-offset: 3px;
   }
 
-  .footer-icon {
-    height: 30px;
+  .footer-logo {
+    height: 48px;
     width: auto;
     display: block;
-    opacity: 0.85;
     transition: opacity 0.2s ease;
   }
 
-  .footer-icon-link:hover .footer-icon {
-    opacity: 1;
+  .footer-logo-link:hover {
+    opacity: 0.9;
+    transform: translateY(-1px);
   }
 
   .footer-text,
   .footer-version,
   .footer-fun {
     margin: 0;
-    font-size: 13px;
-    line-height: 1.6;
+    font-size: 15px;
+    line-height: 1.7;
   }
 
   .footer-version {
@@ -70,7 +70,7 @@
   }
 
   .footer-fun {
-    color: rgba(255, 255, 255, 0.7);
+    color: rgba(255, 255, 255, 0.75);
   }
 
   .footer-nav {
@@ -78,7 +78,7 @@
     justify-content: center;
     flex-wrap: wrap;
     gap: 8px;
-    font-size: 13px;
+    font-size: 15px;
   }
 
   .footer-nav a {
@@ -98,15 +98,13 @@
 </style>
 <footer class="site-footer">
   <div class="footer-container">
-    <div class="footer-icon-strip" aria-label="Podcast platforms">
-      <a class="footer-icon-link" href="https://podcasts.apple.com/" target="_blank" rel="noopener noreferrer">
-        <img class="footer-icon" src="image_assets/web_icons/Apple Podcast Icon.png" alt="Apple Podcasts" />
-      </a>
-      <a class="footer-icon-link" href="https://open.spotify.com/" target="_blank" rel="noopener noreferrer">
-        <img class="footer-icon" src="image_assets/web_icons/Spotify Icon.png" alt="Spotify" />
-      </a>
-      <a class="footer-icon-link" href="https://pocketcasts.com/" target="_blank" rel="noopener noreferrer">
-        <img class="footer-icon" src="image_assets/web_icons/Other Podcast Icon.png" alt="Other podcast platforms" />
+    <div class="footer-logo-strip" aria-label="No Context Cinema Club">
+      <a class="footer-logo-link" href="index.html" aria-label="No Context Cinema Club home">
+        <img
+          class="footer-logo"
+          src="https://i.postimg.cc/BQqdVY8W/No-Con-Cin-Club-Web-Title-Large.png"
+          alt="No Context Cinema Club"
+        />
       </a>
     </div>
     <p class="footer-text">© No Context Cinema Club 2026</p>
@@ -123,7 +121,7 @@
 </footer>
 <script>
   const versionMeta = document.querySelector('meta[name="website-version"]');
-  const versionText = versionMeta?.content || "0.03";
+  const versionText = versionMeta?.content || "1.85";
   const versionEl = document.getElementById("footer-version");
   if (versionEl) {
     versionEl.textContent = `Website version ${versionText}`;
