@@ -108,7 +108,7 @@
       </a>
     </div>
     <p class="footer-text">© No Context Cinema Club 2026</p>
-    <p class="footer-version" id="footer-version">Website version</p>
+    <p class="footer-version" id="footer-version">Website version 1.85</p>
     <p class="footer-fun">Opinions expressed are legally binding and absolutely correct.</p>
     <nav class="footer-nav" aria-label="Footer">
       <a href="index.html">Films</a>
@@ -119,11 +119,3 @@
     </nav>
   </div>
 </footer>
-<script>
-  const versionMeta = document.querySelector('meta[name="website-version"]');
-  const versionText = versionMeta?.content || "1.85";
-  const versionEl = document.getElementById("footer-version");
-  if (versionEl) {
-    versionEl.textContent = `Website version ${versionText}`;
-  }
-</script>
