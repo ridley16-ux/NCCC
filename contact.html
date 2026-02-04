@@ -16,7 +16,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/contact.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.9.1" />
+<meta name="website-version" content="1.9.2" />
 <meta property="og:title" content="No Context Cinema Club – Contact Us" />
 <meta property="og:description" content="Contact No Context Cinema Club to share film suggestions, feedback, or wild plot pitches for upcoming episodes." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/contact.html" />
@@ -169,6 +169,22 @@ nav a.active {
   padding: 18px;
   border: 1px solid #3a3a3a;
   box-shadow: 0 10px 22px rgba(0, 0, 0, 0.25);
+  transition: transform 0.18s ease, box-shadow 0.18s ease, border-color 0.18s ease;
+  cursor: pointer;
+}
+
+.contact-tile:hover,
+.contact-tile:focus-within {
+  transform: translateY(-2px);
+  border-color: rgba(209, 99, 46, 0.4);
+  box-shadow:
+    0 12px 26px rgba(0, 0, 0, 0.28),
+    0 0 16px rgba(209, 99, 46, 0.18);
+}
+
+.contact-tile:focus-visible {
+  outline: 2px solid rgba(209, 99, 46, 0.6);
+  outline-offset: 3px;
 }
 
 .contact-avatar {
@@ -181,6 +197,7 @@ nav a.active {
   flex-shrink: 0;
   background: #1a1a1a;
   display: block;
+  box-shadow: inset 0 0 0 2px rgba(209, 99, 46, 0.28);
 }
 
 .contact-body {
@@ -258,6 +275,23 @@ nav a.active {
   opacity: 1;
 }
 
+.contact-cta {
+  margin: 20px auto 0;
+  max-width: 720px;
+  font-size: 14px;
+  color: #cfcfcf;
+  text-align: center;
+}
+
+.contact-cta a {
+  color: #d1632e;
+  font-weight: bold;
+  text-decoration: none;
+}
+
+.contact-cta a:hover {
+  text-decoration: underline;
+}
 
 @media (max-width: 520px) {
   .site-title img {
@@ -305,11 +339,11 @@ nav a.active {
   </p>
 
   <div class="contact-stack">
-    <div class="contact-tile" data-email="kev@nocontextcinemaclub.com">
+    <div class="contact-tile" data-email="kev@nocontextcinemaclub.com" role="button" tabindex="0" aria-label="Copy Kev email address">
       <img class="contact-avatar" src="assets/web_icons/Kev%20Icon.png" alt="Kev icon" />
       <div class="contact-body">
         <h3 class="contact-name">Kev</h3>
-        <p class="contact-role">Film suggestion wrangler</p>
+        <p class="contact-role">Film suggestions &amp; episode ideas</p>
         <div class="contact-email-row">
           <a class="contact-email" href="mailto:kev@nocontextcinemaclub.com">kev@nocontextcinemaclub.com</a>
           <button class="copy-btn" type="button" aria-label="Copy Kev email">
@@ -317,15 +351,15 @@ nav a.active {
               <path d="M8 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7zm-4 4V5a2 2 0 0 1 2-2h8v2H6v6H4z"/>
             </svg>
           </button>
-          <span class="copy-toast" role="status" aria-live="polite">Copied!</span>
+          <span class="copy-toast" role="status" aria-live="polite">Copied ✓</span>
         </div>
       </div>
     </div>
-    <div class="contact-tile" data-email="rob@nocontextcinemaclub.com">
+    <div class="contact-tile" data-email="rob@nocontextcinemaclub.com" role="button" tabindex="0" aria-label="Copy Rob email address">
       <img class="contact-avatar" src="assets/web_icons/Rob%20Icon.png" alt="Rob icon" />
       <div class="contact-body">
         <h3 class="contact-name">Rob</h3>
-        <p class="contact-role">Quiz master &amp; trivia vault</p>
+        <p class="contact-role">Quizzes, trivia, stats &amp; questions</p>
         <div class="contact-email-row">
           <a class="contact-email" href="mailto:rob@nocontextcinemaclub.com">rob@nocontextcinemaclub.com</a>
           <button class="copy-btn" type="button" aria-label="Copy Rob email">
@@ -333,15 +367,15 @@ nav a.active {
               <path d="M8 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7zm-4 4V5a2 2 0 0 1 2-2h8v2H6v6H4z"/>
             </svg>
           </button>
-          <span class="copy-toast" role="status" aria-live="polite">Copied!</span>
+          <span class="copy-toast" role="status" aria-live="polite">Copied ✓</span>
         </div>
       </div>
     </div>
-    <div class="contact-tile" data-email="show@nocontextcinemaclub.com">
+    <div class="contact-tile" data-email="show@nocontextcinemaclub.com" role="button" tabindex="0" aria-label="Copy Show email address">
       <img class="contact-avatar" src="assets/web_icons/Name%20Icon.png" alt="Show icon" />
       <div class="contact-body">
         <h3 class="contact-name">Show</h3>
-        <p class="contact-role">Feedback hotline &amp; story keeper</p>
+        <p class="contact-role">General feedback, thoughts &amp; hot takes</p>
         <div class="contact-email-row">
           <a class="contact-email" href="mailto:show@nocontextcinemaclub.com">show@nocontextcinemaclub.com</a>
           <button class="copy-btn" type="button" aria-label="Copy Show email">
@@ -349,11 +383,15 @@ nav a.active {
               <path d="M8 7a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2h-8a2 2 0 0 1-2-2V7zm-4 4V5a2 2 0 0 1 2-2h8v2H6v6H4z"/>
             </svg>
           </button>
-          <span class="copy-toast" role="status" aria-live="polite">Copied!</span>
+          <span class="copy-toast" role="status" aria-live="polite">Copied ✓</span>
         </div>
       </div>
     </div>
   </div>
+  <p class="contact-cta">
+    Not sure who to ping? Start with the main inbox at
+    <a href="mailto:show@nocontextcinemaclub.com">show@nocontextcinemaclub.com</a>.
+  </p>
 </div>
 
 <div id="site-footer"></div>
@@ -370,6 +408,7 @@ nav a.active {
 </script>
 <script>
   const copyButtons = document.querySelectorAll(".copy-btn");
+  const contactTiles = document.querySelectorAll(".contact-tile");
 
   const fallbackCopy = (text) => {
     const textArea = document.createElement("textarea");
@@ -395,30 +434,48 @@ nav a.active {
     }, 1200);
   };
 
+  const copyEmailFromTile = async (tile) => {
+    if (!tile) {
+      return;
+    }
+    const email = tile.dataset.email || "";
+    if (!email) {
+      return;
+    }
+    let copied = false;
+    if (navigator.clipboard && window.isSecureContext) {
+      try {
+        await navigator.clipboard.writeText(email);
+        copied = true;
+      } catch (error) {
+        copied = false;
+      }
+    }
+    if (!copied) {
+      copied = fallbackCopy(email);
+    }
+    if (copied) {
+      setCopiedState(tile);
+    }
+  };
+
   copyButtons.forEach((button) => {
-    button.addEventListener("click", async () => {
+    button.addEventListener("click", async (event) => {
+      event.stopPropagation();
       const tile = button.closest(".contact-tile");
-      if (!tile) {
-        return;
-      }
-      const email = tile.dataset.email || "";
-      if (!email) {
-        return;
-      }
-      let copied = false;
-      if (navigator.clipboard && window.isSecureContext) {
-        try {
-          await navigator.clipboard.writeText(email);
-          copied = true;
-        } catch (error) {
-          copied = false;
-        }
-      }
-      if (!copied) {
-        copied = fallbackCopy(email);
-      }
-      if (copied) {
-        setCopiedState(tile);
+      await copyEmailFromTile(tile);
+    });
+  });
+
+  contactTiles.forEach((tile) => {
+    tile.addEventListener("click", async () => {
+      await copyEmailFromTile(tile);
+    });
+
+    tile.addEventListener("keydown", async (event) => {
+      if (event.key === "Enter" || event.key === " ") {
+        event.preventDefault();
+        await copyEmailFromTile(tile);
       }
     });
   });
