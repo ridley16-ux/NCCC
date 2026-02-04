@@ -3,7 +3,7 @@
   "rob": true,
   "title": "Minority Report",
   "starring": "Tom Cruise",
-  "poster": "https://i.postimg.cc/nrZ8mCVm/Minortiy-report-Rob.png",
+  "poster": "assets/posters/robs/minortiy-report-rob.webp",
   "coherence": 8,
   "entertainment": 7,
   "originality": 6,
@@ -13,3 +13,4 @@
   "link": "#",
   "linkType": "podcast"
 }
+
