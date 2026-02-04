@@ -16,7 +16,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/about.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.13.0" />
+<meta name="website-version" content="1.16.0" />
 <meta property="og:title" content="No Context Cinema Club – About Us" />
 <meta property="og:description" content="Meet the hosts behind No Context Cinema Club and the chaos of weekly film rewrites." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/about.html" />
@@ -26,6 +26,7 @@
 <meta name="twitter:title" content="No Context Cinema Club – About Us" />
 <meta name="twitter:description" content="Meet the hosts behind No Context Cinema Club and the chaos of weekly film rewrites." />
 <meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<link rel="stylesheet" href="assets/site.css" />
 <script type="module">
   import { buildPodcastSeriesSchema, injectJsonLd } from "./assets/seo/seo.js";
 
@@ -85,74 +86,6 @@ label {
   font-family: inherit;
   font-weight: inherit;
   font-style: inherit;
-}
-
-nav {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 16px;
-  padding: 12px 0 20px;
-  margin-bottom: 24px;
-  flex-wrap: nowrap;
-  overflow-x: auto;
-  -webkit-overflow-scrolling: touch;
-}
-
-nav a {
-  background: #2c2c2c;
-  color: #fff;
-  text-decoration: none;
-  padding: 12px 20px;
-  min-width: 120px;
-  border-radius: 20px;
-  font-weight: bold;
-  transition: opacity 0.2s ease;
-  white-space: nowrap;
-  text-align: center;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-}
-
-nav a:hover {
-  opacity: 0.7;
-}
-
-nav a.active {
-  background: #d1632e;
-}
-
-.site-title {
-  text-align: center;
-  margin: 0 0 12px;
-  color: #c06131;
-}
-.site-title img {
-  display: block;
-  max-width: 320px;
-  width: 100%;
-  height: auto;
-  margin: 0 auto;
-}
-
-.sticky-menu {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: #0f0f0f;
-  padding: 16px;
-  margin: 0 0 24px;
-}
-
-.sticky-menu::after {
-  content: "";
-  display: block;
-  width: 100%;
-  height: 1px;
-  margin-top: 12px;
-  background: rgba(255, 255, 255, 0.2);
-  min-width: 48px;
 }
 
 .content {
@@ -324,11 +257,6 @@ nav a.active {
 }
 
 @media (max-width: 520px) {
-  .site-title img {
-    max-width: 100%;
-    width: 100%;
-  }
-
   .content {
     padding: 22px;
   }
@@ -345,30 +273,11 @@ nav a.active {
 
 }
 
-@media (max-width: 520px) {
-  nav {
-    gap: 8px;
-  }
-  nav a {
-    padding: 8px 10px;
-    font-size: 12px;
-  }
-}
 </style>
 </head>
 
 <body>
-<div class="sticky-menu">
-  <h1 class="site-title">
-    <img src="assets/web_icons/Main Logo.webp" alt="No Context Cinema Club" />
-  </h1>
-  <nav>
-    <a href="about.html" class="active">About Us</a>
-    <a href="index.html">Films</a>
-    <a href="listen.html">Listen</a>
-    <a href="contact.html">Contact</a>
-  </nav>
-</div>
+<div id="site-header"></div>
 
 <main class="content">
   <section class="hero">
@@ -450,6 +359,23 @@ nav a.active {
 
 <div id="site-footer"></div>
 <script>
+  const headerContainer = document.getElementById("site-header");
+  fetch("assets/header.html")
+    .then((response) => response.text())
+    .then((html) => {
+      headerContainer.innerHTML = html;
+      const activePath = window.location.pathname.split("/").pop() || "index.html";
+      const navLinks = headerContainer.querySelectorAll(".nav-links a");
+      navLinks.forEach((link) => {
+        if (link.getAttribute("href") === activePath) {
+          link.classList.add("active");
+        }
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to load header:", error);
+    });
+
   const footerContainer = document.getElementById("site-footer");
   fetch("assets/footer.html")
     .then((response) => response.text())
