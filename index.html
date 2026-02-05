@@ -253,6 +253,19 @@ label {
 
 .meta-line + .meta-line { margin-top: 4px; }
 
+.audience-score {
+  margin-top: 8px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  font-size: 13px;
+  color: rgba(255, 255, 255, 0.72);
+}
+
+.audience-line {
+  margin: 0;
+}
+
 .variant {
   color: #bfe8bf;
   font-weight: 800;
@@ -904,6 +917,7 @@ let currentFilter = "rob";
 let currentSort = "score";
 let lastScoreFetchKey = "";
 const listenerScores = {};
+const audienceScores = {};
 const RATING_STORAGE_KEY = "nccc_film_ratings";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
@@ -1152,6 +1166,12 @@ function formatListenerRating(score) {
   return `${display}/10`;
 }
 
+function formatAudienceScore(value) {
+  const score = Number(value);
+  if (!Number.isFinite(score)) return null;
+  return Math.round(score);
+}
+
 function buildRatingSegments(filmId, storedRating) {
   return Array.from({ length: 10 }, (_, index) => {
     const value = index + 1;
@@ -1252,6 +1272,25 @@ async function refreshListenerScores(films) {
   });
 }
 
+async function fetchAudienceScores() {
+  if (!supabaseClient) return;
+  const { data, error } = await supabaseClient
+    .from("film_scores_v1")
+    .select("film_id, weighted_percent, listener_count");
+
+  if (error) {
+    console.error("Failed to fetch audience scores.", error);
+    return;
+  }
+
+  data.forEach(row => {
+    audienceScores[row.film_id] = {
+      weighted_percent: row.weighted_percent,
+      listener_count: row.listener_count
+    };
+  });
+}
+
 async function render(options = {}) {
   container.innerHTML = "";
   closeOpenTooltip();
@@ -1274,6 +1313,15 @@ async function render(options = {}) {
 
   visibleFilms.forEach((film, index) => {
     const listenerScore = listenerScores[film.id] ?? 0;
+    const audienceData = audienceScores[film.id];
+    const audiencePercent = formatAudienceScore(audienceData?.weighted_percent);
+    const audienceVotes = Number(audienceData?.listener_count ?? 0);
+    const audienceLabel = audiencePercent !== null
+      ? `Audience: ${audiencePercent}%`
+      : "Audience: —";
+    const audienceVotesLabel = audiencePercent !== null
+      ? `${audienceVotes} vote(s)`
+      : "0 votes";
     const storedRating = localRatings[film.id] ?? null;
     const transcriptButton = film.transcriptTxt
       ? `<button class="transcript-link" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
@@ -1309,6 +1357,10 @@ async function render(options = {}) {
                 Starring: ${film.starring}
               </p>
               <p class="meta-line">Podcasted: ${formatUkDate(film.podcastDate)}</p>
+              <div class="audience-score">
+                <p class="audience-line">${audienceLabel}</p>
+                <p class="audience-line">${audienceVotesLabel}</p>
+              </div>
             </div>
 
             <aside class="badge kev-badge" aria-label="Kev's score">
@@ -1376,6 +1428,10 @@ async function render(options = {}) {
               <h2 class="detail-title">${film.title}</h2>
               ${film.director ? `<p class="meta-line">Directed by ${film.director}</p>` : ""}
               <p class="meta-line">Starring: ${film.starring}</p>
+              <div class="audience-score">
+                <p class="audience-line">${audienceLabel}</p>
+                <p class="audience-line">${audienceVotesLabel}</p>
+              </div>
             </div>
             <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
               <div class="badge-label">Rotten Tomatoes</div>
@@ -1413,6 +1469,7 @@ async function loadFilms() {
     allFilms = films;
     lastScoreFetchKey = "";     // force a fetch on first render
     resetPagination();
+    await fetchAudienceScores();
     await render();
     updatePodcastEpisodeSchema();
 
