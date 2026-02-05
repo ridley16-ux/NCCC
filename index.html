@@ -171,6 +171,7 @@ label {
   padding: 18px;
   position: relative;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  --rosette-pocket-right: 18px;
 }
 
 .film-card.rob-film {
@@ -233,15 +234,16 @@ label {
 
 .rosette-stack {
   position: absolute;
-  top: 8px;
-  right: 8px;
+  top: calc(var(--badge-row-top) + 2px);
+  right: var(--rosette-pocket-right);
   display: flex;
-  flex-direction: column;
+  flex-direction: row;
   align-items: flex-end;
   gap: 6px;
   z-index: 4;
   pointer-events: none;
   white-space: nowrap;
+  flex-wrap: nowrap;
 }
 
 .poster {
@@ -922,10 +924,17 @@ body.modal-open {
     grid-template-columns: 1fr;
     padding-top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-mobile));
   }
+  .film-poster-wrapper,
   .poster-wrap {
-    max-width: 260px;
+    max-width: none;
+    width: 100%;
   }
-  .poster { width: 100%; height: auto; }
+  .poster {
+    width: 100%;
+    max-width: none;
+    height: auto;
+    display: block;
+  }
   .hero-rank {
     left: 12px;
     top: 12px;
@@ -971,17 +980,23 @@ body.modal-open {
     font-size: 12px;
   }
   .rosette-stack {
-    top: 8px;
+    top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-mobile) + 8px);
     right: 8px;
+    flex-direction: column;
+    align-items: flex-end;
+    flex-wrap: nowrap;
   }
   .listener-score { flex-wrap: wrap; }
 }
 
 @media (min-width: 768px) {
   .rosette-stack {
-    top: 10px;
-    right: 10px;
+    top: calc(var(--badge-row-top) + 2px);
+    right: var(--rosette-pocket-right);
     gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    flex-wrap: nowrap;
   }
 
   .rosette {
@@ -1757,14 +1772,14 @@ async function render(options = {}) {
 
     card.innerHTML = `
       <div class="hero-rank">#${index + 1}</div>
+      <div class="rosette-stack" aria-label="Episode rosettes">
+        ${rosetteMarkup}
+      </div>
 
       <div class="hero-layout">
         <div class="film-poster-wrapper">
           <div class="poster-wrap">
             <img src="${film.poster}" class="poster" />
-          </div>
-          <div class="rosette-stack" aria-label="Episode rosettes">
-            ${rosetteMarkup}
           </div>
         </div>
 
@@ -2169,7 +2184,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
