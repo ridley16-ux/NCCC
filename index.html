@@ -209,11 +209,17 @@ label {
 .flag.rob { background: #3e5f3e; color: #d8f0d8; }
 .flag.real { background: #444; color: #fff; }
 
+.poster-wrap {
+  position: relative;
+  flex: 0 0 auto;
+}
+
 .poster {
   width: 140px;
   height: 210px;
   object-fit: cover;
   border-radius: 8px;
+  display: block;
 }
 
 .film-details {
@@ -322,6 +328,8 @@ label {
   flex-direction: column;
   gap: 6px;
   min-width: 0;
+  align-items: center;
+  text-align: center;
 }
 
 .score-label {
@@ -350,13 +358,15 @@ label {
   background: var(--score-tie);
 }
 
-.rosettes-slot {
+.poster-rosettes {
+  position: absolute;
+  top: 8px;
+  left: 8px;
   display: flex;
   flex-direction: column;
   gap: 6px;
-  min-width: 130px;
-  align-items: flex-end;
-  justify-content: center;
+  z-index: 2;
+  pointer-events: none;
 }
 
 .badge {
@@ -687,115 +697,42 @@ body.modal-open {
 .rating-shell {
   background: rgba(14, 14, 14, 0.72);
   border: 1px solid rgba(255, 255, 255, 0.12);
-  padding: 8px 10px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  gap: 10px;
+  padding: 10px 12px;
+  border-radius: 16px;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: 8px;
+  min-width: 220px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.rate-toggle {
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  color: #fff;
-  border-radius: 999px;
-  padding: 8px 16px;
-  font-size: 14px;
-  font-weight: 600;
-  cursor: pointer;
-}
-
-.rate-toggle:hover,
-.rate-toggle:focus-visible {
-  border-color: rgba(255, 255, 255, 0.5);
-  background: rgba(255, 255, 255, 0.16);
-  outline: none;
-}
-
-.rating-panel.open .rate-toggle {
-  display: none;
-}
-
-.rating-bar {
-  display: none;
-  gap: 6px;
-  align-items: center;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-}
-
-.rating-panel.open .rating-bar {
+.rating-meta {
   display: flex;
-}
-
-.rating-segment {
-  min-width: 36px;
-  min-height: 36px;
-  padding: 0 6px;
-  border-radius: 10px;
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  background: rgba(255, 255, 255, 0.08);
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 13px;
-  font-weight: 600;
-  cursor: pointer;
-  transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
-}
-
-.rating-segment:hover,
-.rating-segment:focus-visible {
-  transform: translateY(-1px);
-  outline: none;
-}
-
-.rating-segment.preview,
-.rating-segment.selected {
-  background: var(--segment-color);
-  border-color: rgba(255, 255, 255, 0.35);
-  color: #fff;
-  filter: brightness(1.05);
-}
-
-.rating-segment.selected {
-  filter: none;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
-}
-
-.rating-panel.locked .rating-segment {
-  cursor: default;
-}
-
-.rating-panel.locked .rating-bar {
-  border-radius: 18px;
-  padding: 4px;
-  pointer-events: none;
-  border: 1px solid rgba(245, 197, 107, 0.3);
-}
-
-.rating-panel.locked .rating-segment.selected {
-  box-shadow: 0 0 0 1px rgba(245, 197, 107, 0.55);
-}
-
-.rating-status {
-  display: none;
   align-items: center;
+  justify-content: space-between;
   gap: 8px;
   font-size: 12px;
-  color: rgba(255, 255, 255, 0.82);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
 }
 
-.rating-panel.locked .rating-status {
-  display: flex;
+.rating-output {
+  color: #f5c56b;
+  font-weight: 800;
+  font-size: 13px;
 }
 
-.rating-error {
-  margin-top: 6px;
-  font-size: 12px;
-  color: #f7b0b0;
+.rating-slider {
+  width: 100%;
+  accent-color: #f5c56b;
+  height: 4px;
 }
 
-.rating-change {
+.rating-clear {
+  align-self: flex-end;
   appearance: none;
   border: none;
   background: none;
@@ -807,22 +744,29 @@ body.modal-open {
   padding: 0;
 }
 
-.rating-change:focus-visible {
+.rating-clear:focus-visible {
   outline: 2px solid rgba(245, 197, 107, 0.5);
   outline-offset: 2px;
   border-radius: 6px;
 }
 
-.rating-segment:nth-child(1) { --segment-color: #2f3b52; }
-.rating-segment:nth-child(2) { --segment-color: #36435a; }
-.rating-segment:nth-child(3) { --segment-color: #3f4c60; }
-.rating-segment:nth-child(4) { --segment-color: #46525f; }
-.rating-segment:nth-child(5) { --segment-color: #54555d; }
-.rating-segment:nth-child(6) { --segment-color: #665651; }
-.rating-segment:nth-child(7) { --segment-color: #7a5c49; }
-.rating-segment:nth-child(8) { --segment-color: #8f613f; }
-.rating-segment:nth-child(9) { --segment-color: #a86a37; }
-.rating-segment:nth-child(10) { --segment-color: #c07a33; }
+.rating-status {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.rating-panel.rated .rating-status {
+  display: flex;
+}
+
+.rating-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #f7b0b0;
+}
 
 .badge-flag.listener { background: #5b88ff; }
 
@@ -907,34 +851,29 @@ body.modal-open {
     width: 100%;
   }
   .rating-panel {
-    margin-left: auto;
-    width: auto;
-    max-width: 100%;
-    align-items: flex-end;
+    margin-left: 0;
+    width: 100%;
+    align-items: stretch;
+  }
+  .rating-shell {
+    width: 100%;
+    min-width: 0;
+  }
+  .rating-meta {
+    font-size: 11px;
+  }
+  .rating-output {
+    font-size: 12px;
+  }
+  .poster-rosettes {
+    top: 10px;
+    left: 10px;
+  }
+  .poster-rosettes .badge-flag {
+    font-size: 10px;
+    padding: 5px 8px;
   }
   .listener-score { flex-wrap: wrap; }
-  .rating-panel.open .rating-shell {
-    flex-direction: column;
-    align-items: stretch;
-    width: 100%;
-  }
-  .rating-panel.open .rating-grid {
-    display: grid;
-    grid-template-columns: repeat(5, minmax(0, 1fr));
-    gap: 8px;
-    width: 100%;
-    justify-items: stretch;
-  }
-  .rating-grid .rating-segment {
-    min-width: 0;
-    min-height: 42px;
-    border-radius: 12px;
-    font-size: 14px;
-    padding: 0;
-  }
-  .rosettes-slot {
-    display: none;
-  }
 }
 
 @media (max-width: 760px) {
@@ -949,8 +888,8 @@ body.modal-open {
 }
 
 @media (max-width: 400px) {
-  .rating-panel.open .rating-grid {
-    grid-template-columns: repeat(4, minmax(0, 1fr));
+  .rating-shell {
+    padding: 10px;
   }
 }
 </style>
@@ -1303,18 +1242,6 @@ function formatAudienceScore(value) {
   const score = Number(value);
   if (!Number.isFinite(score)) return null;
   return Math.round(score);
-}
-
-function buildRatingSegments(filmId, storedRating) {
-  return Array.from({ length: 10 }, (_, index) => {
-    const value = index + 1;
-    const isSelected = storedRating ? value <= storedRating : false;
-    return `
-      <button class="rating-segment${isSelected ? " selected" : ""}" type="button" data-film-id="${filmId}" data-rating="${value}" aria-label="Rate ${value} out of 10" aria-pressed="${isSelected}">
-        ${value}
-      </button>
-    `;
-  }).join("");
 }
 
 function setRatingError(panel, message) {
@@ -1676,7 +1603,16 @@ async function render(options = {}) {
         <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
       </div>
 
-      <img src="${film.poster}" class="poster" />
+      <div class="poster-wrap">
+        <img src="${film.poster}" class="poster" />
+        ${film.rob ? `
+          <div class="poster-rosettes" aria-label="Episode rosettes">
+            ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
+            ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
+            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
+          </div>
+        ` : ''}
+      </div>
 
       ${film.rob ? `
         <div class="film-details rob-details">
@@ -1699,14 +1635,9 @@ async function render(options = {}) {
                   <div class="score-value" data-score-value>${film.score}%</div>
                 </div>
                 <div class="score-half score-half--audience" data-score-half="audience">
-                  <div class="score-label">Audience</div>
+                  <div class="score-label">Audience Score</div>
                   <div class="score-value" data-score-value>${audiencePercent !== null ? `${audiencePercent}%` : "—"}</div>
                 </div>
-              </div>
-              <div class="rosettes-slot" aria-label="Episode rosettes">
-                ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
-                ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
-                ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
               </div>
             </div>
           </div>
@@ -1738,16 +1669,17 @@ async function render(options = {}) {
               <a class="btn podcast" href="${film.link}" target="_blank">Play Episode ▶</a>
               ${transcriptButton}
             </div>
-            <div class="rating-panel ${storedRating ? "open locked" : ""}" data-rating-panel data-film-id="${film.id}">
+            <div class="rating-panel ${storedRating ? "rated" : ""}" data-rating-panel data-film-id="${film.id}">
               <div class="rating-shell">
-                <button class="rate-toggle" type="button" aria-expanded="${storedRating ? "true" : "false"}">Rate</button>
-                <div class="rating-bar rating-grid" role="group" aria-label="Rate ${film.title}">
-                  ${buildRatingSegments(film.id, storedRating)}
+                <div class="rating-meta">
+                  <span class="rating-label">Your rating</span>
+                  <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "—/10"}</span>
                 </div>
+                <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
+                <button class="rating-clear" type="button" ${storedRating ? "" : "hidden"}>Clear</button>
               </div>
               <div class="rating-status" ${storedRating ? "" : "hidden"}>
                 <span class="rating-status-text">${storedRating ? `You rated: ${storedRating}/10` : ""}</span>
-                <button class="rating-change" type="button">Change</button>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
@@ -1842,34 +1774,33 @@ document.addEventListener("change", (event) => {
   }
 });
 
-container.addEventListener("click", async (event) => {
-  const toggle = event.target.closest(".rate-toggle");
-  if (toggle) {
-    const panel = toggle.closest(".rating-panel");
-    if (!panel) return;
-    panel.classList.add("open");
-    toggle.setAttribute("aria-expanded", "true");
-    return;
-  }
+container.addEventListener("click", (event) => {
+  const clearButton = event.target.closest(".rating-clear");
+  if (!clearButton) return;
+  const panel = clearButton.closest(".rating-panel");
+  if (!panel) return;
+  setRatingError(panel, "");
+  const filmId = panel.dataset.filmId;
+  if (!filmId) return;
+  delete localRatings[filmId];
+  saveLocalRatings();
+  updateRatingUI(filmId, listenerScores[filmId] ?? 0, null);
+});
 
-  const changeButton = event.target.closest(".rating-change");
-  if (changeButton) {
-    const panel = changeButton.closest(".rating-panel");
-    if (!panel) return;
-    setRatingError(panel, "");
-    const filmId = panel.dataset.filmId;
-    if (!filmId) return;
-    delete localRatings[filmId];
-    saveLocalRatings();
-    updateRatingUI(filmId, listenerScores[filmId] ?? 0, null);
-    panel.classList.add("open");
-    return;
-  }
+container.addEventListener("input", (event) => {
+  const slider = event.target.closest(".rating-slider");
+  if (!slider) return;
+  const panel = slider.closest(".rating-panel");
+  if (!panel) return;
+  const value = Number(slider.value);
+  updateRatingOutput(panel, value);
+});
 
-  const segment = event.target.closest(".rating-segment");
-  if (!segment) return;
-  const panel = segment.closest(".rating-panel");
-  if (!panel || panel.classList.contains("locked")) return;
+container.addEventListener("change", async (event) => {
+  const slider = event.target.closest(".rating-slider");
+  if (!slider) return;
+  const panel = slider.closest(".rating-panel");
+  if (!panel) return;
   const card = panel.closest(".film-card");
   setRatingError(panel, "");
   if (!supabaseClient) {
@@ -1877,7 +1808,7 @@ container.addEventListener("click", async (event) => {
     return;
   }
   const filmId = card?.dataset.filmId;
-  const ratingValue = Number(segment.dataset.rating);
+  const ratingValue = Number(slider.value);
   if (!ratingValue) return;
   if (!filmId || filmId.length < 8) {
     console.error("Invalid film_id for listener vote submission.", {
@@ -1928,41 +1859,6 @@ container.addEventListener("click", async (event) => {
   }
 });
 
-container.addEventListener("mouseover", (event) => {
-  const segment = event.target.closest(".rating-segment");
-  if (!segment) return;
-  const panel = segment.closest(".rating-panel");
-  if (!panel || panel.classList.contains("locked")) return;
-  const value = Number(segment.dataset.rating);
-  setRatingPreview(panel, value);
-});
-
-container.addEventListener("mouseout", (event) => {
-  const bar = event.target.closest(".rating-bar");
-  if (!bar) return;
-  const panel = bar.closest(".rating-panel");
-  if (!panel || panel.classList.contains("locked")) return;
-  if (event.relatedTarget && bar.contains(event.relatedTarget)) return;
-  clearRatingPreview(panel);
-});
-
-container.addEventListener("focusin", (event) => {
-  const segment = event.target.closest(".rating-segment");
-  if (!segment) return;
-  const panel = segment.closest(".rating-panel");
-  if (!panel || panel.classList.contains("locked")) return;
-  const value = Number(segment.dataset.rating);
-  setRatingPreview(panel, value);
-});
-
-container.addEventListener("focusout", (event) => {
-  const bar = event.target.closest(".rating-bar");
-  if (!bar) return;
-  const panel = bar.closest(".rating-panel");
-  if (!panel || panel.classList.contains("locked")) return;
-  if (event.relatedTarget && bar.contains(event.relatedTarget)) return;
-  clearRatingPreview(panel);
-});
 
 container.addEventListener("click", (event) => {
   const trigger = event.target.closest(".transcript-link");
@@ -2023,33 +1919,29 @@ window.addEventListener("resize", () => {
 
 function updateRatingUI(filmId, listenerRating, yourRating) {
   document.querySelectorAll(`.rating-panel[data-film-id="${filmId}"]`).forEach(panel => {
-    const rateToggle = panel.querySelector(".rate-toggle");
     const status = panel.querySelector(".rating-status");
     const statusText = panel.querySelector(".rating-status-text");
-    const segments = panel.querySelectorAll(".rating-segment");
+    const clearButton = panel.querySelector(".rating-clear");
+    const slider = panel.querySelector(".rating-slider");
     const hasRating = Boolean(yourRating);
 
-    panel.classList.toggle("locked", hasRating);
-    panel.classList.add("open");
+    panel.classList.toggle("rated", hasRating);
     setRatingError(panel, "");
 
-    if (rateToggle) {
-      rateToggle.setAttribute("aria-expanded", "true");
-    }
     if (status) {
       status.hidden = !hasRating;
     }
     if (statusText) {
       statusText.textContent = hasRating ? `You rated: ${yourRating}/10` : "";
     }
+    if (clearButton) {
+      clearButton.hidden = !hasRating;
+    }
+    if (slider) {
+      slider.value = hasRating ? String(yourRating) : "5";
+    }
+    updateRatingOutput(panel, hasRating ? yourRating : null);
 
-    segments.forEach(segment => {
-      const value = Number(segment.dataset.rating);
-      const isSelected = hasRating && value <= yourRating;
-      segment.classList.toggle("selected", isSelected);
-      segment.setAttribute("aria-pressed", String(isSelected));
-    });
-    clearRatingPreview(panel);
   });
 
   document.querySelectorAll(`[data-listener-score="${filmId}"] .listener-score-text`).forEach(el => {
@@ -2057,18 +1949,11 @@ function updateRatingUI(filmId, listenerRating, yourRating) {
   });
 }
 
-function setRatingPreview(panel, value) {
-  const segments = panel.querySelectorAll(".rating-segment");
-  segments.forEach(segment => {
-    const segmentValue = Number(segment.dataset.rating);
-    segment.classList.toggle("preview", segmentValue <= value);
-  });
-}
-
-function clearRatingPreview(panel) {
-  panel.querySelectorAll(".rating-segment.preview").forEach(segment => {
-    segment.classList.remove("preview");
-  });
+function updateRatingOutput(panel, value) {
+  if (!panel) return;
+  const output = panel.querySelector("[data-rating-output]");
+  if (!output) return;
+  output.textContent = value ? `${value}/10` : "—/10";
 }
 
 function closeOpenTooltip() {
