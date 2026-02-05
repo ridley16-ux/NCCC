@@ -94,6 +94,45 @@ body {
   }
 }
 
+
+.films-page #site-header,
+.films-page #site-header .sticky-menu,
+.films-page #site-header .films-sticky-header,
+.films-page #site-header .header-extras,
+.films-page #site-header .controls {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+
+.films-page #site-header {
+  position: relative;
+  z-index: 1100;
+  background: var(--bg);
+}
+
+.films-page #site-header .films-sticky-header {
+  top: env(safe-area-inset-top, 0px);
+  background: var(--bg);
+}
+
+.films-page #site-header .header-extras,
+.films-page #site-header .controls,
+.films-page #site-header .filter,
+.films-page #site-header .sort {
+  min-width: 0;
+}
+
+.films-page #site-header select {
+  max-width: 100%;
+}
+
+/* Keep filter dropdown menus above sticky content and avoid clipping. */
+.films-page #site-header .controls select {
+  position: relative;
+  z-index: 2;
+}
+
 button,
 input,
 select,
@@ -159,6 +198,7 @@ label {
 /* Film list */
 .films-list {
   max-width: 900px;
+  padding-top: 4px;
   margin: 0 auto;
   display: flex;
   flex-direction: column;
@@ -1042,7 +1082,7 @@ body.modal-open {
 </style>
 </head>
 
-<body>
+<body class="films-page">
 
 <div id="site-header"></div>
 
