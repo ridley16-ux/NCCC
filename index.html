@@ -1318,9 +1318,21 @@ function stableSortFilms(films, comparator) {
     .map(({ film }) => film);
 }
 
-function getListenerScore(film) {
-  const score = Number(listenerScores[film.id] ?? film.listenerScore ?? film.listener_score);
-  return Number.isFinite(score) && score > 0 ? score : null;
+function parseListenerRatingValue(value) {
+  if (value === null || value === undefined || value === "") return null;
+  const cleanedValue = typeof value === "string" ? value.replace(/%/g, "").trim() : value;
+  const score = Number(cleanedValue);
+  if (!Number.isFinite(score)) return null;
+  return Math.round(score);
+}
+
+function getListenerRatingValue(film) {
+  const audienceValue = formatAudienceScore(audienceScores[film.id]?.weighted_percent);
+  if (audienceValue !== null) return audienceValue;
+  const fallbackValue = parseListenerRatingValue(
+    film.listenerRating ?? film.listenerPercent ?? film.listenerScore ?? film.listener_score
+  );
+  return fallbackValue !== null ? fallbackValue : -1;
 }
 
 function getCompositeScore(film) {
@@ -1353,21 +1365,21 @@ function sortFilms(films) {
   }
   if (currentSort === "listener-asc") {
     return stableSortFilms(films, (a, b) => {
-      const aScore = getListenerScore(a);
-      const bScore = getListenerScore(b);
-      if (aScore === null && bScore === null) return 0;
-      if (aScore === null) return 1;
-      if (bScore === null) return -1;
+      const aScore = getListenerRatingValue(a);
+      const bScore = getListenerRatingValue(b);
+      if (aScore === -1 && bScore === -1) return 0;
+      if (aScore === -1) return 1;
+      if (bScore === -1) return -1;
       return aScore - bScore;
     });
   }
   if (currentSort === "listener-desc") {
     return stableSortFilms(films, (a, b) => {
-      const aScore = getListenerScore(a);
-      const bScore = getListenerScore(b);
-      if (aScore === null && bScore === null) return 0;
-      if (aScore === null) return 1;
-      if (bScore === null) return -1;
+      const aScore = getListenerRatingValue(a);
+      const bScore = getListenerRatingValue(b);
+      if (aScore === -1 && bScore === -1) return 0;
+      if (aScore === -1) return 1;
+      if (bScore === -1) return -1;
       return bScore - aScore;
     });
   }
@@ -1554,6 +1566,7 @@ async function render(options = {}) {
   closeOpenTooltip();
 
   let films = getFilteredFilms();
+  const showListenerUI = currentFilter !== "real";
 
   if (!options.skipScoreRefresh) {
     await refreshListenerScores(films);
@@ -1692,10 +1705,12 @@ async function render(options = {}) {
               <h2 class="detail-title">${film.title}</h2>
               ${film.director ? `<p class="meta-line">Directed by ${film.director}</p>` : ""}
               <p class="meta-line">Starring: ${film.starring}</p>
-              <div class="audience-score">
-                <p class="audience-line" data-audience-label>${audienceLabel}</p>
-                <p class="audience-line" data-audience-votes>${audienceVotesLabel}</p>
-              </div>
+              ${showListenerUI ? `
+                <div class="audience-score">
+                  <p class="audience-line" data-audience-label>${audienceLabel}</p>
+                  <p class="audience-line" data-audience-votes>${audienceVotesLabel}</p>
+                </div>
+              ` : ""}
             </div>
             <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
               <div class="badge-label">Rotten Tomatoes</div>
