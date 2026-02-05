@@ -689,6 +689,12 @@ body.modal-open {
   display: flex;
 }
 
+.rating-error {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #f7b0b0;
+}
+
 .rating-change {
   appearance: none;
   border: none;
@@ -899,11 +905,9 @@ let currentSort = "score";
 let lastScoreFetchKey = "";
 const listenerScores = {};
 const RATING_STORAGE_KEY = "nccc_film_ratings";
-const DEVICE_ID_KEY = "nccc_device_id";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const deviceId = getOrCreateDeviceId();
 const localRatings = loadLocalRatings();
 let openTooltip = null;
 
@@ -1126,14 +1130,6 @@ function handleTranscriptKeydown(event) {
   }
 }
 
-function getOrCreateDeviceId() {
-  const existing = localStorage.getItem(DEVICE_ID_KEY);
-  if (existing) return existing;
-  const created = crypto.randomUUID();
-  localStorage.setItem(DEVICE_ID_KEY, created);
-  return created;
-}
-
 function loadLocalRatings() {
   try {
     const stored = localStorage.getItem(RATING_STORAGE_KEY);
@@ -1166,6 +1162,14 @@ function buildRatingSegments(filmId, storedRating) {
       </button>
     `;
   }).join("");
+}
+
+function setRatingError(panel, message) {
+  if (!panel) return;
+  const errorEl = panel.querySelector(".rating-error");
+  if (!errorEl) return;
+  errorEl.textContent = message;
+  errorEl.hidden = !message;
 }
 
 /* ✅ set active class based on the button actually clicked */
@@ -1351,6 +1355,7 @@ async function render(options = {}) {
                 <span class="rating-status-text">${storedRating ? `You rated: ${storedRating}/10` : ""}</span>
                 <button class="rating-change" type="button">Change</button>
               </div>
+              <div class="rating-error" role="status" aria-live="polite" hidden></div>
               <p class="listener-score" data-listener-score="${film.id}">
                 <span class="listener-score-text">Listeners Rating: ${formatListenerRating(listenerScore)}</span>
                 <span class="listener-info-wrap">
@@ -1455,6 +1460,7 @@ container.addEventListener("click", async (event) => {
   if (changeButton) {
     const panel = changeButton.closest(".rating-panel");
     if (!panel) return;
+    setRatingError(panel, "");
     const filmId = panel.dataset.filmId;
     if (!filmId) return;
     delete localRatings[filmId];
@@ -1468,42 +1474,43 @@ container.addEventListener("click", async (event) => {
   if (!segment) return;
   const panel = segment.closest(".rating-panel");
   if (!panel || panel.classList.contains("locked")) return;
-  if (!supabaseClient) return;
+  setRatingError(panel, "");
+  if (!supabaseClient) {
+    setRatingError(panel, "Ratings are unavailable right now.");
+    return;
+  }
   const filmId = segment.dataset.filmId;
   const ratingValue = Number(segment.dataset.rating);
-  const film = allFilms.find(entry => entry.id === filmId);
-  if (!film || !ratingValue) return;
+  if (!ratingValue) return;
+  if (typeof getVisitorId !== "function") {
+    setRatingError(panel, "We couldn’t verify your session to save this rating.");
+    return;
+  }
+  const visitorId = getVisitorId();
 
-  const { data, error } = await supabaseClient.rpc("submit_film_rating", {
-    p_film_id: filmId,
-    p_device_id: deviceId,
-    p_rating: ratingValue,
-    p_title: film.title ?? null
-  });
+  const { error } = await supabaseClient
+    .from("film_votes")
+    .upsert(
+      {
+        film_id: filmId,
+        visitor_id: visitorId,
+        rating: ratingValue
+      },
+      { onConflict: "film_id,visitor_id" }
+    );
 
   if (error) {
     console.error("Rating update failed.", error);
-    statusEl.textContent = `Rating failed: ${error.message || "Unknown error"}`;
+    setRatingError(panel, error.message ? `Rating failed: ${error.message}` : "Rating failed. Try again.");
     return;
   }
-  statusEl.textContent = "";
 
-  const response = Array.isArray(data) ? data[0] : data;
-  if (!response) return;
-  const listenerRating = response.listener_rating ?? response.listener_score ?? 0;
-  const yourRating = response.your_rating ?? response.your_vote ?? ratingValue;
+  const listenerRating = listenerScores[filmId] ?? 0;
+  const yourRating = ratingValue;
 
-  listenerScores[filmId] = listenerRating;
-  film.listener_score = listenerRating;
-
-  if (!yourRating) {
-    delete localRatings[filmId];
-  } else {
-    localRatings[filmId] = yourRating;
-  }
+  localRatings[filmId] = yourRating;
   saveLocalRatings();
   updateRatingUI(filmId, listenerRating, yourRating);
-  render({ skipScoreRefresh: true });
 });
 
 container.addEventListener("mouseover", (event) => {
@@ -1609,6 +1616,7 @@ function updateRatingUI(filmId, listenerRating, yourRating) {
 
     panel.classList.toggle("locked", hasRating);
     panel.classList.add("open");
+    setRatingError(panel, "");
 
     if (rateToggle) {
       rateToggle.setAttribute("aria-expanded", "true");
