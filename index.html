@@ -2526,21 +2526,13 @@ function clearFilmSearchSuggestions() {
 function updateFilmSearchSuggestions(matchCount) {
   const { suggestions } = getFilmSearchElements();
   if (!suggestions) return;
-  if (!filmSearchQuery) {
-    suggestions.textContent = "";
-    return;
-  }
-  suggestions.textContent = `${matchCount} result${matchCount === 1 ? "" : "s"}`;
+  suggestions.textContent = "";
 }
 
 function updateFilmSearchLabel(resultCount = 0) {
   const { label } = getFilmSearchElements();
   if (!label) return;
-  if (!filmSearchQuery) {
-    label.textContent = "Search";
-    return;
-  }
-  label.textContent = `Search – ${resultCount} result${resultCount === 1 ? "" : "s"}`;
+  label.textContent = "Search";
 }
 
 
