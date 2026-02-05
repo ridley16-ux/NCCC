@@ -1475,18 +1475,21 @@ container.addEventListener("click", async (event) => {
   if (!segment) return;
   const panel = segment.closest(".rating-panel");
   if (!panel || panel.classList.contains("locked")) return;
+  const card = panel.closest(".film-card");
   setRatingError(panel, "");
   if (!supabaseClient) {
     setRatingError(panel, "Ratings are unavailable right now.");
     return;
   }
-  const filmId = panel.dataset.filmId;
+  const filmId = card?.dataset.filmId;
   const ratingValue = Number(segment.dataset.rating);
   if (!ratingValue) return;
   if (!filmId || filmId.length < 8) {
     console.error("Invalid film_id for listener vote submission.", {
       filmId,
-      ratingValue
+      ratingValue,
+      panel,
+      card
     });
     setRatingError(panel, "We couldn’t verify this film rating right now.");
     return;
