@@ -115,9 +115,13 @@ label {
   margin-bottom: 0;           /* ✅ header owns spacing now */
   flex-wrap: wrap;
   width: 100%;
+}
+
+.filters-row {
+  width: 100%;
   max-width: 900px;
-  margin-left: auto;
-  margin-right: auto;
+  margin: 0 auto;
+  padding: 0 16px;
 }
 
 .filter-row {
@@ -170,17 +174,30 @@ label {
 
 .film-search-wrap {
   position: relative;
-  max-width: 900px;
-  margin: 0 auto;
 }
 
 .film-search-input {
   width: 100%;
   background: #2c2c2c;
   color: #fff;
-  border: none;
-  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 20px;
   padding: 10px 14px;
+  min-height: 40px;
+  font-size: 16px;
+  line-height: 1.2;
+}
+
+.film-search-input:hover {
+  border-color: rgba(255, 255, 255, 0.28);
+}
+
+.film-search-input:focus,
+.film-search-input:focus-visible,
+.film-search-input:active {
+  outline: none;
+  box-shadow: none;
+  border-color: var(--accent-rob);
 }
 
 .film-search-suggestions {
@@ -1033,6 +1050,9 @@ body.modal-open {
     font-size: 13px;
     width: 100%;
   }
+  .film-search-input {
+    font-size: 16px;
+  }
   .rating-panel {
     margin-left: 0;
     width: 100%;
@@ -1136,7 +1156,7 @@ body.modal-open {
 
 <template id="header-extras-template">
   <div class="controls">
-    <div class="filter-row">
+    <div class="filters-row filter-row">
       <div class="filter">
         <label for="filmFilter">Show films</label>
         <select id="filmFilter">
@@ -1161,7 +1181,7 @@ body.modal-open {
       </button>
     </div>
 
-    <div id="filmSearchRow" class="film-search-row" aria-hidden="true">
+    <div id="filmSearchRow" class="filters-row film-search-row" aria-hidden="true">
       <div class="film-search-wrap">
         <input id="filmSearchInput" class="film-search-input" type="search" placeholder="Search films by title or cast" autocomplete="off" />
         <div id="filmSearchSuggestions" class="film-search-suggestions" aria-live="polite"></div>
