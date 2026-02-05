@@ -177,15 +177,31 @@ label {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a;
 }
 
+:root {
+  --badge-height: 30px;
+  --badge-font-size: 15px;
+  --badge-padding-x: 12px;
+  --badge-radius: 999px;
+  --badge-row-top: 16px;
+  --badge-row-gap-desktop: 10px;
+  --badge-row-gap-mobile: 8px;
+}
+
 .hero-rank {
   position: absolute;
-  top: 16px;
+  top: var(--badge-row-top);
   left: 16px;
   background: gold;
   color: #000;
-  font-weight: bold;
-  padding: 6px 10px;
-  border-radius: 20px;
+  min-height: var(--badge-height);
+  padding: 0 var(--badge-padding-x);
+  border-radius: var(--badge-radius);
+  font-size: var(--badge-font-size);
+  font-weight: 900;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   z-index: 5;
 }
 
@@ -200,7 +216,7 @@ label {
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 18px;
   align-items: start;
-  padding-top: 72px;
+  padding-top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-desktop));
 }
 
 .poster-wrap {
@@ -358,7 +374,7 @@ label {
 
 .hero-rosettes {
   position: absolute;
-  top: 16px;
+  top: var(--badge-row-top);
   right: 16px;
   display: flex;
   flex-direction: row;
@@ -372,15 +388,25 @@ label {
 }
 
 .rosette {
-  font-size: 11px;
+  min-height: var(--badge-height);
+  font-size: var(--badge-font-size);
   font-weight: 900;
-  padding: 6px 10px;
-  border-radius: 999px;
+  padding: 0 var(--badge-padding-x);
+  border-radius: var(--badge-radius);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
   line-height: 1;
   border: 1px solid rgba(255,255,255,0.18);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.35em;
+}
+
+.badge-icon {
+  font-size: 0.9em;
+  line-height: 1;
 }
 
 .badge {
@@ -914,13 +940,19 @@ body.modal-open {
   .films-list { padding: 0 16px; }
   .hero-layout {
     grid-template-columns: 1fr;
-    padding-top: 120px;
+    padding-top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-mobile));
   }
   .poster-wrap {
     max-width: 260px;
   }
   .poster { width: 100%; height: auto; }
-  .hero-rank { left: 12px; top: 12px; }
+  .hero-rank {
+    left: 12px;
+    top: 12px;
+    font-size: 13px;
+    min-height: 26px;
+    padding: 0 10px;
+  }
   .controls {
     flex-direction: column;
     align-items: stretch;
@@ -959,23 +991,16 @@ body.modal-open {
     font-size: 12px;
   }
   .hero-rosettes {
-    top: 46px;
+    top: 12px;
     right: 12px;
-    flex-direction: column;
-    flex-wrap: nowrap;
+    flex-direction: row;
+    flex-wrap: wrap;
     justify-content: flex-start;
     align-items: flex-end;
     gap: 7px;
-    max-width: 62%;
+    max-width: 70%;
   }
-  .hero-rosettes .badge-flag {
-    font-size: 10px;
-    padding: 5px 8px;
-  }
-  .hero-rosettes .flag {
-    font-size: 10px;
-    padding: 5px 8px;
-  }
+  .hero-rosettes .rosette { font-size: 13px; min-height: 26px; padding: 0 10px; }
   .listener-score { flex-wrap: wrap; }
 }
 
@@ -992,8 +1017,8 @@ body.modal-open {
   }
 
   .hero-rosettes .rosette {
-    font-size: clamp(10px, 0.72vw, 11px);
-    padding: clamp(5px, 0.42vw, 6px) clamp(8px, 0.8vw, 10px);
+    font-size: var(--badge-font-size);
+    padding: 0 var(--badge-padding-x);
   }
 }
 
@@ -1735,9 +1760,9 @@ async function render(options = {}) {
       <div class="hero-rank">#${index + 1}</div>
       <div class="hero-rosettes" aria-label="Episode rosettes">
           <span class="rosette flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
-          ${film.rob && film === best ? '<span class="rosette badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
-          ${film.rob && listenerBest && film === listenerBest ? '<span class="rosette badge-flag listener">Listeners Pick ❤️</span>' : ''}
-          ${film.rob && film === newest ? '<span class="rosette badge-flag new">NEW 🆕</span>' : ''}
+          ${film.rob && film === best ? '<span class="rosette badge-flag best">Kev&#39;s Pick <span class="badge-icon" aria-hidden="true">🏅</span></span>' : ''}
+          ${film.rob && listenerBest && film === listenerBest ? '<span class="rosette badge-flag listener">Listeners Pick <span class="badge-icon" aria-hidden="true">❤️</span></span>' : ''}
+          ${film.rob && film === newest ? '<span class="rosette badge-flag new">NEW <span class="badge-icon" aria-hidden="true">🆕</span></span>' : ''}
       </div>
 
       <div class="hero-layout">
@@ -2146,7 +2171,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
