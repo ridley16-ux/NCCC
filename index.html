@@ -858,10 +858,6 @@ body.modal-open {
   color: rgba(255, 255, 255, 0.82);
 }
 
-.rating-panel.rated .rating-status {
-  display: flex;
-}
-
 .rating-error {
   margin-top: 6px;
   font-size: 12px;
@@ -991,10 +987,11 @@ body.modal-open {
     min-width: 0;
   }
   .rating-meta {
-    font-size: 11px;
+    font-size: 12px;
   }
   .rating-output {
-    font-size: 12px;
+    font-size: 24px;
+    line-height: 1;
   }
   .rosette-stack {
     top: calc(var(--poster-side-offset) - (var(--badge-height) * 0.2) + 2px);
@@ -1863,13 +1860,10 @@ async function render(options = {}) {
               <div class="rating-shell">
                 <div class="rating-meta">
                   <span class="rating-label">Your rating</span>
-                  <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "—/10"}</span>
-                </div>
-                <div class="rating-status" ${storedRating ? "" : "hidden"}>
-                  <span class="rating-status-text">${storedRating ? `You rated: ${storedRating}/10` : ""}</span>
+                  <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "-/10"}</span>
                 </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
-                <button class="rating-clear" type="button" ${storedRating ? "" : "hidden"}>Reset</button>
+                <button class="rating-clear" type="button" ${storedRating ? "" : "disabled"}>Reset</button>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
@@ -2112,8 +2106,6 @@ window.addEventListener("resize", () => {
 
 function updateRatingUI(filmId, listenerRating, yourRating) {
   document.querySelectorAll(`.rating-panel[data-film-id="${filmId}"]`).forEach(panel => {
-    const status = panel.querySelector(".rating-status");
-    const statusText = panel.querySelector(".rating-status-text");
     const clearButton = panel.querySelector(".rating-clear");
     const slider = panel.querySelector(".rating-slider");
     const hasRating = Boolean(yourRating);
@@ -2121,14 +2113,8 @@ function updateRatingUI(filmId, listenerRating, yourRating) {
     panel.classList.toggle("rated", hasRating);
     setRatingError(panel, "");
 
-    if (status) {
-      status.hidden = !hasRating;
-    }
-    if (statusText) {
-      statusText.textContent = hasRating ? `You rated: ${yourRating}/10` : "";
-    }
     if (clearButton) {
-      clearButton.hidden = !hasRating;
+      clearButton.disabled = !hasRating;
     }
     if (slider) {
       slider.value = hasRating ? String(yourRating) : "5";
@@ -2146,7 +2132,7 @@ function updateRatingOutput(panel, value) {
   if (!panel) return;
   const output = panel.querySelector("[data-rating-output]");
   if (!output) return;
-  output.textContent = value ? `${value}/10` : "—/10";
+  output.textContent = value ? `${value}/10` : "-/10";
 }
 
 function closeOpenTooltip() {
@@ -2205,11 +2191,3 @@ loadFilms();
 
 </body>
 </html>
-
-
-
-
-
-
-
-
