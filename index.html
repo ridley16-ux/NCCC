@@ -148,6 +148,10 @@ label {
 }
 
 .film-search-toggle {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
   border: none;
   border-radius: 20px;
   padding: 10px 14px;
@@ -156,6 +160,19 @@ label {
   cursor: pointer;
   font-size: 18px;
   line-height: 1;
+}
+
+.film-search-toggle-text {
+  display: none;
+}
+
+.film-search-toggle-icon {
+  font-size: 16px;
+  line-height: 1;
+}
+
+.film-search-toggle.is-active {
+  background: #383838;
 }
 
 .film-search-row {
@@ -1000,7 +1017,7 @@ body.modal-open {
 
 
 @media (max-width: 768px) {
-  /* Mobile-only: align filter labels + controls + pre-expanded search */
+  /* Mobile-only: grouped search + filters accordion */
   .films-list { padding: 0 16px; }
   .hero-layout {
     grid-template-columns: 1fr;
@@ -1028,9 +1045,9 @@ body.modal-open {
     max-width: 900px;
     margin: 0 auto;
     padding: 0 16px;
-    display: grid;
-    grid-template-columns: 1fr;
-    row-gap: 10px;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
     align-items: stretch;
   }
   .filters-row {
@@ -1039,74 +1056,106 @@ body.modal-open {
     margin: 0;
   }
   .filter-row {
-    display: grid;
-    grid-template-columns: 1fr;
-    row-gap: 10px;
-    align-items: stretch;
+    display: contents;
+  }
+  .mobile-filter-control {
+    min-height: 44px;
+    border-radius: 16px;
+    padding: 0 14px;
+    background: #2c2c2c;
+  }
+  .film-search-toggle {
+    order: 1;
+    width: 100%;
+    min-height: 44px;
+    border-radius: 16px;
+    justify-content: flex-start;
+    font-size: 16px;
+  }
+  .film-search-toggle-text {
+    display: inline;
+    font-weight: 600;
+  }
+  .film-search-toggle-icon {
+    font-size: 15px;
+  }
+  .film-search-row {
+    order: 2;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.2s ease, opacity 0.2s ease, padding 0.2s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 0 12px;
+  }
+  .controls.mobile-filters-open .film-search-row {
+    max-height: 260px;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 12px;
   }
   .filter {
-    display: grid;
-    grid-template-columns: 86px minmax(0, 1fr);
-    align-items: center;
-    column-gap: 12px;
-    min-height: 40px;
+    order: 3;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.2s ease, opacity 0.2s ease;
   }
   .sort {
-    display: grid;
-    grid-template-columns: 86px minmax(0, 1fr);
-    align-items: center;
-    column-gap: 12px;
-    min-height: 40px;
+    order: 4;
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.2s ease, opacity 0.2s ease;
+  }
+  .controls.mobile-filters-open .filter,
+  .controls.mobile-filters-open .sort {
+    max-height: 120px;
+    opacity: 1;
+    pointer-events: auto;
   }
   .filter label,
   .sort label {
     margin: 0;
+    font-size: 13px;
+    color: var(--muted);
   }
   .filter select,
   .sort select {
-    padding: 8px 10px;
-    font-size: 13px;
+    font-size: 16px;
     width: 100%;
-    min-height: 40px;
-    border-radius: 20px;
     margin: 0;
-  }
-  .film-search-toggle {
-    display: none;
-  }
-  .film-search-row {
-    display: block;
-    max-height: none;
-    opacity: 1;
-    overflow: visible;
-    pointer-events: auto;
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    font-weight: 600;
   }
   .film-search-wrap {
-    display: grid;
-    grid-template-columns: 24px minmax(0, 1fr);
-    column-gap: 12px;
-    align-items: center;
-    width: 100%;
-  }
-  .film-search-wrap::before {
-    content: "🔍";
     display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 18px;
-    line-height: 1;
+    flex-direction: column;
+    gap: 6px;
+    width: 100%;
   }
   .film-search-input {
     width: 100%;
-    min-height: 40px;
-    border-radius: 20px;
-    padding: 8px 10px;
     font-size: 16px;
     -webkit-appearance: none;
     appearance: none;
     outline: none;
     box-shadow: none;
     margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .film-search-input:focus,
   .film-search-input:focus-visible,
@@ -1116,7 +1165,6 @@ body.modal-open {
     box-shadow: none;
   }
   .film-search-suggestions {
-    grid-column: 2;
     margin-top: 6px;
   }
   .rating-panel {
@@ -1225,7 +1273,7 @@ body.modal-open {
     <div class="filters-row filter-row">
       <div class="filter">
         <label for="filmFilter">Show films</label>
-        <select id="filmFilter">
+        <select id="filmFilter" class="mobile-filter-control">
           <option value="all">All Films</option>
           <option value="real">Real Films</option>
           <option value="rob" selected>Rob’s Films</option>
@@ -1234,7 +1282,7 @@ body.modal-open {
 
       <div class="sort">
         <label for="sortSelect">Sort by</label>
-        <select id="sortSelect">
+        <select id="sortSelect" class="mobile-filter-control">
           <option value="rating-desc">Rating (High to Low)</option>
           <option value="rating-asc">Rating (Low to High)</option>
           <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
@@ -1242,14 +1290,15 @@ body.modal-open {
         </select>
       </div>
 
-      <button id="filmSearchToggle" class="film-search-toggle" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle film search">
-        🔍
+      <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle search and filters">
+        <span class="film-search-toggle-icon" aria-hidden="true">⚙︎</span>
+        <span class="film-search-toggle-text">Search &amp; Filters</span>
       </button>
     </div>
 
     <div id="filmSearchRow" class="filters-row film-search-row" aria-hidden="true">
       <div class="film-search-wrap">
-        <input id="filmSearchInput" class="film-search-input" type="search" placeholder="Search films by title or cast" autocomplete="off" />
+        <input id="filmSearchInput" class="film-search-input mobile-filter-control" type="search" placeholder="Search films by title or cast" autocomplete="off" />
         <div id="filmSearchSuggestions" class="film-search-suggestions" aria-live="polite"></div>
       </div>
     </div>
@@ -2113,6 +2162,23 @@ function getFilmSearchElements() {
   };
 }
 
+function refreshSearchFilterToggleState() {
+  const { toggle } = getFilmSearchElements();
+  if (!toggle) return;
+  const hasActiveState = Boolean((filmSearchQuery && filmSearchQuery.length) || currentFilter !== "all" || currentSort !== "rating-desc");
+  toggle.classList.toggle("is-active", hasActiveState);
+}
+
+function setFilmSearchOpen(isOpen) {
+  const { toggle, row } = getFilmSearchElements();
+  const controls = toggle?.closest(".controls");
+  if (!row || !toggle || !controls) return;
+  row.classList.toggle("is-open", isOpen);
+  row.setAttribute("aria-hidden", String(!isOpen));
+  toggle.setAttribute("aria-expanded", String(isOpen));
+  controls.classList.toggle("mobile-filters-open", isOpen);
+}
+
 function clearFilmSearchSuggestions() {
   const { suggestions } = getFilmSearchElements();
   if (suggestions) suggestions.textContent = "";
@@ -2129,24 +2195,18 @@ function updateFilmSearchSuggestions(matchCount) {
 }
 
 function closeFilmSearch({ resetInput = false } = {}) {
-  const { toggle, row, input } = getFilmSearchElements();
-  if (!row || !toggle) return;
-  row.classList.remove("is-open");
-  row.setAttribute("aria-hidden", "true");
-  toggle.setAttribute("aria-expanded", "false");
+  const { input } = getFilmSearchElements();
+  setFilmSearchOpen(false);
   if (resetInput && input) {
     input.value = "";
   }
 }
 
 function toggleFilmSearch() {
-  const { toggle, row, input } = getFilmSearchElements();
-  if (!toggle || !row) return;
+  const { row, input } = getFilmSearchElements();
+  if (!row) return;
   const isOpen = !row.classList.contains("is-open");
-  // console.log("Search toggle clicked", isOpen);
-  row.classList.toggle("is-open", isOpen);
-  row.setAttribute("aria-hidden", String(!isOpen));
-  toggle.setAttribute("aria-expanded", String(isOpen));
+  setFilmSearchOpen(isOpen);
   if (isOpen && input) {
     input.focus();
     return;
@@ -2155,6 +2215,7 @@ function toggleFilmSearch() {
   if (input) input.value = "";
   clearFilmSearchSuggestions();
   resetPagination();
+  refreshSearchFilterToggleState();
   render();
 }
 
@@ -2196,6 +2257,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("header:ready", () => {
     syncFilterControls();
     closeFilmSearch({ resetInput: true });
+    refreshSearchFilterToggleState();
   });
 
   document.addEventListener("click", (event) => {
@@ -2208,6 +2270,7 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("input", (event) => {
     if (event.target?.id !== "filmSearchInput") return;
     filmSearchQuery = event.target.value.trim();
+    refreshSearchFilterToggleState();
     resetPagination();
     render();
   });
@@ -2216,11 +2279,13 @@ document.addEventListener("DOMContentLoaded", () => {
     if (event.target?.id === "filmFilter") {
       currentFilter = event.target.value;
       updateListenerSortAvailability();
+      refreshSearchFilterToggleState();
       resetPagination();
       render();
     }
     if (event.target?.id === "sortSelect") {
       currentSort = event.target.value;
+      refreshSearchFilterToggleState();
       resetPagination();
       render();
     }
