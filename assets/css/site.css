@@ -98,3 +98,54 @@
     font-size: 13px;
   }
 }
+
+@media (max-width: 600px) {
+  .sticky-menu {
+    padding: 10px 10px 6px;
+    margin: 0 0 14px;
+  }
+
+  .site-title {
+    margin: 0 0 8px;
+  }
+
+  .site-title img {
+    width: 96vw;
+    max-width: 360px;
+    max-height: 92px;
+    object-fit: contain;
+  }
+
+  .nav-links {
+    gap: 6px;
+    padding: 4px 0 8px;
+  }
+
+  .nav-links a {
+    font-size: 14px;
+    min-height: 42px;
+    padding: 11px 12px;
+    border-radius: 22px;
+  }
+
+  #header-extras {
+    margin-top: 2px;
+  }
+
+  #header-extras .controls {
+    gap: 4px;
+    margin: 0;
+  }
+
+  #header-extras .filters-row {
+    margin: 0;
+  }
+
+  #header-extras .film-search-row {
+    margin-top: 0;
+  }
+
+  .sticky-divider {
+    margin-top: 8px;
+  }
+}
