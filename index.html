@@ -187,16 +187,7 @@ label {
   font-weight: bold;
   padding: 6px 10px;
   border-radius: 20px;
-}
-
-.flag-stack {
-  position: absolute;
-  top: 10px;
-  right: 10px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 6px;
+  z-index: 4;
 }
 
 .flag {
@@ -220,6 +211,8 @@ label {
   object-fit: cover;
   border-radius: 8px;
   display: block;
+  position: relative;
+  z-index: 1;
 }
 
 .film-details {
@@ -364,8 +357,9 @@ label {
   left: 8px;
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 6px;
-  z-index: 2;
+  z-index: 3;
   pointer-events: none;
 }
 
@@ -421,6 +415,22 @@ label {
   border: 1px solid rgba(255,255,255,0.18);
   color: #fff;
   white-space: nowrap;
+}
+
+.poster-rosettes .flag {
+  order: 1;
+}
+
+.poster-rosettes .badge-flag.new {
+  order: 2;
+}
+
+.poster-rosettes .badge-flag.best {
+  order: 3;
+}
+
+.poster-rosettes .badge-flag.listener {
+  order: 4;
 }
 
 .badge-flag.new { background: #2e6bd1; }
@@ -705,6 +715,12 @@ body.modal-open {
   gap: 8px;
   min-width: 220px;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+  transition: box-shadow 0.2s ease, border-color 0.2s ease;
+}
+
+.rating-shell:focus-within {
+  border-color: rgba(245, 197, 107, 0.55);
+  box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
 .rating-meta {
@@ -728,7 +744,66 @@ body.modal-open {
 .rating-slider {
   width: 100%;
   accent-color: #f5c56b;
-  height: 4px;
+  height: 6px;
+  cursor: pointer;
+}
+
+.rating-slider:focus-visible {
+  outline: 2px solid rgba(245, 197, 107, 0.55);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+.rating-slider::-webkit-slider-runnable-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(245, 197, 107, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(245, 197, 107, 0.4);
+}
+
+.rating-slider::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f5c56b;
+  border: 2px solid #1b1b1b;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  margin-top: -6px;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+.rating-slider::-moz-range-track {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(245, 197, 107, 0.28);
+  box-shadow: inset 0 0 0 1px rgba(245, 197, 107, 0.4);
+}
+
+.rating-slider::-moz-range-progress {
+  height: 6px;
+  border-radius: 999px;
+  background: rgba(245, 197, 107, 0.75);
+}
+
+.rating-slider::-moz-range-thumb {
+  width: 18px;
+  height: 18px;
+  border-radius: 50%;
+  background: #f5c56b;
+  border: 2px solid #1b1b1b;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .rating-slider:hover::-webkit-slider-thumb,
+  .rating-slider:active::-webkit-slider-thumb,
+  .rating-slider:hover::-moz-range-thumb,
+  .rating-slider:active::-moz-range-thumb {
+    transform: scale(1.08);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
+  }
 }
 
 .rating-clear {
@@ -874,6 +949,23 @@ body.modal-open {
     padding: 5px 8px;
   }
   .listener-score { flex-wrap: wrap; }
+}
+
+@media (min-width: 900px) {
+  .film-card.rob-film {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: 24px;
+    align-items: start;
+  }
+
+  .film-card.rob-film .poster-wrap {
+    grid-column: 2;
+  }
+
+  .film-card.rob-film .film-details {
+    grid-column: 1;
+  }
 }
 
 @media (max-width: 760px) {
@@ -1611,20 +1703,15 @@ async function render(options = {}) {
     card.dataset.filmId = film.id;
 
     card.innerHTML = `
-      <div class="rank">#${index + 1}</div>
-      <div class="flag-stack">
-        <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
-      </div>
-
       <div class="poster-wrap">
+        <div class="rank">#${index + 1}</div>
+        <div class="poster-rosettes" aria-label="Episode rosettes">
+          <span class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
+          ${film.rob && film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
+          ${film.rob && film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
+          ${film.rob && listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
+        </div>
         <img src="${film.poster}" class="poster" />
-        ${film.rob ? `
-          <div class="poster-rosettes" aria-label="Episode rosettes">
-            ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
-            ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
-            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
-          </div>
-        ` : ''}
       </div>
 
       ${film.rob ? `
@@ -1688,11 +1775,11 @@ async function render(options = {}) {
                   <span class="rating-label">Your rating</span>
                   <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "—/10"}</span>
                 </div>
+                <div class="rating-status" ${storedRating ? "" : "hidden"}>
+                  <span class="rating-status-text">${storedRating ? `You rated: ${storedRating}/10` : ""}</span>
+                </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
-                <button class="rating-clear" type="button" ${storedRating ? "" : "hidden"}>Clear</button>
-              </div>
-              <div class="rating-status" ${storedRating ? "" : "hidden"}>
-                <span class="rating-status-text">${storedRating ? `You rated: ${storedRating}/10` : ""}</span>
+                <button class="rating-clear" type="button" ${storedRating ? "" : "hidden"}>Reset</button>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
