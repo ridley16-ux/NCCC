@@ -234,7 +234,7 @@ label {
 
 .detail-row {
   display: grid;
-  grid-template-columns: 1fr 240px;
+  grid-template-columns: 1fr minmax(220px, 320px);
   gap: 14px;
   align-items: start;
   min-width: 0;
@@ -242,7 +242,7 @@ label {
 
 /* ✅ wider Kev badge column on Rob cards */
 .rob-details .detail-row {
-  grid-template-columns: 1fr 300px;
+  grid-template-columns: 1fr minmax(260px, 420px);
 }
 
 .detail-title {
@@ -274,6 +274,10 @@ label {
   margin: 0;
 }
 
+[data-audience-votes] {
+  display: none;
+}
+
 .audience-line.audience-nudge {
   animation: audienceNudge 1.4s ease-out;
 }
@@ -295,6 +299,76 @@ label {
 }
 
 .dot { opacity: 0.7; }
+
+.score-row {
+  display: flex;
+  align-items: stretch;
+  gap: 12px;
+  min-width: 0;
+}
+
+.score-card {
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.score-card--split {
+  --score-win: #f0a45c;
+  --score-lose: #c46d37;
+  --score-tie: #dd8446;
+  flex: 1;
+  min-width: 0;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  border: 1px solid rgba(255, 178, 118, 0.35);
+  background: rgba(212, 106, 42, 0.28);
+  overflow: hidden;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
+  padding: 0;
+}
+
+.score-half {
+  padding: 14px;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+}
+
+.score-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.score-value {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.score-half--win {
+  background: var(--score-win);
+}
+
+.score-half--lose {
+  background: var(--score-lose);
+}
+
+.score-half--tie {
+  background: var(--score-tie);
+}
+
+.rosettes-slot {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 130px;
+  align-items: flex-end;
+  justify-content: center;
+}
 
 .badge {
   border-radius: 18px;
@@ -677,7 +751,7 @@ body.modal-open {
   font-size: 13px;
   font-weight: 600;
   cursor: pointer;
-  transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease;
+  transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease, box-shadow 0.12s ease;
 }
 
 .rating-segment:hover,
@@ -691,11 +765,12 @@ body.modal-open {
   background: var(--segment-color);
   border-color: rgba(255, 255, 255, 0.35);
   color: #fff;
-  filter: brightness(1.1);
+  filter: brightness(1.05);
 }
 
 .rating-segment.selected {
-  filter: brightness(1.2);
+  filter: none;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.4);
 }
 
 .rating-panel.locked .rating-segment {
@@ -703,10 +778,10 @@ body.modal-open {
 }
 
 .rating-panel.locked .rating-bar {
-  box-shadow: 0 0 0 1px rgba(245, 197, 107, 0.25), 0 0 16px rgba(245, 197, 107, 0.18);
   border-radius: 18px;
   padding: 4px;
   pointer-events: none;
+  border: 1px solid rgba(245, 197, 107, 0.3);
 }
 
 .rating-panel.locked .rating-segment.selected {
@@ -838,6 +913,28 @@ body.modal-open {
     align-items: flex-end;
   }
   .listener-score { flex-wrap: wrap; }
+  .rating-panel.open .rating-shell {
+    flex-direction: column;
+    align-items: stretch;
+    width: 100%;
+  }
+  .rating-panel.open .rating-grid {
+    display: grid;
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    justify-items: stretch;
+  }
+  .rating-grid .rating-segment {
+    min-width: 0;
+    min-height: 42px;
+    border-radius: 12px;
+    font-size: 14px;
+    padding: 0;
+  }
+  .rosettes-slot {
+    display: none;
+  }
 }
 
 @media (max-width: 760px) {
@@ -849,6 +946,12 @@ body.modal-open {
 
 @media (max-width: 520px) {
   .bar-row { grid-template-columns: 110px 1fr 40px; }
+}
+
+@media (max-width: 400px) {
+  .rating-panel.open .rating-grid {
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+  }
 }
 </style>
 </head>
@@ -1400,6 +1503,7 @@ function updateAudienceScoreUI(filmId, audienceData, options = {}) {
   document.querySelectorAll(`.film-card[data-film-id="${filmId}"]`).forEach(card => {
     const audienceLabelEl = card.querySelector("[data-audience-label]");
     const audienceVotesEl = card.querySelector("[data-audience-votes]");
+    const scoreCard = card.querySelector("[data-score-card]");
     if (audienceLabelEl) {
       audienceLabelEl.textContent = audienceLabel;
       if (highlight) triggerAudienceNudge(audienceLabelEl);
@@ -1407,7 +1511,44 @@ function updateAudienceScoreUI(filmId, audienceData, options = {}) {
     if (audienceVotesEl) {
       audienceVotesEl.textContent = audienceVotesLabel;
     }
+    if (scoreCard) {
+      const audienceValueEl = scoreCard.querySelector('[data-score-half="audience"] [data-score-value]');
+      scoreCard.dataset.audienceScore = audiencePercent ?? "";
+      if (audienceValueEl) {
+        audienceValueEl.textContent = audiencePercent !== null ? `${audiencePercent}%` : "—";
+      }
+      applyScoreCardHighlight(scoreCard);
+    }
   });
+}
+
+function applyScoreCardHighlight(scoreCard) {
+  if (!scoreCard) return;
+  const kevValue = Number(scoreCard.dataset.kevScore);
+  const audienceValue = Number(scoreCard.dataset.audienceScore);
+  const kevHalf = scoreCard.querySelector('[data-score-half="kev"]');
+  const audienceHalf = scoreCard.querySelector('[data-score-half="audience"]');
+  if (!kevHalf || !audienceHalf) return;
+  [kevHalf, audienceHalf].forEach((half) => {
+    half.classList.remove("score-half--win", "score-half--lose", "score-half--tie");
+  });
+
+  if (!Number.isFinite(kevValue) || !Number.isFinite(audienceValue)) {
+    kevHalf.classList.add("score-half--tie");
+    audienceHalf.classList.add("score-half--tie");
+    return;
+  }
+
+  if (kevValue > audienceValue) {
+    kevHalf.classList.add("score-half--win");
+    audienceHalf.classList.add("score-half--lose");
+  } else if (audienceValue > kevValue) {
+    audienceHalf.classList.add("score-half--win");
+    kevHalf.classList.add("score-half--lose");
+  } else {
+    kevHalf.classList.add("score-half--tie");
+    audienceHalf.classList.add("score-half--tie");
+  }
 }
 
 async function refreshAudienceScoreForFilm(filmId) {
@@ -1483,13 +1624,6 @@ async function render(options = {}) {
       <div class="rank">#${index + 1}</div>
       <div class="flag-stack">
         <div class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</div>
-        ${film.rob ? `
-          <div class="badge-flags" aria-label="Episode rosettes">
-            ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
-            ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
-            ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
-          </div>
-        ` : ''}
       </div>
 
       <img src="${film.poster}" class="poster" />
@@ -1506,17 +1640,25 @@ async function render(options = {}) {
                 Starring: ${film.starring}
               </p>
               <p class="meta-line">Podcasted: ${formatUkDate(film.podcastDate)}</p>
-              <div class="audience-score">
-                <p class="audience-line" data-audience-label>${audienceLabel}</p>
-                <p class="audience-line" data-audience-votes>${audienceVotesLabel}</p>
-              </div>
             </div>
 
-            <aside class="badge kev-badge" aria-label="Kev's score">
-              <div class="badge-label">Kev’s Score</div>
-              <div class="badge-value">${film.score}%</div>
-
-            </aside>
+            <div class="score-row">
+              <div class="score-card score-card--split" data-score-card data-kev-score="${film.score}" data-audience-score="${audiencePercent ?? ""}">
+                <div class="score-half score-half--kev" data-score-half="kev">
+                  <div class="score-label">Kev’s Score</div>
+                  <div class="score-value" data-score-value>${film.score}%</div>
+                </div>
+                <div class="score-half score-half--audience" data-score-half="audience">
+                  <div class="score-label">Audience</div>
+                  <div class="score-value" data-score-value>${audiencePercent !== null ? `${audiencePercent}%` : "—"}</div>
+                </div>
+              </div>
+              <div class="rosettes-slot" aria-label="Episode rosettes">
+                ${film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
+                ${film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
+                ${listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
+              </div>
+            </div>
           </div>
 
           <div class="divider"></div>
@@ -1549,7 +1691,7 @@ async function render(options = {}) {
             <div class="rating-panel ${storedRating ? "open locked" : ""}" data-rating-panel data-film-id="${film.id}">
               <div class="rating-shell">
                 <button class="rate-toggle" type="button" aria-expanded="${storedRating ? "true" : "false"}">Rate</button>
-                <div class="rating-bar" role="group" aria-label="Rate ${film.title}">
+                <div class="rating-bar rating-grid" role="group" aria-label="Rate ${film.title}">
                   ${buildRatingSegments(film.id, storedRating)}
                 </div>
               </div>
@@ -1558,15 +1700,6 @@ async function render(options = {}) {
                 <button class="rating-change" type="button">Change</button>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
-              <p class="listener-score" data-listener-score="${film.id}">
-                <span class="listener-score-text">Listeners Rating: ${formatListenerRating(listenerScore)}</span>
-                <span class="listener-info-wrap">
-                  <button class="listener-info" type="button" aria-label="Listener rating info" aria-expanded="false" aria-controls="listener-tooltip-${film.id}">i</button>
-                  <span class="listener-tooltip" id="listener-tooltip-${film.id}" role="tooltip">
-                    This is the average listener rating on a 1–10 scale.
-                  </span>
-                </span>
-              </p>
             </div>
           </div>
         </div>
@@ -1601,6 +1734,7 @@ async function render(options = {}) {
     `;
 
     container.appendChild(card);
+    applyScoreCardHighlight(card.querySelector("[data-score-card]"));
   });
 
   updateStatus(visibleFilms.length, currentTotal);
