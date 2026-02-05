@@ -204,7 +204,7 @@ label {
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 18px;
   align-items: start;
-  padding-top: 66px;
+  padding-top: 84px;
 }
 
 .poster-wrap {
@@ -365,12 +365,14 @@ label {
   top: 16px;
   right: 16px;
   display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: 8px;
+  flex-direction: row;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  align-items: flex-start;
+  gap: 9px;
   z-index: 5;
   pointer-events: none;
-  max-width: min(48%, 220px);
+  max-width: min(50%, 360px);
 }
 
 .badge {
@@ -431,15 +433,15 @@ label {
   order: 1;
 }
 
-.hero-rosettes .badge-flag.new {
+.hero-rosettes .badge-flag.best {
   order: 2;
 }
 
-.hero-rosettes .badge-flag.best {
+.hero-rosettes .badge-flag.listener {
   order: 3;
 }
 
-.hero-rosettes .badge-flag.listener {
+.hero-rosettes .badge-flag.new {
   order: 4;
 }
 
@@ -908,7 +910,7 @@ body.modal-open {
 }
 
 
-@media (max-width: 700px) {
+@media (max-width: 767px) {
   .films-list { padding: 0 16px; }
   .hero-layout {
     grid-template-columns: 1fr;
@@ -959,6 +961,11 @@ body.modal-open {
   .hero-rosettes {
     top: 46px;
     right: 12px;
+    flex-direction: column;
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    align-items: flex-end;
+    gap: 7px;
     max-width: 62%;
   }
   .hero-rosettes .badge-flag {
@@ -1710,9 +1717,9 @@ async function render(options = {}) {
       <div class="hero-rank">#${index + 1}</div>
       <div class="hero-rosettes" aria-label="Episode rosettes">
           <span class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
-          ${film.rob && film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
           ${film.rob && film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
           ${film.rob && listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
+          ${film.rob && film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
       </div>
 
       <div class="hero-layout">
@@ -2121,7 +2128,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
