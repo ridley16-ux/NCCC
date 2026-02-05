@@ -276,7 +276,22 @@ label {
 
 /* ✅ wider Kev badge column on Rob cards */
 .rob-details .detail-row {
-  grid-template-columns: 1fr minmax(260px, 420px);
+  grid-template-columns: minmax(0, 1.5fr) minmax(260px, 420px);
+}
+
+.rob-details .detail-row > :first-child {
+  max-width: 150%;
+}
+
+.rob-details .score-row {
+  height: 100%;
+  align-items: center;
+  justify-content: center;
+}
+
+.rob-details .score-card--split {
+  width: 100%;
+  max-width: 420px;
 }
 
 .detail-title {
@@ -1822,7 +1837,7 @@ async function render(options = {}) {
                   <div class="score-value" data-score-value>${film.score}%</div>
                 </div>
                 <div class="score-half score-half--audience" data-score-half="audience">
-                  <div class="score-label">Audience Score</div>
+                  <div class="score-label">Listener Score</div>
                   <div class="score-value" data-score-value>${audiencePercent !== null ? `${audiencePercent}%` : "—"}</div>
                 </div>
               </div>
