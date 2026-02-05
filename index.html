@@ -1262,6 +1262,18 @@ function getAudienceSortValues(film) {
   };
 }
 
+function compareAudience(a, b) {
+  const aValues = getAudienceSortValues(a);
+  const bValues = getAudienceSortValues(b);
+  if (aValues.weighted !== bValues.weighted) {
+    return bValues.weighted - aValues.weighted;
+  }
+  if (aValues.listenerCount !== bValues.listenerCount) {
+    return bValues.listenerCount - aValues.listenerCount;
+  }
+  return 0;
+}
+
 function stableSortFilms(films, comparator) {
   return films
     .map((film) => ({
@@ -1282,17 +1294,7 @@ function getFilteredFilms() {
   if (currentFilter === "real") films = films.filter(f => !f.rob);
 
   if (currentSort === "audience") {
-    films = stableSortFilms(films, (a, b) => {
-      const aValues = getAudienceSortValues(a);
-      const bValues = getAudienceSortValues(b);
-      if (aValues.weighted !== bValues.weighted) {
-        return bValues.weighted - aValues.weighted;
-      }
-      if (aValues.listenerCount !== bValues.listenerCount) {
-        return bValues.listenerCount - aValues.listenerCount;
-      }
-      return 0;
-    });
+    films = stableSortFilms(films, compareAudience);
   } else if (currentSort === "votes") {
     films = stableSortFilms(films, (a, b) => {
       const aValues = getAudienceSortValues(a);
@@ -1432,7 +1434,14 @@ async function render(options = {}) {
   const newest = [...robFilms].sort((a,b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
   const best = [...robFilms].sort((a,b) => b.score - a.score)[0];
   const robFilmsInView = films.filter(f => f.rob);
-  const listenerBest = [...robFilmsInView].sort((a, b) => (listenerScores[b.id] ?? 0) - (listenerScores[a.id] ?? 0))[0];
+  const eligibleListenerFilms = robFilmsInView.filter(film => {
+    const values = getAudienceSortValues(film);
+    return values.weighted !== -1 || values.listenerCount !== 0;
+  });
+  const listenerBestCandidates = eligibleListenerFilms.length ? eligibleListenerFilms : robFilmsInView;
+  const listenerBest = listenerBestCandidates.length
+    ? stableSortFilms(listenerBestCandidates, compareAudience)[0]
+    : null;
 
   currentTotal = films.length;
   const visibleFilms = films.slice(0, visibleCount);
@@ -1708,6 +1717,13 @@ container.addEventListener("click", async (event) => {
   saveLocalRatings();
   updateRatingUI(filmId, listenerRating, yourRating);
   await refreshAudienceScoreForFilm(filmId);
+  if (currentSort === "audience" || currentSort === "votes") {
+    await render({ skipScoreRefresh: true });
+    const updatedCard = document.querySelector(`.film-card[data-film-id="${filmId}"]`);
+    if (updatedCard) {
+      updatedCard.scrollIntoView({ block: "center", behavior: "smooth" });
+    }
+  }
 });
 
 container.addEventListener("mouseover", (event) => {
