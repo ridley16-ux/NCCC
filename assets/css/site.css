@@ -22,11 +22,12 @@ body {
 }
 
 .sticky-menu {
-  position: relative;
+  position: sticky;
+  top: 0;
   width: 100%;
   max-width: 100%;
   padding: 16px 16px 12px;
-  margin: 0 0 24px;
+  margin: 0 0 12px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
 }
 
@@ -45,13 +46,6 @@ body {
 
 .header-extras:empty {
   display: none;
-}
-
-/* Keep first content block clear of sticky header across pages. */
-#site-header ~ .content,
-#site-header ~ main.content,
-#site-header ~ #films.films-list {
-  margin-top: var(--stickyHeaderH);
 }
 
 .site-title {
@@ -126,7 +120,7 @@ body {
 @media (max-width: 600px) {
   .sticky-menu {
     padding: 10px 10px 6px;
-    margin: 0 0 14px;
+    margin: 0 0 8px;
   }
 
   .site-title {
