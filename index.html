@@ -112,7 +112,7 @@ label {
   justify-content: center;
   align-items: stretch;
   gap: 8px;
-  margin-bottom: 0;           /* ✅ header owns spacing now */
+  margin-bottom: 0;
   flex-wrap: wrap;
   width: 100%;
 }
@@ -147,6 +147,7 @@ label {
   gap: 6px;
 }
 
+
 .film-search-toggle {
   display: inline-flex;
   align-items: center;
@@ -164,6 +165,18 @@ label {
 
 .film-search-toggle-text {
   display: none;
+}
+
+.film-search-toggle-label {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
 }
 
 .film-search-toggle-icon {
@@ -212,9 +225,10 @@ label {
 .film-search-input:focus,
 .film-search-input:focus-visible,
 .film-search-input:active {
-  outline: none;
-  box-shadow: none;
-  border-color: var(--accent-rob);
+  outline: 2px solid rgba(245, 197, 107, 0.6);
+  outline-offset: 2px;
+  box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.2);
+  border-color: rgba(245, 197, 107, 0.5);
 }
 
 .film-search-suggestions {
@@ -231,18 +245,19 @@ label {
 
 .filter select,
 .sort select {
-  white-space: nowrap;        /* ✅ avoids wrapping */
+  white-space: nowrap;
 }
 
 .filter select,
 .sort select {
   background: #2c2c2c;
   color: #fff;
-  border: none;
+  border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 10px 14px;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
+  font-size: 16px;
 }
 
 /* Film list */
@@ -1017,7 +1032,6 @@ body.modal-open {
 
 
 @media (max-width: 768px) {
-  /* Mobile-only: grouped search + filters accordion */
   .films-list { padding: 0 16px; }
   .hero-layout {
     grid-template-columns: 1fr;
@@ -1056,7 +1070,10 @@ body.modal-open {
     margin: 0;
   }
   .filter-row {
-    display: contents;
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 44px;
+    gap: 8px;
+    align-items: end;
   }
   .mobile-filter-control {
     min-height: 44px;
@@ -1064,64 +1081,26 @@ body.modal-open {
     padding: 0 14px;
     background: #2c2c2c;
   }
-  .film-search-toggle {
-    order: 1;
-    width: 100%;
-    min-height: 44px;
-    border-radius: 16px;
-    justify-content: flex-start;
-    font-size: 16px;
-  }
-  .film-search-toggle-text {
-    display: inline;
-    font-weight: 600;
-  }
-  .film-search-toggle-icon {
-    font-size: 15px;
-  }
-  .film-search-row {
-    order: 2;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
-    transition: max-height 0.2s ease, opacity 0.2s ease, padding 0.2s ease;
-    background: rgba(255, 255, 255, 0.03);
-    border: 1px solid rgba(255, 255, 255, 0.08);
-    border-radius: 16px;
-    padding: 0 12px;
-  }
-  .controls.mobile-filters-open .film-search-row {
-    max-height: 260px;
-    opacity: 1;
-    pointer-events: auto;
-    padding: 12px;
-  }
   .filter {
-    order: 3;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 6px;
-    max-height: 0;
-    opacity: 0;
-    overflow: hidden;
-    pointer-events: none;
-    transition: max-height 0.2s ease, opacity 0.2s ease;
+    width: 100%;
   }
   .sort {
-    order: 4;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     gap: 6px;
+    width: 100%;
+    grid-column: 1 / -1;
     max-height: 0;
     opacity: 0;
     overflow: hidden;
     pointer-events: none;
-    transition: max-height 0.2s ease, opacity 0.2s ease;
+    transition: max-height 0.23s ease, opacity 0.2s ease;
   }
-  .controls.mobile-filters-open .filter,
   .controls.mobile-filters-open .sort {
     max-height: 120px;
     opacity: 1;
@@ -1134,12 +1113,50 @@ body.modal-open {
     color: var(--muted);
   }
   .filter select,
-  .sort select {
-    font-size: 16px;
+  .sort select,
+  .film-search-input {
     width: 100%;
     margin: 0;
     border: 1px solid rgba(255, 255, 255, 0.1);
     font-weight: 600;
+    min-height: 44px;
+    border-radius: 16px;
+    font-size: 16px;
+  }
+  .film-search-toggle {
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 14px;
+    padding: 0;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+  }
+  .film-search-toggle-icon {
+    font-size: 18px;
+  }
+  .film-search-toggle.is-active {
+    background: rgba(245, 197, 107, 0.2);
+    border: 1px solid rgba(245, 197, 107, 0.5);
+    box-shadow: 0 0 10px rgba(245, 197, 107, 0.22);
+  }
+  .film-search-row {
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.23s ease, opacity 0.2s ease, padding 0.2s ease;
+    background: rgba(255, 255, 255, 0.03);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 16px;
+    padding: 0 12px;
+  }
+  .controls.mobile-filters-open .film-search-row {
+    max-height: 220px;
+    opacity: 1;
+    pointer-events: auto;
+    padding: 12px;
   }
   .film-search-wrap {
     display: flex;
@@ -1148,21 +1165,18 @@ body.modal-open {
     width: 100%;
   }
   .film-search-input {
-    width: 100%;
-    font-size: 16px;
     -webkit-appearance: none;
     appearance: none;
     outline: none;
     box-shadow: none;
-    margin: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
   }
   .film-search-input:focus,
   .film-search-input:focus-visible,
   .film-search-input:active {
-    border-color: rgba(255, 255, 255, 0.1);
-    outline: none;
-    box-shadow: none;
+    border-color: rgba(245, 197, 107, 0.45);
+    outline: 2px solid rgba(245, 197, 107, 0.55);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.2);
   }
   .film-search-suggestions {
     margin-top: 6px;
@@ -1291,8 +1305,9 @@ body.modal-open {
       </div>
 
       <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle search and filters">
-        <span class="film-search-toggle-icon" aria-hidden="true">⚙︎</span>
+        <span class="film-search-toggle-icon" aria-hidden="true">☰</span>
         <span class="film-search-toggle-text">Search &amp; Filters</span>
+        <span class="film-search-toggle-label">Search and sort controls</span>
       </button>
     </div>
 
@@ -1303,6 +1318,7 @@ body.modal-open {
       </div>
     </div>
   </div>
+
 </template>
 
 <div id="films" class="films-list"></div>
@@ -2162,10 +2178,18 @@ function getFilmSearchElements() {
   };
 }
 
+function isMobileViewport() {
+  return window.matchMedia("(max-width: 768px)").matches;
+}
+
+function hasActiveSearchFilterState() {
+  return Boolean((filmSearchQuery && filmSearchQuery.length) || currentFilter !== "all" || currentSort !== "rating-desc");
+}
+
 function refreshSearchFilterToggleState() {
   const { toggle } = getFilmSearchElements();
   if (!toggle) return;
-  const hasActiveState = Boolean((filmSearchQuery && filmSearchQuery.length) || currentFilter !== "all" || currentSort !== "rating-desc");
+  const hasActiveState = hasActiveSearchFilterState();
   toggle.classList.toggle("is-active", hasActiveState);
 }
 
@@ -2173,6 +2197,7 @@ function setFilmSearchOpen(isOpen) {
   const { toggle, row } = getFilmSearchElements();
   const controls = toggle?.closest(".controls");
   if (!row || !toggle || !controls) return;
+
   row.classList.toggle("is-open", isOpen);
   row.setAttribute("aria-hidden", String(!isOpen));
   toggle.setAttribute("aria-expanded", String(isOpen));
@@ -2256,7 +2281,8 @@ async function loadFilms() {
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("header:ready", () => {
     syncFilterControls();
-    closeFilmSearch({ resetInput: true });
+    const shouldExpand = isMobileViewport() && hasActiveSearchFilterState();
+    setFilmSearchOpen(shouldExpand);
     refreshSearchFilterToggleState();
   });
 
