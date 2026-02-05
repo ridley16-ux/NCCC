@@ -119,6 +119,20 @@ label {
   margin-right: auto;
 }
 
+.controls-shell {
+  width: 100%;
+  max-width: 900px;
+  margin: 0 auto;
+}
+
+.controls-main {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  width: 100%;
+}
+
 .filter {
   display: flex;
   gap: 8px;
@@ -132,6 +146,94 @@ label {
   display: flex;
   align-items: center;
   gap: 6px;
+}
+
+.search-toggle {
+  width: 42px;
+  height: 42px;
+  border-radius: 999px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: #2c2c2c;
+  color: #fff;
+  cursor: pointer;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 18px;
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.search-toggle:hover {
+  background: #373737;
+  transform: translateY(-1px);
+}
+
+.search-toggle[aria-expanded="true"] {
+  background: #d1632e;
+  border-color: #d1632e;
+}
+
+.search-row {
+  margin-top: 10px;
+  max-height: 0;
+  opacity: 0;
+  overflow: hidden;
+  transition: max-height 0.22s ease, opacity 0.18s ease;
+}
+
+.search-row.is-open {
+  max-height: 140px;
+  opacity: 1;
+}
+
+.search-input-wrap {
+  position: relative;
+}
+
+.search-input {
+  width: 100%;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 999px;
+  background: #2c2c2c;
+  color: #fff;
+  padding: 10px 16px;
+  font-size: 14px;
+}
+
+.search-input:focus-visible,
+.search-toggle:focus-visible {
+  outline: 2px solid rgba(245, 154, 79, 0.7);
+  outline-offset: 2px;
+}
+
+.search-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  z-index: 20;
+  background: #1c1c1c;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-radius: 12px;
+  padding: 6px;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.search-suggestion {
+  width: 100%;
+  text-align: left;
+  background: transparent;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 8px 10px;
+  cursor: pointer;
+}
+
+.search-suggestion:hover,
+.search-suggestion.is-active {
+  background: rgba(209, 99, 46, 0.28);
 }
 
 .filter label,
@@ -952,9 +1054,12 @@ body.modal-open {
     padding: 0 10px;
   }
   .controls {
+    display: block;
+    gap: 12px;
+  }
+  .controls-main {
     flex-direction: column;
     align-items: stretch;
-    gap: 12px;
   }
   .filter {
     flex-direction: column;
@@ -972,6 +1077,10 @@ body.modal-open {
     padding: 8px 10px;
     font-size: 13px;
     width: 100%;
+  }
+  .search-toggle {
+    width: 100%;
+    border-radius: 20px;
   }
   .rating-panel {
     margin-left: 0;
@@ -1075,24 +1184,35 @@ body.modal-open {
 <div id="site-header"></div>
 
 <template id="header-extras-template">
-  <div class="controls">
-    <div class="filter">
-      <label for="filmFilter">Show films</label>
-      <select id="filmFilter">
-        <option value="all">All Films</option>
-        <option value="real">Real Films</option>
-        <option value="rob" selected>Rob’s Films</option>
-      </select>
+  <div class="controls-shell">
+    <div class="controls controls-main">
+      <div class="filter">
+        <label for="filmFilter">Show films</label>
+        <select id="filmFilter">
+          <option value="all">All Films</option>
+          <option value="real">Real Films</option>
+          <option value="rob" selected>Rob’s Films</option>
+        </select>
+      </div>
+
+      <div class="sort">
+        <label for="sortSelect">Sort by</label>
+        <select id="sortSelect">
+          <option value="rating-desc">Rating (High to Low)</option>
+          <option value="rating-asc">Rating (Low to High)</option>
+          <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
+          <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
+        </select>
+      </div>
+
+      <button id="filmSearchToggle" class="search-toggle" type="button" aria-label="Search films" aria-expanded="false">🔍</button>
     </div>
 
-    <div class="sort">
-      <label for="sortSelect">Sort by</label>
-      <select id="sortSelect">
-        <option value="rating-desc">Rating (High to Low)</option>
-        <option value="rating-asc">Rating (Low to High)</option>
-        <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
-        <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
-      </select>
+    <div id="filmSearchRow" class="search-row" aria-hidden="true">
+      <div class="search-input-wrap">
+        <input id="filmSearchInput" class="search-input" type="search" placeholder="Search film titles" autocomplete="off" aria-label="Search film titles" />
+        <div id="filmSearchSuggestions" class="search-suggestions" role="listbox" hidden></div>
+      </div>
     </div>
   </div>
 </template>
@@ -1161,6 +1281,11 @@ const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
 let currentFilter = "rob";
 let currentSort = "rating-desc";
+let currentSearchQuery = "";
+let isSearchOpen = false;
+let searchDebounceTimer = null;
+let activeSuggestionIndex = -1;
+let visibleSuggestions = [];
 let lastScoreFetchKey = "";
 const listenerScores = {};
 const audienceScores = {};
@@ -1184,6 +1309,22 @@ const transcriptDialog = transcriptModal?.querySelector(".transcript-dialog");
 const transcriptBody = document.getElementById("transcript-body");
 const transcriptTitle = document.getElementById("transcript-title");
 let transcriptTrigger = null;
+
+function getSearchToggle() {
+  return document.getElementById("filmSearchToggle");
+}
+
+function getSearchRow() {
+  return document.getElementById("filmSearchRow");
+}
+
+function getSearchInput() {
+  return document.getElementById("filmSearchInput");
+}
+
+function getSuggestionsBox() {
+  return document.getElementById("filmSearchSuggestions");
+}
 
 function parseLocalDate(d) {
   if (!d) return null;
@@ -1524,11 +1665,90 @@ function getCompositeScore(film) {
   return 0;
 }
 
-function getFilteredFilms() {
+function getBaseFilteredFilms() {
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
   return films;
+}
+
+function applySearchFilter(films) {
+  const query = currentSearchQuery.trim().toLowerCase();
+  if (!query) return films;
+  return films.filter((film) => film.title.toLowerCase().includes(query));
+}
+
+function getFilteredFilms() {
+  const baseFilms = getBaseFilteredFilms();
+  return applySearchFilter(baseFilms);
+}
+
+function buildSuggestions(baseFilms, rawQuery) {
+  const query = rawQuery.trim().toLowerCase();
+  if (!query) return [];
+  return [...baseFilms]
+    .filter((film) => film.title.toLowerCase().includes(query))
+    .sort((a, b) => {
+      const aTitle = a.title.toLowerCase();
+      const bTitle = b.title.toLowerCase();
+      const aStarts = aTitle.startsWith(query) ? 0 : 1;
+      const bStarts = bTitle.startsWith(query) ? 0 : 1;
+      if (aStarts !== bStarts) return aStarts - bStarts;
+      if (a.title.length !== b.title.length) return a.title.length - b.title.length;
+      return a.title.localeCompare(b.title, "en", { sensitivity: "base" });
+    })
+    .slice(0, 6);
+}
+
+function renderSuggestions() {
+  const suggestionsBox = getSuggestionsBox();
+  if (!suggestionsBox) return;
+  visibleSuggestions = buildSuggestions(getBaseFilteredFilms(), currentSearchQuery);
+  activeSuggestionIndex = visibleSuggestions.length ? Math.min(activeSuggestionIndex, visibleSuggestions.length - 1) : -1;
+
+  if (!visibleSuggestions.length || !currentSearchQuery.trim() || !isSearchOpen) {
+    suggestionsBox.innerHTML = "";
+    suggestionsBox.hidden = true;
+    return;
+  }
+
+  suggestionsBox.innerHTML = visibleSuggestions.map((film, index) => {
+    const isActive = index === activeSuggestionIndex;
+    return `<button type="button" class="search-suggestion ${isActive ? "is-active" : ""}" role="option" aria-selected="${isActive ? "true" : "false"}" data-suggestion-index="${index}">${escapeHtml(film.title)}</button>`;
+  }).join("");
+  suggestionsBox.hidden = false;
+}
+
+function closeSuggestions() {
+  activeSuggestionIndex = -1;
+  const suggestionsBox = getSuggestionsBox();
+  if (!suggestionsBox) return;
+  suggestionsBox.hidden = true;
+  suggestionsBox.innerHTML = "";
+}
+
+function setSearchOpen(nextOpen) {
+  const searchToggle = getSearchToggle();
+  const searchRow = getSearchRow();
+  const searchInput = getSearchInput();
+  if (!searchToggle || !searchRow || !searchInput) return;
+
+  isSearchOpen = nextOpen;
+  searchToggle.setAttribute("aria-expanded", String(nextOpen));
+  searchRow.classList.toggle("is-open", nextOpen);
+  searchRow.setAttribute("aria-hidden", nextOpen ? "false" : "true");
+
+  if (!nextOpen) {
+    currentSearchQuery = "";
+    searchInput.value = "";
+    closeSuggestions();
+    resetPagination();
+    render();
+    return;
+  }
+
+  searchInput.focus();
+  renderSuggestions();
 }
 
 function sortFilms(films) {
@@ -1591,6 +1811,80 @@ function syncFilterControls() {
   if (filterSelect) filterSelect.value = currentFilter;
   if (sortSelect) sortSelect.value = currentSort;
   updateListenerSortAvailability();
+}
+
+function applySearchQuery(rawValue) {
+  currentSearchQuery = rawValue.trim();
+  activeSuggestionIndex = -1;
+  resetPagination();
+  render();
+  renderSuggestions();
+}
+
+function bindSearchControls() {
+  const searchToggle = getSearchToggle();
+  const searchInput = getSearchInput();
+  const suggestionsBox = getSuggestionsBox();
+  if (!searchToggle || !searchInput || !suggestionsBox || searchToggle.dataset.bound === "true") return;
+
+  searchToggle.dataset.bound = "true";
+
+  searchToggle.addEventListener("click", () => {
+    setSearchOpen(!isSearchOpen);
+  });
+
+  searchInput.addEventListener("input", () => {
+    clearTimeout(searchDebounceTimer);
+    searchDebounceTimer = setTimeout(() => {
+      applySearchQuery(searchInput.value);
+    }, 120);
+  });
+
+  searchInput.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      if (!visibleSuggestions.length) return;
+      event.preventDefault();
+      activeSuggestionIndex = Math.min(activeSuggestionIndex + 1, visibleSuggestions.length - 1);
+      renderSuggestions();
+      return;
+    }
+    if (event.key === "ArrowUp") {
+      if (!visibleSuggestions.length) return;
+      event.preventDefault();
+      activeSuggestionIndex = Math.max(activeSuggestionIndex - 1, 0);
+      renderSuggestions();
+      return;
+    }
+    if (event.key === "Enter") {
+      if (!visibleSuggestions.length) return;
+      event.preventDefault();
+      const selected = visibleSuggestions[activeSuggestionIndex >= 0 ? activeSuggestionIndex : 0];
+      if (!selected) return;
+      searchInput.value = selected.title;
+      currentSearchQuery = selected.title;
+      closeSuggestions();
+      resetPagination();
+      render();
+      return;
+    }
+    if (event.key === "Escape") {
+      closeSuggestions();
+    }
+  });
+
+  suggestionsBox.addEventListener("click", (event) => {
+    const suggestion = event.target.closest("[data-suggestion-index]");
+    if (!suggestion) return;
+    const index = Number(suggestion.dataset.suggestionIndex);
+    const film = visibleSuggestions[index];
+    if (!film) return;
+    searchInput.value = film.title;
+    currentSearchQuery = film.title;
+    closeSuggestions();
+    resetPagination();
+    render();
+    searchInput.focus();
+  });
 }
 
 async function refreshListenerScores(films) {
@@ -1931,6 +2225,7 @@ async function render(options = {}) {
   });
 
   updateStatus(visibleFilms.length, currentTotal);
+  if (isSearchOpen) renderSuggestions();
   updateLoadingState(false);
   updateSentinelVisibility();
 }
@@ -1969,7 +2264,10 @@ async function loadFilms() {
   }
 }
 
-document.addEventListener("header:ready", syncFilterControls);
+document.addEventListener("header:ready", () => {
+  syncFilterControls();
+  bindSearchControls();
+});
 
 document.addEventListener("change", (event) => {
   if (event.target?.id === "filmFilter") {
