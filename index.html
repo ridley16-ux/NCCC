@@ -1280,6 +1280,7 @@ async function render(options = {}) {
       : "";
     const card = document.createElement("div");
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
+    card.dataset.filmId = film.id;
 
     card.innerHTML = `
       <div class="rank">#${index + 1}</div>
@@ -1479,9 +1480,17 @@ container.addEventListener("click", async (event) => {
     setRatingError(panel, "Ratings are unavailable right now.");
     return;
   }
-  const filmId = segment.dataset.filmId;
+  const filmId = panel.dataset.filmId;
   const ratingValue = Number(segment.dataset.rating);
   if (!ratingValue) return;
+  if (!filmId || filmId.length < 8) {
+    console.error("Invalid film_id for listener vote submission.", {
+      filmId,
+      ratingValue
+    });
+    setRatingError(panel, "We couldn’t verify this film rating right now.");
+    return;
+  }
   if (typeof getVisitorId !== "function") {
     setRatingError(panel, "We couldn’t verify your session to save this rating.");
     return;
