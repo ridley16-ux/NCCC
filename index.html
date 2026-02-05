@@ -127,6 +127,14 @@ label {
 
 .sort {
   flex: 0 0 auto;             /* ✅ dropdown keeps its size */
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.sort label {
+  font-size: 13px;
+  color: var(--muted);
 }
 
 .sort select {
@@ -843,10 +851,11 @@ body.modal-open {
     </div>
 
     <div class="sort">
+      <label for="sortSelect">Sort</label>
       <select id="sortSelect">
-        <option value="score">↑↓ by Score</option>
-        <option value="newest">↑↓ by Recent</option>
-        <option value="listener">↑↓ by Ratings</option>
+        <option value="default">Default</option>
+        <option value="audience">Audience score (high to low)</option>
+        <option value="votes">Most votes (high to low)</option>
       </select>
     </div>
   </div>
@@ -914,7 +923,7 @@ import { loadFilmsData } from "./assets/js/films-data.js";
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
 let currentFilter = "rob";
-let currentSort = "score";
+let currentSort = "default";
 let lastScoreFetchKey = "";
 const listenerScores = {};
 const audienceScores = {};
@@ -1228,20 +1237,61 @@ function updatePodcastEpisodeSchema() {
   }
 }
 
+function getAudienceSortValues(film) {
+  const audienceData = audienceScores[film.id];
+  const weighted = Number(audienceData?.weighted_percent);
+  const listenerCount = Number(audienceData?.listener_count);
+  return {
+    weighted: Number.isFinite(weighted) ? weighted : -1,
+    listenerCount: Number.isFinite(listenerCount) ? listenerCount : 0
+  };
+}
+
+function stableSortFilms(films, comparator) {
+  return films
+    .map((film) => ({
+      film,
+      originalIndex: Number.isInteger(film.originalIndex) ? film.originalIndex : 0
+    }))
+    .sort((a, b) => {
+      const result = comparator(a.film, b.film);
+      if (result !== 0) return result;
+      return a.originalIndex - b.originalIndex;
+    })
+    .map(({ film }) => film);
+}
+
 function getFilteredFilms() {
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
 
-  if (currentSort === "newest") {
-    films.sort((a, b) =>
-      (safeDate(b.podcastDate)?.getTime() || 0) -
-      (safeDate(a.podcastDate)?.getTime() || 0)
-    );
-  } else if (currentSort === "listener") {
-    films.sort((a, b) => (listenerScores[b.id] ?? 0) - (listenerScores[a.id] ?? 0));
+  if (currentSort === "audience") {
+    films = stableSortFilms(films, (a, b) => {
+      const aValues = getAudienceSortValues(a);
+      const bValues = getAudienceSortValues(b);
+      if (aValues.weighted !== bValues.weighted) {
+        return bValues.weighted - aValues.weighted;
+      }
+      if (aValues.listenerCount !== bValues.listenerCount) {
+        return bValues.listenerCount - aValues.listenerCount;
+      }
+      return 0;
+    });
+  } else if (currentSort === "votes") {
+    films = stableSortFilms(films, (a, b) => {
+      const aValues = getAudienceSortValues(a);
+      const bValues = getAudienceSortValues(b);
+      if (aValues.listenerCount !== bValues.listenerCount) {
+        return bValues.listenerCount - aValues.listenerCount;
+      }
+      if (aValues.weighted !== bValues.weighted) {
+        return bValues.weighted - aValues.weighted;
+      }
+      return 0;
+    });
   } else {
-    films.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
+    films = stableSortFilms(films, (a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
 
   return films;
@@ -1462,8 +1512,9 @@ async function render(options = {}) {
 async function loadFilms() {
   try {
     const films = await loadFilmsData();
-    films.forEach((film) => {
+    films.forEach((film, index) => {
       if (film.rob) calcRobScore(film);
+      film.originalIndex = index;
     });
 
     allFilms = films;
