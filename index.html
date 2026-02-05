@@ -1000,6 +1000,7 @@ body.modal-open {
 
 
 @media (max-width: 768px) {
+  /* Mobile-only: align filter labels + controls + pre-expanded search */
   .films-list { padding: 0 16px; }
   .hero-layout {
     grid-template-columns: 1fr;
@@ -1028,10 +1029,9 @@ body.modal-open {
     margin: 0 auto;
     padding: 0 16px;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
-    column-gap: 8px;
-    row-gap: 0;
-    align-items: center;
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    align-items: stretch;
   }
   .filters-row {
     max-width: none;
@@ -1039,58 +1039,74 @@ body.modal-open {
     margin: 0;
   }
   .filter-row {
-    display: contents;
+    display: grid;
+    grid-template-columns: 1fr;
+    row-gap: 10px;
+    align-items: stretch;
   }
   .filter {
-    grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 86px minmax(0, 1fr);
     align-items: center;
-    gap: 8px;
+    column-gap: 12px;
+    min-height: 40px;
   }
   .sort {
-    grid-column: 1 / -1;
     display: grid;
-    grid-template-columns: auto minmax(0, 1fr);
+    grid-template-columns: 86px minmax(0, 1fr);
     align-items: center;
-    gap: 8px;
+    column-gap: 12px;
+    min-height: 40px;
   }
-  .filter select,
-  .sort select,
-  .film-search-toggle {
-    padding: 8px 10px;
-    font-size: 13px;
+  .filter label,
+  .sort label {
+    margin: 0;
   }
   .filter select,
   .sort select {
-    width: auto;
-    justify-self: end;
+    padding: 8px 10px;
+    font-size: 13px;
+    width: 100%;
+    min-height: 40px;
+    border-radius: 20px;
+    margin: 0;
   }
   .film-search-toggle {
-    grid-column: 1;
-    grid-row: 3;
-    width: auto;
-    justify-self: start;
+    display: none;
   }
   .film-search-row {
-    grid-column: 2;
-    grid-row: 3;
-  }
-  .film-search-row.is-open {
-    max-height: 56px;
+    display: block;
+    max-height: none;
+    opacity: 1;
+    overflow: visible;
+    pointer-events: auto;
   }
   .film-search-wrap {
-    display: flex;
+    display: grid;
+    grid-template-columns: 24px minmax(0, 1fr);
+    column-gap: 12px;
     align-items: center;
     width: 100%;
   }
+  .film-search-wrap::before {
+    content: "🔍";
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 18px;
+    line-height: 1;
+  }
   .film-search-input {
-    flex: 1;
+    width: 100%;
+    min-height: 40px;
+    border-radius: 20px;
+    padding: 8px 10px;
     font-size: 16px;
     -webkit-appearance: none;
     appearance: none;
     outline: none;
     box-shadow: none;
+    margin: 0;
   }
   .film-search-input:focus,
   .film-search-input:focus-visible,
@@ -1098,6 +1114,10 @@ body.modal-open {
     border-color: rgba(255, 255, 255, 0.1);
     outline: none;
     box-shadow: none;
+  }
+  .film-search-suggestions {
+    grid-column: 2;
+    margin-top: 6px;
   }
   .rating-panel {
     margin-left: 0;
