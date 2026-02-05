@@ -289,9 +289,8 @@ label {
   justify-content: center;
 }
 
-.rob-details .score-card--split {
+.rob-details .score-card--stat {
   width: 100%;
-  max-width: 340px;
 }
 
 .detail-title {
@@ -350,7 +349,8 @@ label {
 .dot { opacity: 0.7; }
 
 .score-row {
-  display: flex;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
   gap: 12px;
   min-width: 0;
@@ -361,23 +361,15 @@ label {
   padding: 14px;
 }
 
-.score-card--split {
-  --score-win: #f0a45c;
-  --score-lose: #c46d37;
-  --score-tie: #dd8446;
-  flex: 1;
+.score-card--stat {
   min-width: 0;
-  display: grid;
-  grid-template-columns: repeat(2, minmax(0, 1fr));
-  border: 1px solid rgba(255, 178, 118, 0.35);
-  background: rgba(212, 106, 42, 0.28);
-  overflow: hidden;
-  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.05);
-  padding: 0;
+  border: 1px solid rgba(186, 103, 52, 0.82);
+  background: #b06b3f;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
-.score-half {
-  padding: 14px;
+.score-stat {
+  height: 100%;
   display: flex;
   flex-direction: column;
   gap: 6px;
@@ -400,16 +392,18 @@ label {
   line-height: 1;
 }
 
-.score-half--win {
-  background: var(--score-win);
+.score-trend {
+  margin-left: 0.32em;
+  font-size: 0.9em;
+  line-height: 1;
 }
 
-.score-half--lose {
-  background: var(--score-lose);
+.score-trend--up {
+  color: #8ddf9f;
 }
 
-.score-half--tie {
-  background: var(--score-tie);
+.score-trend--down {
+  color: #ff8e86;
 }
 
 .rosette {
@@ -1043,6 +1037,10 @@ body.modal-open {
   .rob-details .detail-row {
     grid-template-columns: 1fr;
   }
+
+  .score-row {
+    grid-template-columns: 1fr;
+  }
 }
 
 @media (max-width: 520px) {
@@ -1652,7 +1650,7 @@ function updateAudienceScoreUI(filmId, audienceData, options = {}) {
   document.querySelectorAll(`.film-card[data-film-id="${filmId}"]`).forEach(card => {
     const audienceLabelEl = card.querySelector("[data-audience-label]");
     const audienceVotesEl = card.querySelector("[data-audience-votes]");
-    const scoreCard = card.querySelector("[data-score-card]");
+    const scoreRow = card.querySelector("[data-score-row]");
     if (audienceLabelEl) {
       audienceLabelEl.textContent = audienceLabel;
       if (highlight) triggerAudienceNudge(audienceLabelEl);
@@ -1660,43 +1658,35 @@ function updateAudienceScoreUI(filmId, audienceData, options = {}) {
     if (audienceVotesEl) {
       audienceVotesEl.textContent = audienceVotesLabel;
     }
-    if (scoreCard) {
-      const audienceValueEl = scoreCard.querySelector('[data-score-half="audience"] [data-score-value]');
-      scoreCard.dataset.audienceScore = audiencePercent ?? "";
+    if (scoreRow) {
+      const audienceValueEl = scoreRow.querySelector('[data-score-half="audience"] [data-score-number]');
+      scoreRow.dataset.audienceScore = audiencePercent ?? "";
       if (audienceValueEl) {
         audienceValueEl.textContent = audiencePercent !== null ? `${audiencePercent}%` : "—";
       }
-      applyScoreCardHighlight(scoreCard);
+      applyScoreCardHighlight(scoreRow);
     }
   });
 }
 
-function applyScoreCardHighlight(scoreCard) {
-  if (!scoreCard) return;
-  const kevValue = Number(scoreCard.dataset.kevScore);
-  const audienceValue = Number(scoreCard.dataset.audienceScore);
-  const kevHalf = scoreCard.querySelector('[data-score-half="kev"]');
-  const audienceHalf = scoreCard.querySelector('[data-score-half="audience"]');
-  if (!kevHalf || !audienceHalf) return;
-  [kevHalf, audienceHalf].forEach((half) => {
-    half.classList.remove("score-half--win", "score-half--lose", "score-half--tie");
-  });
+function applyScoreCardHighlight(scoreRow) {
+  if (!scoreRow) return;
+  const kevValue = Number(scoreRow.dataset.kevScore);
+  const audienceValue = Number(scoreRow.dataset.audienceScore);
+  const audienceTrend = scoreRow.querySelector('[data-score-trend]');
+  if (!audienceTrend) return;
 
-  if (!Number.isFinite(kevValue) || !Number.isFinite(audienceValue)) {
-    kevHalf.classList.add("score-half--tie");
-    audienceHalf.classList.add("score-half--tie");
-    return;
-  }
+  audienceTrend.textContent = "";
+  audienceTrend.classList.remove("score-trend--up", "score-trend--down");
 
-  if (kevValue > audienceValue) {
-    kevHalf.classList.add("score-half--win");
-    audienceHalf.classList.add("score-half--lose");
-  } else if (audienceValue > kevValue) {
-    audienceHalf.classList.add("score-half--win");
-    kevHalf.classList.add("score-half--lose");
-  } else {
-    kevHalf.classList.add("score-half--tie");
-    audienceHalf.classList.add("score-half--tie");
+  if (!Number.isFinite(kevValue) || !Number.isFinite(audienceValue)) return;
+
+  if (audienceValue > kevValue) {
+    audienceTrend.textContent = "▲";
+    audienceTrend.classList.add("score-trend--up");
+  } else if (audienceValue < kevValue) {
+    audienceTrend.textContent = "▼";
+    audienceTrend.classList.add("score-trend--down");
   }
 }
 
@@ -1830,15 +1820,19 @@ async function render(options = {}) {
               <p class="meta-line">Podcasted: ${formatUkDate(film.podcastDate)}</p>
             </div>
 
-            <div class="score-row">
-              <div class="score-card score-card--split" data-score-card data-kev-score="${film.score}" data-audience-score="${audiencePercent ?? ""}">
-                <div class="score-half score-half--kev" data-score-half="kev">
+            <div class="score-row" data-score-row data-kev-score="${film.score}" data-audience-score="${audiencePercent ?? ""}">
+              <div class="score-card score-card--stat" data-score-card="kev">
+                <div class="score-stat" data-score-half="kev">
                   <div class="score-label">Kev’s Score</div>
                   <div class="score-value" data-score-value>${film.score}%</div>
                 </div>
-                <div class="score-half score-half--audience" data-score-half="audience">
+              </div>
+              <div class="score-card score-card--stat" data-score-card="audience">
+                <div class="score-stat" data-score-half="audience">
                   <div class="score-label">Listener Score</div>
-                  <div class="score-value" data-score-value>${audiencePercent !== null ? `${audiencePercent}%` : "—"}</div>
+                  <div class="score-value" data-score-value>
+                    <span data-score-number>${audiencePercent !== null ? `${audiencePercent}%` : "—"}</span><span class="score-trend" data-score-trend aria-hidden="true"></span>
+                  </div>
                 </div>
               </div>
             </div>
@@ -1918,7 +1912,7 @@ async function render(options = {}) {
     `;
 
     container.appendChild(card);
-    applyScoreCardHighlight(card.querySelector("[data-score-card]"));
+    applyScoreCardHighlight(card.querySelector("[data-score-row]"));
   });
 
   updateStatus(visibleFilms.length, currentTotal);
