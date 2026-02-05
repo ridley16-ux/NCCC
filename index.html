@@ -860,17 +860,18 @@ body.modal-open {
 <template id="header-extras-template">
   <div class="controls">
     <div class="filter">
-      <button id="all">All</button>
-      <button id="rob" class="active">Rob’s Films</button>
+      <button id="all">All Films</button>
       <button id="real">Real Films</button>
+      <button id="rob" class="active">Rob’s Films</button>
     </div>
 
     <div class="sort">
-      <label for="sortSelect">Sort</label>
+      <label for="sortSelect">Sort by</label>
       <select id="sortSelect">
-        <option value="default">Default</option>
-        <option value="audience">Audience score (high to low)</option>
-        <option value="votes">Most votes (high to low)</option>
+        <option value="rating-desc">Rating High to Low</option>
+        <option value="rating-asc">Rating Low to High</option>
+        <option value="listener-desc">Listener Rating High to Low</option>
+        <option value="listener-asc">Listener Rating Low to High</option>
       </select>
     </div>
   </div>
@@ -938,7 +939,7 @@ import { loadFilmsData } from "./assets/js/films-data.js";
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
 let currentFilter = "rob";
-let currentSort = "default";
+let currentSort = "rating-desc";
 let lastScoreFetchKey = "";
 const listenerScores = {};
 const audienceScores = {};
@@ -1288,24 +1289,37 @@ function stableSortFilms(films, comparator) {
     .map(({ film }) => film);
 }
 
+function getListenerScore(film) {
+  const score = Number(listenerScores[film.id] ?? film.listener_score);
+  return Number.isFinite(score) && score > 0 ? score : null;
+}
+
 function getFilteredFilms() {
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
 
-  if (currentSort === "audience") {
-    films = stableSortFilms(films, compareAudience);
-  } else if (currentSort === "votes") {
+  if (currentSort === "rating-asc") {
+    films = stableSortFilms(films, (a, b) => (a.score ?? 0) - (b.score ?? 0));
+  } else if (currentSort === "rating-desc") {
+    films = stableSortFilms(films, (a, b) => (b.score ?? 0) - (a.score ?? 0));
+  } else if (currentSort === "listener-asc") {
     films = stableSortFilms(films, (a, b) => {
-      const aValues = getAudienceSortValues(a);
-      const bValues = getAudienceSortValues(b);
-      if (aValues.listenerCount !== bValues.listenerCount) {
-        return bValues.listenerCount - aValues.listenerCount;
-      }
-      if (aValues.weighted !== bValues.weighted) {
-        return bValues.weighted - aValues.weighted;
-      }
-      return 0;
+      const aScore = getListenerScore(a);
+      const bScore = getListenerScore(b);
+      if (aScore === null && bScore === null) return 0;
+      if (aScore === null) return 1;
+      if (bScore === null) return -1;
+      return aScore - bScore;
+    });
+  } else if (currentSort === "listener-desc") {
+    films = stableSortFilms(films, (a, b) => {
+      const aScore = getListenerScore(a);
+      const bScore = getListenerScore(b);
+      if (aScore === null && bScore === null) return 0;
+      if (aScore === null) return 1;
+      if (bScore === null) return -1;
+      return bScore - aScore;
     });
   } else {
     films = stableSortFilms(films, (a, b) => (b.score ?? 0) - (a.score ?? 0));
@@ -1717,8 +1731,8 @@ container.addEventListener("click", async (event) => {
   saveLocalRatings();
   updateRatingUI(filmId, listenerRating, yourRating);
   await refreshAudienceScoreForFilm(filmId);
-  if (currentSort === "audience" || currentSort === "votes") {
-    await render({ skipScoreRefresh: true });
+  if (currentSort === "listener-asc" || currentSort === "listener-desc") {
+    await render();
     const updatedCard = document.querySelector(`.film-card[data-film-id="${filmId}"]`);
     if (updatedCard) {
       updatedCard.scrollIntoView({ block: "center", behavior: "smooth" });
