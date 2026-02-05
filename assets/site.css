@@ -8,50 +8,25 @@
   --nav-pad-x-mobile: 14px;
 }
 
-*,
-*::before,
-*::after {
-  box-sizing: border-box;
-}
-
-html {
-  overflow-x: clip;
-}
-
-@supports not (overflow: clip) {
-  html {
-    overflow-x: hidden;
-  }
-}
-
-body {
-  padding-top: var(--sticky-header-h, 0px);
-}
-
-.site-header {
+.sticky-menu {
   position: sticky;
-  top: env(safe-area-inset-top, 0px);
-  z-index: 1000;
-  background: var(--bg, #0f0f0f);
-  padding-top: env(safe-area-inset-top, 0px);
-  padding-right: 16px;
-  padding-bottom: 12px;
-  padding-left: 16px;
-  margin: 0 0 24px;
+  top: 0;
+  left: 0;
+  right: 0;
   width: 100%;
   max-width: 100%;
+  z-index: 1000;
+  background: #0f0f0f;
+  padding: 16px 16px 12px;
+  margin: 0 0 24px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
 }
 
-.site-header * {
-  max-width: 100%;
-}
-
-.site-header-divider {
+.sticky-divider {
   width: 100%;
   height: 1px;
   margin-top: 12px;
-  background: var(--line, rgba(255, 255, 255, 0.1));
+  background: rgba(255, 255, 255, 0.2);
   min-width: 48px;
 }
 
