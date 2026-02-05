@@ -134,6 +134,86 @@ label {
   gap: 6px;
 }
 
+.film-search {
+  position: relative;
+  display: flex;
+  align-items: center;
+  min-height: 40px;
+}
+
+.film-search-toggle {
+  width: 40px;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #2c2c2c;
+  color: #fff;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+}
+
+.film-search-panel {
+  position: relative;
+  width: 0;
+  opacity: 0;
+  overflow: hidden;
+  pointer-events: none;
+  transition: width 0.2s ease, opacity 0.2s ease;
+}
+
+.film-search.is-open .film-search-panel {
+  width: min(300px, calc(100vw - 48px));
+  opacity: 1;
+  pointer-events: auto;
+}
+
+.film-search-input {
+  width: 100%;
+  height: 40px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  background: #2c2c2c;
+  color: #fff;
+  padding: 0 14px;
+  font-size: 14px;
+}
+
+.film-search-input::placeholder {
+  color: rgba(255, 255, 255, 0.6);
+}
+
+.film-search-suggestions {
+  position: absolute;
+  top: calc(100% + 6px);
+  left: 0;
+  right: 0;
+  background: #1f1f1f;
+  border: 1px solid var(--line);
+  border-radius: 12px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.35);
+  overflow: hidden;
+  z-index: 20;
+}
+
+.film-search-suggestion {
+  width: 100%;
+  border: none;
+  background: transparent;
+  color: #fff;
+  text-align: left;
+  padding: 10px 12px;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.film-search-suggestion:hover,
+.film-search-suggestion.is-active {
+  background: rgba(255, 255, 255, 0.12);
+}
+
 .filter label,
 .sort label {
   font-size: 13px;
@@ -967,6 +1047,12 @@ body.modal-open {
     gap: 6px;
     margin-left: 0;
   }
+  .film-search {
+    width: 100%;
+  }
+  .film-search.is-open .film-search-panel {
+    width: 100%;
+  }
   .filter select,
   .sort select {
     padding: 8px 10px;
@@ -1094,6 +1180,29 @@ body.modal-open {
         <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
       </select>
     </div>
+
+    <div class="film-search" id="filmSearchControl">
+      <button
+        class="film-search-toggle"
+        id="filmSearchToggle"
+        type="button"
+        aria-label="Search films"
+        aria-expanded="false"
+      >
+        🔍
+      </button>
+      <div class="film-search-panel">
+        <input
+          class="film-search-input"
+          id="filmSearchInput"
+          type="text"
+          autocomplete="off"
+          placeholder="Search films"
+          aria-label="Search films by title"
+        />
+        <div class="film-search-suggestions" id="filmSearchSuggestions" role="listbox" hidden></div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -1161,6 +1270,7 @@ const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
 let currentFilter = "rob";
 let currentSort = "rating-desc";
+let currentSearchQuery = "";
 let lastScoreFetchKey = "";
 const listenerScores = {};
 const audienceScores = {};
@@ -1184,6 +1294,14 @@ const transcriptDialog = transcriptModal?.querySelector(".transcript-dialog");
 const transcriptBody = document.getElementById("transcript-body");
 const transcriptTitle = document.getElementById("transcript-title");
 let transcriptTrigger = null;
+let searchDebounceTimer = null;
+let searchInputEl = null;
+let searchToggleEl = null;
+let searchControlEl = null;
+let searchSuggestionsEl = null;
+let searchSuggestions = [];
+let highlightedSuggestionIndex = -1;
+let latestSearchSuggestionSource = [];
 
 function parseLocalDate(d) {
   if (!d) return null;
@@ -1531,6 +1649,182 @@ function getFilteredFilms() {
   return films;
 }
 
+function getTitleSearchMatches(films, query) {
+  const trimmedQuery = query.trim().toLowerCase();
+  if (!trimmedQuery) return films;
+  return films.filter((film) => String(film.title || "").toLowerCase().includes(trimmedQuery));
+}
+
+function getPredictiveSuggestions(films, query) {
+  const trimmedQuery = query.trim().toLowerCase();
+  if (!trimmedQuery) return [];
+
+  const seen = new Set();
+  return films
+    .map((film) => String(film.title || "").trim())
+    .filter((title) => {
+      const lowered = title.toLowerCase();
+      if (!title || !lowered.includes(trimmedQuery) || seen.has(lowered)) return false;
+      seen.add(lowered);
+      return true;
+    })
+    .sort((a, b) => {
+      const aLower = a.toLowerCase();
+      const bLower = b.toLowerCase();
+      const aStarts = aLower.startsWith(trimmedQuery);
+      const bStarts = bLower.startsWith(trimmedQuery);
+      if (aStarts !== bStarts) return aStarts ? -1 : 1;
+      if (a.length !== b.length) return a.length - b.length;
+      return a.localeCompare(b, "en", { sensitivity: "base" });
+    })
+    .slice(0, 6);
+}
+
+function renderSearchSuggestions() {
+  if (!searchSuggestionsEl) return;
+  const shouldShow = currentSearchQuery.trim() && searchSuggestions.length > 0 && searchControlEl?.classList.contains("is-open");
+  if (!shouldShow) {
+    searchSuggestionsEl.hidden = true;
+    searchSuggestionsEl.innerHTML = "";
+    highlightedSuggestionIndex = -1;
+    return;
+  }
+
+  searchSuggestionsEl.hidden = false;
+  searchSuggestionsEl.innerHTML = "";
+
+  searchSuggestions.forEach((title, index) => {
+    const option = document.createElement("button");
+    option.type = "button";
+    option.className = "film-search-suggestion";
+    if (index === highlightedSuggestionIndex) option.classList.add("is-active");
+    option.setAttribute("role", "option");
+    option.setAttribute("aria-selected", index === highlightedSuggestionIndex ? "true" : "false");
+    option.textContent = title;
+    option.addEventListener("mousedown", (event) => event.preventDefault());
+    option.addEventListener("click", () => {
+      currentSearchQuery = title;
+      if (searchInputEl) searchInputEl.value = title;
+      searchSuggestions = getPredictiveSuggestions(latestSearchSuggestionSource, currentSearchQuery);
+      highlightedSuggestionIndex = -1;
+      renderSearchSuggestions();
+      resetPagination();
+      render();
+    });
+    searchSuggestionsEl.appendChild(option);
+  });
+}
+
+function collapseSearch({ clearQuery = false, rerender = false } = {}) {
+  if (!searchControlEl) return;
+  searchControlEl.classList.remove("is-open");
+  if (searchToggleEl) searchToggleEl.setAttribute("aria-expanded", "false");
+  searchSuggestions = [];
+  highlightedSuggestionIndex = -1;
+  if (searchSuggestionsEl) {
+    searchSuggestionsEl.hidden = true;
+    searchSuggestionsEl.innerHTML = "";
+  }
+
+  if (clearQuery && currentSearchQuery) {
+    currentSearchQuery = "";
+    if (searchInputEl) searchInputEl.value = "";
+    if (rerender) {
+      resetPagination();
+      render();
+    }
+  }
+}
+
+function openSearch() {
+  if (!searchControlEl) return;
+  searchControlEl.classList.add("is-open");
+  if (searchToggleEl) searchToggleEl.setAttribute("aria-expanded", "true");
+  if (searchInputEl) {
+    window.requestAnimationFrame(() => searchInputEl.focus());
+  }
+}
+
+function updateSearchQueryDebounced(query) {
+  if (searchDebounceTimer) clearTimeout(searchDebounceTimer);
+  searchDebounceTimer = window.setTimeout(() => {
+    currentSearchQuery = query;
+    searchSuggestions = getPredictiveSuggestions(latestSearchSuggestionSource, currentSearchQuery);
+    highlightedSuggestionIndex = -1;
+    renderSearchSuggestions();
+    resetPagination();
+    render();
+  }, 120);
+}
+
+function initSearchControl() {
+  searchInputEl = document.getElementById("filmSearchInput");
+  searchToggleEl = document.getElementById("filmSearchToggle");
+  searchControlEl = document.getElementById("filmSearchControl");
+  searchSuggestionsEl = document.getElementById("filmSearchSuggestions");
+  if (!searchInputEl || !searchToggleEl || !searchControlEl || !searchSuggestionsEl) return;
+
+  searchToggleEl.addEventListener("click", () => {
+    const isOpen = searchControlEl.classList.contains("is-open");
+    if (isOpen) {
+      collapseSearch({ clearQuery: true, rerender: true });
+      return;
+    }
+    openSearch();
+    searchSuggestions = getPredictiveSuggestions(latestSearchSuggestionSource, currentSearchQuery);
+    renderSearchSuggestions();
+  });
+
+  searchInputEl.addEventListener("input", () => {
+    updateSearchQueryDebounced(searchInputEl.value);
+  });
+
+  searchInputEl.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      if (!searchSuggestions.length) return;
+      event.preventDefault();
+      highlightedSuggestionIndex = (highlightedSuggestionIndex + 1) % searchSuggestions.length;
+      renderSearchSuggestions();
+      return;
+    }
+
+    if (event.key === "ArrowUp") {
+      if (!searchSuggestions.length) return;
+      event.preventDefault();
+      highlightedSuggestionIndex = highlightedSuggestionIndex <= 0 ? searchSuggestions.length - 1 : highlightedSuggestionIndex - 1;
+      renderSearchSuggestions();
+      return;
+    }
+
+    if (event.key === "Enter") {
+      if (!searchSuggestions.length) return;
+      event.preventDefault();
+      const selectedIndex = highlightedSuggestionIndex >= 0 ? highlightedSuggestionIndex : 0;
+      const selectedTitle = searchSuggestions[selectedIndex];
+      if (!selectedTitle) return;
+      currentSearchQuery = selectedTitle;
+      searchInputEl.value = selectedTitle;
+      searchSuggestions = getPredictiveSuggestions(latestSearchSuggestionSource, currentSearchQuery);
+      highlightedSuggestionIndex = -1;
+      renderSearchSuggestions();
+      resetPagination();
+      render();
+      return;
+    }
+
+    if (event.key === "Escape") {
+      event.preventDefault();
+      collapseSearch({ clearQuery: true, rerender: true });
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!searchControlEl.classList.contains("is-open")) return;
+    if (searchControlEl.contains(event.target)) return;
+    collapseSearch({ clearQuery: true, rerender: true });
+  });
+}
+
 function sortFilms(films) {
   if (currentSort === "rating-asc") {
     return stableSortFilms(films, (a, b) => getCompositeScore(a) - getCompositeScore(b));
@@ -1732,14 +2026,19 @@ async function render(options = {}) {
   container.innerHTML = "";
   closeOpenTooltip();
 
-  let films = getFilteredFilms();
+  let baseFilms = getFilteredFilms();
   const showListenerUI = currentFilter !== "real";
 
   if (!options.skipScoreRefresh) {
-    await refreshListenerScores(films);
-    films = getFilteredFilms();
+    await refreshListenerScores(baseFilms);
+    baseFilms = getFilteredFilms();
   }
 
+  latestSearchSuggestionSource = baseFilms;
+  searchSuggestions = getPredictiveSuggestions(baseFilms, currentSearchQuery);
+  renderSearchSuggestions();
+
+  let films = getTitleSearchMatches(baseFilms, currentSearchQuery);
   films = sortFilms(films);
 
   const robFilms = allFilms.filter(f => f.rob && f.active);
@@ -1970,6 +2269,7 @@ async function loadFilms() {
 }
 
 document.addEventListener("header:ready", syncFilterControls);
+document.addEventListener("header:ready", initSearchControl);
 
 document.addEventListener("change", (event) => {
   if (event.target?.id === "filmFilter") {
