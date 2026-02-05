@@ -108,53 +108,42 @@ label {
 /* Filters + Sort */
 .controls {
   display: flex;
-  justify-content: center;
+  justify-content: space-between;
   align-items: center;
-  gap: 8px;
+  gap: 12px;
   margin-bottom: 0;           /* ✅ header owns spacing now */
-  flex-wrap: nowrap;          /* ✅ keep on ONE line */
+  flex-wrap: wrap;
   width: 100%;
 }
 
 .filter {
   display: flex;
-  gap: 10px;
-  flex-wrap: nowrap;
+  gap: 8px;
+  flex-wrap: wrap;
   align-items: center;
-  overflow: hidden;           /* ✅ stops it forcing a new row */
-  min-width: 0;               /* ✅ important for flex shrink */
+  min-width: 0;
 }
 
 .sort {
-  flex: 0 0 auto;             /* ✅ dropdown keeps its size */
+  flex: 0 0 auto;
+  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;
 }
 
+.filter label,
 .sort label {
   font-size: 13px;
   color: var(--muted);
 }
 
+.filter select,
 .sort select {
   white-space: nowrap;        /* ✅ avoids wrapping */
 }
 
-.filter button {
-  background: #2c2c2c;
-  color: #fff;
-  border: none;
-  padding: 10px 14px;
-  border-radius: 20px;
-  font-weight: bold;
-  cursor: pointer;
-  white-space: nowrap;
-  transition: opacity 0.2s ease;
-}
-.filter button:hover { opacity: 0.7; }
-.filter button.active { background: #d1632e; }
-
+.filter select,
 .sort select {
   background: #2c2c2c;
   color: #fff;
@@ -896,15 +885,26 @@ body.modal-open {
   .poster { width: 100%; height: auto; }
   .rank { left: 10px; top: 10px; }
   .controls {
-    gap: 6px;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 12px;
   }
   .filter {
+    flex-direction: column;
+    align-items: stretch;
     gap: 6px;
   }
-  .filter button,
+  .sort {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin-left: 0;
+  }
+  .filter select,
   .sort select {
     padding: 8px 10px;
     font-size: 13px;
+    width: 100%;
   }
   .rating-panel {
     margin-left: auto;
@@ -963,18 +963,21 @@ body.modal-open {
 <template id="header-extras-template">
   <div class="controls">
     <div class="filter">
-      <button id="all">All Films</button>
-      <button id="real">Real Films</button>
-      <button id="rob" class="active">Rob’s Films</button>
+      <label for="filmFilter">Show films</label>
+      <select id="filmFilter">
+        <option value="all">All Films</option>
+        <option value="real">Real Films</option>
+        <option value="rob" selected>Rob’s Films</option>
+      </select>
     </div>
 
     <div class="sort">
       <label for="sortSelect">Sort by</label>
       <select id="sortSelect">
-        <option value="rating-desc">Rating High to Low</option>
-        <option value="rating-asc">Rating Low to High</option>
-        <option value="listener-desc">Listener Rating High to Low</option>
-        <option value="listener-asc">Listener Rating Low to High</option>
+        <option value="rating-desc">Rating (High to Low)</option>
+        <option value="rating-asc">Rating (Low to High)</option>
+        <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
+        <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
       </select>
     </div>
   </div>
@@ -1016,6 +1019,7 @@ body.modal-open {
         const extrasTarget = headerContainer.querySelector("#header-extras");
         if (extrasTarget) {
           extrasTarget.appendChild(headerExtrasTemplate.content.cloneNode(true));
+          document.dispatchEvent(new CustomEvent("header:ready"));
         }
       }
     })
@@ -1088,6 +1092,7 @@ function calcRobScore(film) {
   const total = film.coherence + film.entertainment + film.originality;
   film.totalScore = total;
   film.score = Math.ceil((total / 30) * 100);
+  film.kevScore = film.kevScore ?? film.score;
   film.scoreLabel = "🎙️ Kev’s Score";
 }
 
@@ -1320,12 +1325,6 @@ function setRatingError(panel, message) {
   errorEl.hidden = !message;
 }
 
-/* ✅ set active class based on the button actually clicked */
-function setActiveButton(clickedBtn) {
-  document.querySelectorAll(".filter button").forEach(btn => btn.classList.remove("active"));
-  clickedBtn.classList.add("active");
-}
-
 function resetPagination() {
   visibleCount = PAGE_SIZE;
 }
@@ -1393,21 +1392,40 @@ function stableSortFilms(films, comparator) {
 }
 
 function getListenerScore(film) {
-  const score = Number(listenerScores[film.id] ?? film.listener_score);
+  const score = Number(listenerScores[film.id] ?? film.listenerScore ?? film.listener_score);
   return Number.isFinite(score) && score > 0 ? score : null;
+}
+
+function getCompositeScore(film) {
+  const kevScore = Number(film.kevScore);
+  const rottenScore = Number(film.rottenTomatoesScore);
+  const hasKev = Number.isFinite(kevScore);
+  const hasRotten = Number.isFinite(rottenScore);
+  // Composite rating uses equal weighting, but fall back gracefully if data is missing.
+  if (hasKev && hasRotten) {
+    return (kevScore + rottenScore) / 2;
+  }
+  if (hasKev) return kevScore;
+  if (hasRotten) return rottenScore;
+  return 0;
 }
 
 function getFilteredFilms() {
   let films = allFilms.filter(f => f.active);
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
+  return films;
+}
 
+function sortFilms(films) {
   if (currentSort === "rating-asc") {
-    films = stableSortFilms(films, (a, b) => (a.score ?? 0) - (b.score ?? 0));
-  } else if (currentSort === "rating-desc") {
-    films = stableSortFilms(films, (a, b) => (b.score ?? 0) - (a.score ?? 0));
-  } else if (currentSort === "listener-asc") {
-    films = stableSortFilms(films, (a, b) => {
+    return stableSortFilms(films, (a, b) => getCompositeScore(a) - getCompositeScore(b));
+  }
+  if (currentSort === "rating-desc") {
+    return stableSortFilms(films, (a, b) => getCompositeScore(b) - getCompositeScore(a));
+  }
+  if (currentSort === "listener-asc") {
+    return stableSortFilms(films, (a, b) => {
       const aScore = getListenerScore(a);
       const bScore = getListenerScore(b);
       if (aScore === null && bScore === null) return 0;
@@ -1415,8 +1433,9 @@ function getFilteredFilms() {
       if (bScore === null) return -1;
       return aScore - bScore;
     });
-  } else if (currentSort === "listener-desc") {
-    films = stableSortFilms(films, (a, b) => {
+  }
+  if (currentSort === "listener-desc") {
+    return stableSortFilms(films, (a, b) => {
       const aScore = getListenerScore(a);
       const bScore = getListenerScore(b);
       if (aScore === null && bScore === null) return 0;
@@ -1424,11 +1443,40 @@ function getFilteredFilms() {
       if (bScore === null) return -1;
       return bScore - aScore;
     });
-  } else {
-    films = stableSortFilms(films, (a, b) => (b.score ?? 0) - (a.score ?? 0));
   }
+  return stableSortFilms(films, (a, b) => getCompositeScore(b) - getCompositeScore(a));
+}
 
-  return films;
+function getSortSelect() {
+  return document.getElementById("sortSelect");
+}
+
+function getFilterSelect() {
+  return document.getElementById("filmFilter");
+}
+
+function updateListenerSortAvailability() {
+  const sortSelect = getSortSelect();
+  if (!sortSelect) return;
+  const listenerOptions = Array.from(sortSelect.querySelectorAll("[data-listener-option]"));
+  const allowListenerSort = currentFilter !== "real";
+  // Hide/disable listener sorts when Real Films is selected to avoid invalid options.
+  listenerOptions.forEach((option) => {
+    option.hidden = !allowListenerSort;
+    option.disabled = !allowListenerSort;
+  });
+  if (!allowListenerSort && currentSort.startsWith("listener")) {
+    currentSort = "rating-desc";
+    sortSelect.value = currentSort;
+  }
+}
+
+function syncFilterControls() {
+  const filterSelect = getFilterSelect();
+  const sortSelect = getSortSelect();
+  if (filterSelect) filterSelect.value = currentFilter;
+  if (sortSelect) sortSelect.value = currentSort;
+  updateListenerSortAvailability();
 }
 
 async function refreshListenerScores(films) {
@@ -1584,6 +1632,8 @@ async function render(options = {}) {
     await refreshListenerScores(films);
     films = getFilteredFilms();
   }
+
+  films = sortFilms(films);
 
   const robFilms = allFilms.filter(f => f.rob && f.active);
   const newest = [...robFilms].sort((a,b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
@@ -1746,7 +1796,19 @@ async function loadFilms() {
   try {
     const films = await loadFilmsData();
     films.forEach((film, index) => {
+      if (film.robFilm && film.rob === undefined) {
+        film.rob = film.robFilm;
+      }
+      if (film.realFilm && film.rob === undefined) {
+        film.rob = !film.realFilm;
+      }
       if (film.rob) calcRobScore(film);
+      if (!film.rob && film.rottenTomatoesScore === undefined && Number.isFinite(Number(film.score))) {
+        film.rottenTomatoesScore = Number(film.score);
+      }
+      if (film.rob && film.kevScore === undefined && Number.isFinite(Number(film.score))) {
+        film.kevScore = Number(film.score);
+      }
       film.originalIndex = index;
     });
 
@@ -1755,6 +1817,7 @@ async function loadFilms() {
     resetPagination();
     await fetchAudienceScores();
     await render();
+    syncFilterControls();
     updatePodcastEpisodeSchema();
 
   } catch (err) {
@@ -1763,30 +1826,21 @@ async function loadFilms() {
   }
 }
 
-document.getElementById("all").onclick = (e) => {
-  currentFilter = "all";
-  setActiveButton(e.currentTarget);
-  resetPagination();
-  render();
-};
-document.getElementById("rob").onclick = (e) => {
-  currentFilter = "rob";
-  setActiveButton(e.currentTarget);
-  resetPagination();
-  render();
-};
-document.getElementById("real").onclick = (e) => {
-  currentFilter = "real";
-  setActiveButton(e.currentTarget);
-  resetPagination();
-  render();
-};
+document.addEventListener("header:ready", syncFilterControls);
 
-document.getElementById("sortSelect").onchange = (e) => {
-  currentSort = e.target.value;
-  resetPagination();
-  render();
-};
+document.addEventListener("change", (event) => {
+  if (event.target?.id === "filmFilter") {
+    currentFilter = event.target.value;
+    updateListenerSortAvailability();
+    resetPagination();
+    render();
+  }
+  if (event.target?.id === "sortSelect") {
+    currentSort = event.target.value;
+    resetPagination();
+    render();
+  }
+});
 
 container.addEventListener("click", async (event) => {
   const toggle = event.target.closest(".rate-toggle");
