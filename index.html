@@ -11,10 +11,10 @@
   gtag('config', 'G-BHEJTM2PGH');
 </script>
 
-<link rel="apple-touch-icon" sizes="180x180" href="assets/favicon/apple-touch-icon.png">
-<link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
-<link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
-<link rel="manifest" href="assets/favicon/site.webmanifest">
+<link rel="apple-touch-icon" sizes="180x180" href="/assets/img/icons/apple-touch-icon.png">
+<link rel="icon" type="image/png" sizes="32x32" href="/assets/img/icons/favicon-32x32.png">
+<link rel="icon" type="image/png" sizes="16x16" href="/assets/img/icons/favicon-16x16.png">
+<link rel="manifest" href="/assets/data/site.webmanifest">
 
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Films</title>
@@ -32,9 +32,9 @@
 <meta name="twitter:title" content="No Context Cinema Club – Films" />
 <meta name="twitter:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted s." />
 <meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
-<link rel="stylesheet" href="assets/site.css" />
+<link rel="stylesheet" href="/assets/css/site.css" />
 <script type="module">
-  import { buildPodcastSeriesSchema, injectJsonLd } from "./assets/seo/seo.js";
+  import { buildPodcastSeriesSchema, injectJsonLd } from "/assets/js/seo.js";
 
   injectJsonLd(
     "podcast-series-schema",
@@ -1187,15 +1187,15 @@ body.modal-open {
 </div>
 
 <div id="site-footer"></div>
-<script src="assets/js/shared.js"></script>
+<script src="/assets/js/shared.js"></script>
 <script>
   const headerContainer = document.getElementById("site-header");
   const headerExtrasTemplate = document.getElementById("header-extras-template");
-  fetch("assets/header.html")
+  fetch("/assets/header.html")
     .then((response) => response.text())
     .then((html) => {
       headerContainer.innerHTML = html;
-      const activePath = window.location.pathname.split("/").pop() || "index.html";
+      const activePath = window.location.pathname === "/" ? "/index.html" : window.location.pathname;
       const navLinks = headerContainer.querySelectorAll(".nav-links a");
       navLinks.forEach((link) => {
         if (link.getAttribute("href") === activePath) {
@@ -1215,7 +1215,7 @@ body.modal-open {
     });
 
   const footerContainer = document.getElementById("site-footer");
-  fetch("assets/footer.html")
+  fetch("/assets/footer.html")
     .then((response) => response.text())
     .then((html) => {
       footerContainer.innerHTML = html;
@@ -1227,7 +1227,7 @@ body.modal-open {
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
-import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "./assets/seo/seo.js";
+import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.js";
 import { loadFilmsData } from "./assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";

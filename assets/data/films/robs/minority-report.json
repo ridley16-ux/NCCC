@@ -1,0 +1,17 @@
+{
+  "id": "rob-minority-report",
+  "rob": true,
+  "title": "Minority Report",
+  "starring": "Tom Cruise",
+  "poster": "/assets/img/posters/robs/minority-report-rob.webp",
+  "coherence": 8,
+  "entertainment": 7,
+  "originality": 6,
+
+  "podcastDate": "2026-02-11",
+  "summary": "A struggling singer becomes famous for all the wrong reasons when a viral music exposé turns him into a star, only for the internet to uncover that his success is built on stolen songs and an unpunished death he can never escape.",
+  "link": "#",
+  "linkType": "podcast"
+}
+
+

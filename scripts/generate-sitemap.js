@@ -1,13 +1,13 @@
 /*
-  Generate sitemap.xml from films/manifest.json.
+  Generate sitemap.xml from assets/data/films/manifest.json.
   Run: node scripts/generate-sitemap.js
 */
 
 const fs = require("fs");
 const path = require("path");
 
-const BASE_URL = "https://nocontextcinemaclub.com/";
-const MANIFEST_PATH = path.join(__dirname, "..", "films", "manifest.json");
+const BASE_URL = "https://nocontextcinemaclub.com";
+const MANIFEST_PATH = path.join(__dirname, "..", "assets", "data", "films", "manifest.json");
 const OUTPUT_PATH = path.join(__dirname, "..", "sitemap.xml");
 
 function readJson(filePath) {
@@ -33,15 +33,17 @@ function generateSitemap() {
   const manifest = readJson(MANIFEST_PATH);
   const today = todayStamp();
   const urls = [
-    { loc: BASE_URL, lastmod: today },
-    { loc: `${BASE_URL}listen.html`, lastmod: today },
-    { loc: `${BASE_URL}contact.html`, lastmod: today }
+    { loc: `${BASE_URL}/`, lastmod: today },
+    { loc: `${BASE_URL}/pages/about.html`, lastmod: today },
+    { loc: `${BASE_URL}/pages/listen.html`, lastmod: today },
+    { loc: `${BASE_URL}/pages/contact.html`, lastmod: today }
   ];
 
   (manifest.films || [])
     .filter((entry) => entry.active)
     .forEach((entry) => {
-      const filmPath = path.join(__dirname, "..", entry.path.replace("./", ""));
+      const normalizedEntryPath = entry.path.replace(/^\.\//, "").replace(/^\//, "");
+      const filmPath = path.join(__dirname, "..", normalizedEntryPath);
       try {
         const film = readJson(filmPath);
         if (!film || !film.id) return;

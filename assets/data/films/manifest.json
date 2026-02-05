@@ -1,0 +1,52 @@
+{
+  "films": [
+    {
+      "path": "/assets/data/films/robs/million-dollar-baby.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/reservoir-dogs.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/minority-report.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/good-will-hunting.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/face-off.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/blank.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/face-off.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/million-dollar-baby.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/minority-report.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/reservoir-dogs.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/good-will-hunting.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/real-blank.json",
+      "active": true
+    }
+  ]
+}
