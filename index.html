@@ -200,7 +200,8 @@ label {
   line-height: 1;
 }
 
-.film-search-toggle.is-active {
+.film-search-toggle.is-active,
+.film-search-toggle.has-filters {
   background: #383838;
 }
 
@@ -1087,10 +1088,20 @@ body.modal-open {
     margin: 0;
   }
   .filter-row {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) 44px;
+    display: flex;
+    flex-direction: column;
     gap: 8px;
-    align-items: end;
+    align-items: stretch;
+  }
+  .control-row {
+    display: flex;
+    width: 100%;
+    align-items: flex-end;
+    gap: 8px;
+  }
+  .control-row .filter {
+    flex: 1 1 auto;
+    min-width: 0;
   }
   .mobile-filter-control {
     min-height: 44px;
@@ -1111,7 +1122,6 @@ body.modal-open {
     align-items: stretch;
     gap: 6px;
     width: 100%;
-    grid-column: 1 / -1;
     max-height: 0;
     opacity: 0;
     overflow: hidden;
@@ -1142,6 +1152,7 @@ body.modal-open {
     font-size: 16px;
   }
   .film-search-toggle {
+    flex: 0 0 44px;
     width: 44px;
     height: 44px;
     min-height: 44px;
@@ -1152,9 +1163,18 @@ body.modal-open {
     line-height: 1;
   }
   .film-search-toggle-icon {
-    font-size: 18px;
+    width: 18px;
+    height: 18px;
+    color: currentColor;
   }
-  .film-search-toggle.is-active {
+  .film-search-toggle {
+    color: #b6b6b6;
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    background: #2c2c2c;
+  }
+  .film-search-toggle.is-active,
+  .film-search-toggle.has-filters {
+    color: #f5c56b;
     background: rgba(245, 197, 107, 0.2);
     border: 1px solid rgba(245, 197, 107, 0.5);
     box-shadow: 0 0 10px rgba(245, 197, 107, 0.22);
@@ -1188,9 +1208,12 @@ body.modal-open {
     outline: none;
     box-shadow: none;
   }
-  .film-search-input:focus,
-  .film-search-input:focus-visible,
-  .film-search-input:active {
+  .film-search-input:focus {
+    border-color: rgba(255, 255, 255, 0.1);
+    outline: none;
+    box-shadow: none;
+  }
+  .film-search-input:focus-visible {
     border-color: rgba(245, 197, 107, 0.45);
     outline: 2px solid rgba(245, 197, 107, 0.55);
     outline-offset: 1px;
@@ -1285,16 +1308,7 @@ body.modal-open {
 }
 
 @media (max-width: 640px) {
-  .mobile-controls .control-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 8px;
-    width: 100%;
-  }
-  .mobile-controls .control-row .control {
-    flex: 1;
-    min-width: 0;
-  }
+  .mobile-controls .control-row .control { min-width: 0; }
   .mobile-controls .film-search-toggle {
     flex: 0 0 44px;
     width: 44px;
@@ -1332,15 +1346,18 @@ body.modal-open {
     appearance: none;
   }
   .mobile-controls .film-search-input:focus,
-  .mobile-controls .film-search-input:focus-visible,
-  .mobile-controls .film-search-input:active,
   .mobile-controls .sort select:focus,
-  .mobile-controls .sort select:focus-visible,
-  .mobile-controls .filter select:focus,
-  .mobile-controls .filter select:focus-visible {
+  .mobile-controls .filter select:focus {
     outline: none;
     box-shadow: none;
+  }
+  .mobile-controls .film-search-input:focus-visible,
+  .mobile-controls .sort select:focus-visible,
+  .mobile-controls .filter select:focus-visible {
     border-color: rgba(245, 197, 107, 0.45);
+    outline: 2px solid rgba(245, 197, 107, 0.55);
+    outline-offset: 1px;
+    box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.2);
   }
 }
 
@@ -1373,10 +1390,12 @@ body.modal-open {
         </select>
       </div>
 
-      <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle search and filters">
-        <span class="film-search-toggle-icon" aria-hidden="true">☰</span>
-        <span class="film-search-toggle-text">Search &amp; Filters</span>
-        <span class="film-search-toggle-label">Search and sort controls</span>
+      <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle more filters">
+        <svg class="film-search-toggle-icon" aria-hidden="true" viewBox="0 0 24 24" focusable="false">
+          <path fill="currentColor" d="M3 5.75A.75.75 0 0 1 3.75 5h16.5a.75.75 0 0 1 .56 1.25l-6.31 7.1v4.56a.75.75 0 0 1-.35.63l-3 1.91A.75.75 0 0 1 10 19.8v-6.45L3.19 6.25A.75.75 0 0 1 3 5.75Z"/>
+        </svg>
+        <span class="film-search-toggle-text">More Filters</span>
+        <span class="film-search-toggle-label">More filters</span>
       </button>
       </div>
 
@@ -2265,15 +2284,16 @@ function isMobileViewport() {
   return window.matchMedia("(max-width: 768px)").matches;
 }
 
-function hasActiveSearchFilterState() {
-  return Boolean((filmSearchQuery && filmSearchQuery.length) || currentFilter !== "all" || currentSort !== "rating-desc");
+function hasAdvancedFiltersApplied() {
+  return Boolean((filmSearchQuery && filmSearchQuery.length) || currentSort !== "rating-desc");
 }
 
 function refreshSearchFilterToggleState() {
-  const { toggle } = getFilmSearchElements();
+  const { toggle, row } = getFilmSearchElements();
   if (!toggle) return;
-  const hasActiveState = hasActiveSearchFilterState();
-  toggle.classList.toggle("is-active", hasActiveState);
+  const isOpen = Boolean(row?.classList.contains("is-open"));
+  toggle.classList.toggle("is-active", isOpen);
+  toggle.classList.toggle("has-filters", hasAdvancedFiltersApplied());
 }
 
 function setFilmSearchOpen(isOpen) {
@@ -2285,6 +2305,7 @@ function setFilmSearchOpen(isOpen) {
   row.setAttribute("aria-hidden", String(!isOpen));
   toggle.setAttribute("aria-expanded", String(isOpen));
   controls.classList.toggle("mobile-filters-open", isOpen);
+  refreshSearchFilterToggleState();
 }
 
 function clearFilmSearchSuggestions() {
@@ -2328,14 +2349,7 @@ function toggleFilmSearch() {
   setFilmSearchOpen(isOpen);
   if (isOpen && input) {
     input.focus();
-    return;
   }
-  filmSearchQuery = "";
-  if (input) input.value = "";
-  clearFilmSearchSuggestions();
-  resetPagination();
-  refreshSearchFilterToggleState();
-  render();
 }
 
 async function loadFilms() {
@@ -2375,7 +2389,7 @@ async function loadFilms() {
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("header:ready", () => {
     syncFilterControls();
-    const shouldExpand = isMobileViewport() && hasActiveSearchFilterState();
+    const shouldExpand = isMobileViewport() && hasAdvancedFiltersApplied();
     setFilmSearchOpen(shouldExpand);
     refreshSearchFilterToggleState();
     updateFilmSearchLabel(currentTotal);
