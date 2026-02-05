@@ -920,11 +920,11 @@ body.modal-open {
 }
 
 
-@media (max-width: 767px) {
+@media (max-width: 768px) {
   .films-list { padding: 0 16px; }
   .hero-layout {
     grid-template-columns: 1fr;
-    padding-top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-mobile));
+    padding-top: 12px;
   }
   .film-poster-wrapper,
   .poster-wrap {
@@ -939,7 +939,7 @@ body.modal-open {
   }
   .hero-rank {
     left: 12px;
-    top: 12px;
+    top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-mobile) + 2px);
     font-size: 13px;
     min-height: 26px;
     padding: 0 10px;
@@ -2186,7 +2186,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
