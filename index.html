@@ -127,7 +127,7 @@ label {
 .filter-row {
   display: flex;
   justify-content: center;
-  align-items: center;
+  align-items: flex-end;
   gap: 16px;
   flex-wrap: wrap;
 }
@@ -265,10 +265,12 @@ label {
   width: 100%;
   background: #2c2c2c;
   color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
+  border: 2px solid #3f3f3f;
   border-radius: 20px;
-  padding: 10px 14px;
-  min-height: 40px;
+  padding: 0 14px;
+  height: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
   font-size: 16px;
   line-height: 1.2;
   padding-right: 52px;
@@ -281,10 +283,9 @@ label {
 .film-search-input:focus,
 .film-search-input:focus-visible,
 .film-search-input:active {
-  outline: 2px solid rgba(245, 197, 107, 0.6);
-  outline-offset: 2px;
-  box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.85) inset;
-  border-color: rgba(245, 197, 107, 0.5);
+  outline: none;
+  box-shadow: none;
+  border-color: #d46a2a;
 }
 
 .film-search-suggestions {
@@ -310,7 +311,10 @@ label {
   background: #2c2c2c;
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
-  padding: 10px 14px;
+  padding: 0 14px;
+  height: 44px;
+  min-height: 44px;
+  box-sizing: border-box;
   border-radius: 20px;
   font-weight: bold;
   cursor: pointer;
@@ -1188,9 +1192,14 @@ body.modal-open {
     margin: 0;
     border: 1px solid rgba(255, 255, 255, 0.1);
     font-weight: 600;
+    height: 44px;
     min-height: 44px;
     border-radius: 16px;
     font-size: 16px;
+    box-sizing: border-box;
+  }
+  .film-search-input {
+    border: 2px solid #3f3f3f;
   }
   .film-search-toggle {
     flex: 0 0 44px;
@@ -1269,15 +1278,19 @@ body.modal-open {
   .filter select:active {
     border-color: rgba(245, 197, 107, 0.5);
     outline: none;
-    box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.85) inset;
+    box-shadow: none;
   }
   .film-search-input:focus-visible,
   .sort select:focus-visible,
   .filter select:focus-visible {
     border-color: rgba(245, 197, 107, 0.45);
-    outline: 2px solid rgba(245, 197, 107, 0.55);
-    outline-offset: 0;
-    box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.85) inset;
+    outline: none;
+    box-shadow: none;
+  }
+  .film-search-input:focus,
+  .film-search-input:active,
+  .film-search-input:focus-visible {
+    border-color: #d46a2a;
   }
   .search-clear {
     position: absolute;
@@ -1533,9 +1546,13 @@ body.modal-open {
   .mobile-controls .sort select:focus-visible,
   .mobile-controls .filter select:focus-visible {
     border-color: rgba(245, 197, 107, 0.45);
-    outline: 2px solid rgba(245, 197, 107, 0.55);
-    outline-offset: 0;
-    box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.85) inset;
+    outline: none;
+    box-shadow: none;
+  }
+  .mobile-controls .film-search-input:focus,
+  .mobile-controls .film-search-input:active,
+  .mobile-controls .film-search-input:focus-visible {
+    border-color: #d46a2a;
   }
 }
 
