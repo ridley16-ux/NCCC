@@ -219,10 +219,29 @@ label {
   padding-top: calc(var(--badge-row-top) + var(--badge-height) + var(--badge-row-gap-desktop));
 }
 
+.film-poster-wrapper {
+  position: relative;
+  width: 100%;
+  max-width: 260px;
+}
+
 .poster-wrap {
   position: relative;
   width: 100%;
   max-width: 260px;
+}
+
+.rosette-stack {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: 6px;
+  z-index: 4;
+  pointer-events: none;
+  white-space: nowrap;
 }
 
 .poster {
@@ -372,36 +391,22 @@ label {
   background: var(--score-tie);
 }
 
-.hero-rosettes {
-  position: absolute;
-  top: var(--badge-row-top);
-  right: 16px;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  align-items: flex-start;
-  gap: 9px;
-  z-index: 5;
-  pointer-events: none;
-  max-width: min(50%, 360px);
-}
-
 .rosette {
-  min-height: var(--badge-height);
-  font-size: var(--badge-font-size);
+  font-size: 11px;
   font-weight: 900;
-  padding: 0 var(--badge-padding-x);
-  border-radius: var(--badge-radius);
+  padding: 6px 10px;
+  border-radius: 999px;
   letter-spacing: 0.06em;
   text-transform: uppercase;
   white-space: nowrap;
-  line-height: 1;
+  line-height: 1.1;
   border: 1px solid rgba(255,255,255,0.18);
   display: inline-flex;
   align-items: center;
   justify-content: center;
   gap: 0.35em;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.45);
+  color: #fff;
 }
 
 .badge-icon {
@@ -443,36 +448,12 @@ label {
 }
 .kev-badge .badge-label { color: #ffd7bf; }
 
-/* ✅ Rosettes under Rob's flag */
-.badge-flags {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  align-items: flex-end;
-}
-
-.badge-flag {
-  color: #fff;
-}
-
-.hero-rosettes .flag {
-  order: 1;
-}
-
-.hero-rosettes .badge-flag.best {
-  order: 2;
-}
-
-.hero-rosettes .badge-flag.listener {
-  order: 3;
-}
-
-.hero-rosettes .badge-flag.new {
-  order: 4;
-}
-
-.badge-flag.new { background: #2e6bd1; }
-.badge-flag.best { background: #b58b00; }
+.rosette.rob { background: #3e5f3e; color: #d8f0d8; }
+.rosette.real { background: #444; color: #fff; }
+.rosette.kev { background: #b58b00; }
+.rosette.listener { background: #5b88ff; }
+.rosette.new { background: #2e6bd1; }
+.rosette.other { background: #565656; }
 
 .divider {
   height: 1px;
@@ -881,7 +862,6 @@ body.modal-open {
   color: #f7b0b0;
 }
 
-.badge-flag.listener { background: #5b88ff; }
 
 .bars { display: grid; gap: 10px; }
 
@@ -990,35 +970,23 @@ body.modal-open {
   .rating-output {
     font-size: 12px;
   }
-  .hero-rosettes {
-    top: 12px;
-    right: 12px;
-    flex-direction: row;
-    flex-wrap: wrap;
-    justify-content: flex-start;
-    align-items: flex-end;
-    gap: 7px;
-    max-width: 70%;
+  .rosette-stack {
+    top: 8px;
+    right: 8px;
   }
-  .hero-rosettes .rosette { font-size: 13px; min-height: 26px; padding: 0 10px; }
   .listener-score { flex-wrap: wrap; }
 }
 
-@media (min-width: 1024px) {
-  .hero-rosettes {
-    display: flex;
-    flex-wrap: nowrap;
-    justify-content: flex-end;
+@media (min-width: 768px) {
+  .rosette-stack {
+    top: 10px;
+    right: 10px;
     gap: 8px;
-    white-space: nowrap;
-    overflow-x: auto;
-    max-width: min(58%, 560px);
-    scrollbar-width: thin;
   }
 
-  .hero-rosettes .rosette {
-    font-size: var(--badge-font-size);
-    padding: 0 var(--badge-padding-x);
+  .rosette {
+    font-size: 12px;
+    padding: 6px 12px;
   }
 }
 
@@ -1756,18 +1724,48 @@ async function render(options = {}) {
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
     card.dataset.filmId = film.id;
 
+    const rosettes = [
+      {
+        className: film.rob ? "rob" : "real",
+        label: film.rob ? "Rob’s Film" : "Real Film",
+        icon: ""
+      }
+    ];
+
+    if (film.rob && film === best) {
+      rosettes.push({ className: "kev", label: "Kev&#39;s Pick", icon: ' <span class="badge-icon" aria-hidden="true">🏅</span>' });
+    }
+
+    if (film.rob && listenerBest && film === listenerBest) {
+      rosettes.push({ className: "listener", label: "Listeners Pick", icon: ' <span class="badge-icon" aria-hidden="true">❤️</span>' });
+    }
+
+    if (film.rob && film === newest) {
+      rosettes.push({ className: "new", label: "NEW", icon: ' <span class="badge-icon" aria-hidden="true">🆕</span>' });
+    }
+
+    if (Array.isArray(film.rosettes)) {
+      film.rosettes.forEach((rosette) => {
+        if (!rosette?.label) return;
+        rosettes.push({ className: rosette.className || "other", label: rosette.label, icon: rosette.icon || "" });
+      });
+    }
+
+    const rosetteMarkup = rosettes
+      .map(({ className, label, icon }) => `<span class="rosette ${className}">${label}${icon}</span>`)
+      .join("");
+
     card.innerHTML = `
       <div class="hero-rank">#${index + 1}</div>
-      <div class="hero-rosettes" aria-label="Episode rosettes">
-          <span class="rosette flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
-          ${film.rob && film === best ? '<span class="rosette badge-flag best">Kev&#39;s Pick <span class="badge-icon" aria-hidden="true">🏅</span></span>' : ''}
-          ${film.rob && listenerBest && film === listenerBest ? '<span class="rosette badge-flag listener">Listeners Pick <span class="badge-icon" aria-hidden="true">❤️</span></span>' : ''}
-          ${film.rob && film === newest ? '<span class="rosette badge-flag new">NEW <span class="badge-icon" aria-hidden="true">🆕</span></span>' : ''}
-      </div>
 
       <div class="hero-layout">
-        <div class="poster-wrap">
-          <img src="${film.poster}" class="poster" />
+        <div class="film-poster-wrapper">
+          <div class="poster-wrap">
+            <img src="${film.poster}" class="poster" />
+          </div>
+          <div class="rosette-stack" aria-label="Episode rosettes">
+            ${rosetteMarkup}
+          </div>
         </div>
 
       ${film.rob ? `
@@ -2171,7 +2169,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
