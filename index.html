@@ -274,6 +274,21 @@ label {
   margin: 0;
 }
 
+.audience-line.audience-nudge {
+  animation: audienceNudge 1.4s ease-out;
+}
+
+@keyframes audienceNudge {
+  0% {
+    background: rgba(191, 232, 191, 0.28);
+    color: #e9ffef;
+  }
+  100% {
+    background: transparent;
+    color: rgba(255, 255, 255, 0.72);
+  }
+}
+
 .variant {
   color: #bfe8bf;
   font-weight: 800;
@@ -1341,6 +1356,67 @@ async function fetchAudienceScores() {
   });
 }
 
+function triggerAudienceNudge(target) {
+  if (!target) return;
+  target.classList.remove("audience-nudge");
+  void target.offsetWidth;
+  target.classList.add("audience-nudge");
+  target.addEventListener(
+    "animationend",
+    () => {
+      target.classList.remove("audience-nudge");
+    },
+    { once: true }
+  );
+}
+
+function updateAudienceScoreUI(filmId, audienceData, options = {}) {
+  const { highlight = false } = options;
+  const audiencePercent = formatAudienceScore(audienceData?.weighted_percent);
+  const audienceVotes = Number(audienceData?.listener_count ?? 0);
+  const audienceLabel = audiencePercent !== null
+    ? `Audience: ${audiencePercent}%`
+    : "Audience: —";
+  const audienceVotesLabel = audiencePercent !== null
+    ? `${audienceVotes} vote(s)`
+    : "0 votes";
+
+  document.querySelectorAll(`.film-card[data-film-id="${filmId}"]`).forEach(card => {
+    const audienceLabelEl = card.querySelector("[data-audience-label]");
+    const audienceVotesEl = card.querySelector("[data-audience-votes]");
+    if (audienceLabelEl) {
+      audienceLabelEl.textContent = audienceLabel;
+      if (highlight) triggerAudienceNudge(audienceLabelEl);
+    }
+    if (audienceVotesEl) {
+      audienceVotesEl.textContent = audienceVotesLabel;
+    }
+  });
+}
+
+async function refreshAudienceScoreForFilm(filmId) {
+  if (!supabaseClient) return null;
+  const { data, error } = await supabaseClient
+    .from("film_scores_v1")
+    .select("film_id, weighted_percent, listener_count")
+    .eq("film_id", filmId)
+    .maybeSingle();
+
+  if (error) {
+    console.error("Failed to refresh audience score.", error);
+    return null;
+  }
+
+  if (!data) return null;
+
+  audienceScores[filmId] = {
+    weighted_percent: data.weighted_percent,
+    listener_count: data.listener_count
+  };
+  updateAudienceScoreUI(filmId, audienceScores[filmId], { highlight: true });
+  return data;
+}
+
 async function render(options = {}) {
   container.innerHTML = "";
   closeOpenTooltip();
@@ -1408,8 +1484,8 @@ async function render(options = {}) {
               </p>
               <p class="meta-line">Podcasted: ${formatUkDate(film.podcastDate)}</p>
               <div class="audience-score">
-                <p class="audience-line">${audienceLabel}</p>
-                <p class="audience-line">${audienceVotesLabel}</p>
+                <p class="audience-line" data-audience-label>${audienceLabel}</p>
+                <p class="audience-line" data-audience-votes>${audienceVotesLabel}</p>
               </div>
             </div>
 
@@ -1479,8 +1555,8 @@ async function render(options = {}) {
               ${film.director ? `<p class="meta-line">Directed by ${film.director}</p>` : ""}
               <p class="meta-line">Starring: ${film.starring}</p>
               <div class="audience-score">
-                <p class="audience-line">${audienceLabel}</p>
-                <p class="audience-line">${audienceVotesLabel}</p>
+                <p class="audience-line" data-audience-label>${audienceLabel}</p>
+                <p class="audience-line" data-audience-votes>${audienceVotesLabel}</p>
               </div>
             </div>
             <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
@@ -1631,6 +1707,7 @@ container.addEventListener("click", async (event) => {
   localRatings[filmId] = yourRating;
   saveLocalRatings();
   updateRatingUI(filmId, listenerRating, yourRating);
+  await refreshAudienceScoreForFilm(filmId);
 });
 
 container.addEventListener("mouseover", (event) => {
