@@ -8,6 +8,11 @@
   --nav-pad-x-mobile: 14px;
 }
 
+body {
+  /* Updated by shared.js after header injection so page content can offset safely. */
+  --stickyHeaderH: 0px;
+}
+
 .sticky-menu {
   position: sticky;
   top: 0;
@@ -17,6 +22,7 @@
   max-width: 100%;
   z-index: 1000;
   background: #0f0f0f;
+  overflow: visible;
   padding: 16px 16px 12px;
   margin: 0 0 24px;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
@@ -26,8 +32,24 @@
   width: 100%;
   height: 1px;
   margin-top: 12px;
-  background: rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.12);
   min-width: 48px;
+}
+
+.header-extras {
+  margin: 0;
+  padding: 0;
+}
+
+.header-extras:empty {
+  display: none;
+}
+
+/* Keep first content block clear of sticky header across pages. */
+#site-header + .content,
+#site-header + main.content,
+#site-header + #films.films-list {
+  margin-top: var(--stickyHeaderH);
 }
 
 .site-title {
