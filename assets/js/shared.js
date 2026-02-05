@@ -32,5 +32,32 @@
     return created;
   }
 
+  function syncStickyHeaderHeight() {
+    const stickyHeader = document.querySelector("#site-header .sticky-menu");
+    if (!stickyHeader || !document.body) return;
+    const height = stickyHeader.offsetHeight;
+    document.body.style.setProperty("--stickyHeaderH", `${height}px`);
+  }
+
+  function waitForStickyHeader() {
+    let attempts = 0;
+    const maxAttempts = 60;
+    const timer = window.setInterval(() => {
+      attempts += 1;
+      const stickyHeader = document.querySelector("#site-header .sticky-menu");
+      if (stickyHeader || attempts >= maxAttempts) {
+        window.clearInterval(timer);
+        syncStickyHeaderHeight();
+      }
+    }, 100);
+  }
+
   window.getVisitorId = getVisitorId;
+
+  window.addEventListener("resize", syncStickyHeaderHeight, { passive: true });
+  document.addEventListener("header:ready", syncStickyHeaderHeight);
+  document.addEventListener("DOMContentLoaded", () => {
+    waitForStickyHeader();
+    window.setTimeout(syncStickyHeaderHeight, 0);
+  });
 })();
