@@ -15,7 +15,7 @@
 <link rel="icon" type="image/png" sizes="32x32" href="assets/favicon/favicon-32x32.png">
 <link rel="icon" type="image/png" sizes="16x16" href="assets/favicon/favicon-16x16.png">
 <link rel="manifest" href="assets/favicon/site.webmanifest">
-  
+
 <meta charset="UTF-8" />
 <title>No Context Cinema Club – Films</title>
 <meta name="description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
@@ -164,8 +164,7 @@ label {
 }
 
 .film-card {
-  display: flex;
-  gap: 16px;
+  display: block;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), var(--card);
   border-radius: 18px;
   border: 1px solid var(--line);
@@ -178,16 +177,16 @@ label {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a;
 }
 
-.rank {
+.hero-rank {
   position: absolute;
-  top: 10px;
-  left: 10px;
+  top: 16px;
+  left: 16px;
   background: gold;
   color: #000;
   font-weight: bold;
   padding: 6px 10px;
   border-radius: 20px;
-  z-index: 4;
+  z-index: 5;
 }
 
 .flag {
@@ -200,14 +199,24 @@ label {
 .flag.rob { background: #3e5f3e; color: #d8f0d8; }
 .flag.real { background: #444; color: #fff; }
 
+.hero-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+  padding-top: 66px;
+}
+
 .poster-wrap {
   position: relative;
-  flex: 0 0 auto;
+  width: 100%;
+  max-width: 260px;
 }
 
 .poster {
-  width: 140px;
-  height: 210px;
+  width: 100%;
+  max-width: 260px;
+  height: auto;
   object-fit: cover;
   border-radius: 8px;
   display: block;
@@ -351,16 +360,17 @@ label {
   background: var(--score-tie);
 }
 
-.poster-rosettes {
+.hero-rosettes {
   position: absolute;
-  top: 8px;
-  left: 8px;
+  top: 16px;
+  right: 16px;
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 6px;
-  z-index: 3;
+  align-items: flex-end;
+  gap: 8px;
+  z-index: 5;
   pointer-events: none;
+  max-width: min(48%, 220px);
 }
 
 .badge {
@@ -417,19 +427,19 @@ label {
   white-space: nowrap;
 }
 
-.poster-rosettes .flag {
+.hero-rosettes .flag {
   order: 1;
 }
 
-.poster-rosettes .badge-flag.new {
+.hero-rosettes .badge-flag.new {
   order: 2;
 }
 
-.poster-rosettes .badge-flag.best {
+.hero-rosettes .badge-flag.best {
   order: 3;
 }
 
-.poster-rosettes .badge-flag.listener {
+.hero-rosettes .badge-flag.listener {
   order: 4;
 }
 
@@ -900,9 +910,15 @@ body.modal-open {
 
 @media (max-width: 700px) {
   .films-list { padding: 0 16px; }
-  .film-card { flex-direction: column; }
+  .hero-layout {
+    grid-template-columns: 1fr;
+    padding-top: 120px;
+  }
+  .poster-wrap {
+    max-width: 260px;
+  }
   .poster { width: 100%; height: auto; }
-  .rank { left: 10px; top: 10px; }
+  .hero-rank { left: 12px; top: 12px; }
   .controls {
     flex-direction: column;
     align-items: stretch;
@@ -940,32 +956,20 @@ body.modal-open {
   .rating-output {
     font-size: 12px;
   }
-  .poster-rosettes {
-    top: 10px;
-    left: 10px;
+  .hero-rosettes {
+    top: 46px;
+    right: 12px;
+    max-width: 62%;
   }
-  .poster-rosettes .badge-flag {
+  .hero-rosettes .badge-flag {
+    font-size: 10px;
+    padding: 5px 8px;
+  }
+  .hero-rosettes .flag {
     font-size: 10px;
     padding: 5px 8px;
   }
   .listener-score { flex-wrap: wrap; }
-}
-
-@media (min-width: 900px) {
-  .film-card.rob-film {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    column-gap: 24px;
-    align-items: start;
-  }
-
-  .film-card.rob-film .poster-wrap {
-    grid-column: 2;
-  }
-
-  .film-card.rob-film .film-details {
-    grid-column: 1;
-  }
 }
 
 @media (max-width: 760px) {
@@ -1703,16 +1707,18 @@ async function render(options = {}) {
     card.dataset.filmId = film.id;
 
     card.innerHTML = `
-      <div class="poster-wrap">
-        <div class="rank">#${index + 1}</div>
-        <div class="poster-rosettes" aria-label="Episode rosettes">
+      <div class="hero-rank">#${index + 1}</div>
+      <div class="hero-rosettes" aria-label="Episode rosettes">
           <span class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
           ${film.rob && film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
           ${film.rob && film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
           ${film.rob && listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
-        </div>
-        <img src="${film.poster}" class="poster" />
       </div>
+
+      <div class="hero-layout">
+        <div class="poster-wrap">
+          <img src="${film.poster}" class="poster" />
+        </div>
 
       ${film.rob ? `
         <div class="film-details rob-details">
@@ -1815,6 +1821,7 @@ async function render(options = {}) {
           </div>
         </div>
       `}
+      </div>
     `;
 
     container.appendChild(card);
