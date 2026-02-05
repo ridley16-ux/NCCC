@@ -32,5 +32,52 @@
     return created;
   }
 
+  function updateStickyHeaderHeight() {
+    const headerEl = document.querySelector("#site-header .site-header");
+    if (!headerEl) {
+      document.documentElement.style.setProperty("--sticky-header-h", "0px");
+      if (document.body) {
+        document.body.style.paddingTop = "0px";
+      }
+      return;
+    }
+    const height = `${headerEl.offsetHeight}px`;
+    document.documentElement.style.setProperty("--sticky-header-h", height);
+    if (document.body) {
+      document.body.style.paddingTop = height;
+    }
+  }
+
+  function observeSiteHeader() {
+    const host = document.getElementById("site-header");
+    if (!host) {
+      return;
+    }
+
+    const observer = new MutationObserver(() => {
+      updateStickyHeaderHeight();
+    });
+    observer.observe(host, { childList: true, subtree: true });
+  }
+
   window.getVisitorId = getVisitorId;
+
+  try {
+    document.documentElement.style.overflowX = CSS.supports("overflow", "clip") ? "clip" : "hidden";
+  } catch (error) {
+    document.documentElement.style.overflowX = "hidden";
+  }
+
+  window.addEventListener("resize", updateStickyHeaderHeight, { passive: true });
+  window.addEventListener("load", updateStickyHeaderHeight);
+  document.addEventListener("header:ready", updateStickyHeaderHeight);
+  if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", () => {
+      observeSiteHeader();
+      updateStickyHeaderHeight();
+    }, { once: true });
+  } else {
+    observeSiteHeader();
+    updateStickyHeaderHeight();
+  }
 })();
