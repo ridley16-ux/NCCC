@@ -132,6 +132,22 @@ label {
   flex-wrap: wrap;
 }
 
+.control-row {
+  display: contents;
+}
+
+.filter-row .filter {
+  order: 1;
+}
+
+.filter-row .sort {
+  order: 2;
+}
+
+.filter-row .film-search-toggle {
+  order: 3;
+}
+
 .filter {
   display: flex;
   gap: 8px;
@@ -238,7 +254,8 @@ label {
 }
 
 .filter label,
-.sort label {
+.sort label,
+.film-search-wrap label {
   font-size: 13px;
   color: var(--muted);
 }
@@ -1107,7 +1124,8 @@ body.modal-open {
     pointer-events: auto;
   }
   .filter label,
-  .sort label {
+  .sort label,
+  .film-search-wrap label {
     margin: 0;
     font-size: 13px;
     color: var(--muted);
@@ -1266,6 +1284,66 @@ body.modal-open {
   }
 }
 
+@media (max-width: 640px) {
+  .mobile-controls .control-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 8px;
+    width: 100%;
+  }
+  .mobile-controls .control-row .control {
+    flex: 1;
+    min-width: 0;
+  }
+  .mobile-controls .film-search-toggle {
+    flex: 0 0 44px;
+    width: 44px;
+    height: 44px;
+    min-height: 44px;
+  }
+  .mobile-controls .filter select,
+  .mobile-controls .sort select,
+  .mobile-controls .film-search-input {
+    width: 100%;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 999px;
+    padding: 0 14px;
+  }
+  .mobile-controls .film-search-row {
+    background: transparent;
+    border: 0;
+    border-radius: 0;
+    padding: 0;
+  }
+  .mobile-controls.mobile-filters-open .film-search-row {
+    padding: 0;
+  }
+  .mobile-controls .film-search-wrap {
+    background: transparent;
+    border: 0;
+    padding: 0;
+    border-radius: 0;
+  }
+  .mobile-controls .film-search-input,
+  .mobile-controls .sort select,
+  .mobile-controls .filter select {
+    -webkit-appearance: none;
+    appearance: none;
+  }
+  .mobile-controls .film-search-input:focus,
+  .mobile-controls .film-search-input:focus-visible,
+  .mobile-controls .film-search-input:active,
+  .mobile-controls .sort select:focus,
+  .mobile-controls .sort select:focus-visible,
+  .mobile-controls .filter select:focus,
+  .mobile-controls .filter select:focus-visible {
+    outline: none;
+    box-shadow: none;
+    border-color: rgba(245, 197, 107, 0.45);
+  }
+}
+
 @media (max-width: 520px) {
   .bar-row { grid-template-columns: 110px 1fr 40px; }
 }
@@ -1283,9 +1361,10 @@ body.modal-open {
 <div id="site-header"></div>
 
 <template id="header-extras-template">
-  <div class="controls">
+  <div class="controls mobile-controls">
     <div class="filters-row filter-row">
-      <div class="filter">
+      <div class="control-row">
+      <div class="filter control">
         <label for="filmFilter">Show films</label>
         <select id="filmFilter" class="mobile-filter-control">
           <option value="all">All Films</option>
@@ -1294,7 +1373,14 @@ body.modal-open {
         </select>
       </div>
 
-      <div class="sort">
+      <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle search and filters">
+        <span class="film-search-toggle-icon" aria-hidden="true">☰</span>
+        <span class="film-search-toggle-text">Search &amp; Filters</span>
+        <span class="film-search-toggle-label">Search and sort controls</span>
+      </button>
+      </div>
+
+      <div class="sort control">
         <label for="sortSelect">Sort by</label>
         <select id="sortSelect" class="mobile-filter-control">
           <option value="rating-desc">Rating (High to Low)</option>
@@ -1303,16 +1389,11 @@ body.modal-open {
           <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
         </select>
       </div>
-
-      <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle search and filters">
-        <span class="film-search-toggle-icon" aria-hidden="true">☰</span>
-        <span class="film-search-toggle-text">Search &amp; Filters</span>
-        <span class="film-search-toggle-label">Search and sort controls</span>
-      </button>
     </div>
 
     <div id="filmSearchRow" class="filters-row film-search-row" aria-hidden="true">
-      <div class="film-search-wrap">
+      <div class="film-search-wrap control">
+        <label id="filmSearchLabel" for="filmSearchInput">Search</label>
         <input id="filmSearchInput" class="film-search-input mobile-filter-control" type="search" placeholder="Search films by title or cast" autocomplete="off" />
         <div id="filmSearchSuggestions" class="film-search-suggestions" aria-live="polite"></div>
       </div>
@@ -2164,6 +2245,7 @@ async function render(options = {}) {
   });
 
   updateFilmSearchSuggestions(currentTotal);
+  updateFilmSearchLabel(currentTotal);
   updateStatus(visibleFilms.length, currentTotal);
   updateLoadingState(false);
   updateSentinelVisibility();
@@ -2174,7 +2256,8 @@ function getFilmSearchElements() {
     toggle: document.getElementById("filmSearchToggle"),
     row: document.getElementById("filmSearchRow"),
     input: document.getElementById("filmSearchInput"),
-    suggestions: document.getElementById("filmSearchSuggestions")
+    suggestions: document.getElementById("filmSearchSuggestions"),
+    label: document.getElementById("filmSearchLabel")
   };
 }
 
@@ -2218,6 +2301,17 @@ function updateFilmSearchSuggestions(matchCount) {
   }
   suggestions.textContent = `${matchCount} result${matchCount === 1 ? "" : "s"}`;
 }
+
+function updateFilmSearchLabel(resultCount = 0) {
+  const { label } = getFilmSearchElements();
+  if (!label) return;
+  if (!filmSearchQuery) {
+    label.textContent = "Search";
+    return;
+  }
+  label.textContent = `Search – ${resultCount} result${resultCount === 1 ? "" : "s"}`;
+}
+
 
 function closeFilmSearch({ resetInput = false } = {}) {
   const { input } = getFilmSearchElements();
@@ -2284,6 +2378,7 @@ document.addEventListener("DOMContentLoaded", () => {
     const shouldExpand = isMobileViewport() && hasActiveSearchFilterState();
     setFilmSearchOpen(shouldExpand);
     refreshSearchFilterToggleState();
+    updateFilmSearchLabel(currentTotal);
   });
 
   document.addEventListener("click", (event) => {
