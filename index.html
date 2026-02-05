@@ -577,7 +577,7 @@ body.modal-open {
   transform: translateY(0);
 }
 
-.vote-panel {
+.rating-panel {
   margin-left: auto;
   display: flex;
   flex-direction: column;
@@ -585,30 +585,138 @@ body.modal-open {
   gap: 6px;
 }
 
-.vote-actions {
+.rating-shell {
+  background: rgba(14, 14, 14, 0.72);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 8px 10px;
+  border-radius: 999px;
   display: inline-flex;
-  gap: 8px;
   align-items: center;
+  gap: 10px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
 }
 
-.vote-button {
+.rate-toggle {
   background: rgba(255, 255, 255, 0.08);
   border: 1px solid rgba(255, 255, 255, 0.2);
   color: #fff;
-  width: 40px;
-  height: 40px;
-  border-radius: 12px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  font-size: 18px;
+  border-radius: 999px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 600;
   cursor: pointer;
 }
 
-.vote-button.selected {
-  background: rgba(245, 197, 107, 0.25);
-  border-color: rgba(245, 197, 107, 0.6);
+.rate-toggle:hover,
+.rate-toggle:focus-visible {
+  border-color: rgba(255, 255, 255, 0.5);
+  background: rgba(255, 255, 255, 0.16);
+  outline: none;
 }
+
+.rating-panel.open .rate-toggle {
+  display: none;
+}
+
+.rating-bar {
+  display: none;
+  gap: 6px;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+}
+
+.rating-panel.open .rating-bar {
+  display: flex;
+}
+
+.rating-segment {
+  min-width: 36px;
+  min-height: 36px;
+  padding: 0 6px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.08);
+  color: rgba(255, 255, 255, 0.85);
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: transform 0.12s ease, filter 0.12s ease, background 0.12s ease;
+}
+
+.rating-segment:hover,
+.rating-segment:focus-visible {
+  transform: translateY(-1px);
+  outline: none;
+}
+
+.rating-segment.preview,
+.rating-segment.selected {
+  background: var(--segment-color);
+  border-color: rgba(255, 255, 255, 0.35);
+  color: #fff;
+  filter: brightness(1.1);
+}
+
+.rating-segment.selected {
+  filter: brightness(1.2);
+}
+
+.rating-panel.locked .rating-segment {
+  cursor: default;
+}
+
+.rating-panel.locked .rating-bar {
+  box-shadow: 0 0 0 1px rgba(245, 197, 107, 0.25), 0 0 16px rgba(245, 197, 107, 0.18);
+  border-radius: 18px;
+  padding: 4px;
+  pointer-events: none;
+}
+
+.rating-panel.locked .rating-segment.selected {
+  box-shadow: 0 0 0 1px rgba(245, 197, 107, 0.55);
+}
+
+.rating-status {
+  display: none;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+  color: rgba(255, 255, 255, 0.82);
+}
+
+.rating-panel.locked .rating-status {
+  display: flex;
+}
+
+.rating-change {
+  appearance: none;
+  border: none;
+  background: none;
+  color: #f5c56b;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
+  cursor: pointer;
+  padding: 0;
+}
+
+.rating-change:focus-visible {
+  outline: 2px solid rgba(245, 197, 107, 0.5);
+  outline-offset: 2px;
+  border-radius: 6px;
+}
+
+.rating-segment:nth-child(1) { --segment-color: #2f3b52; }
+.rating-segment:nth-child(2) { --segment-color: #36435a; }
+.rating-segment:nth-child(3) { --segment-color: #3f4c60; }
+.rating-segment:nth-child(4) { --segment-color: #46525f; }
+.rating-segment:nth-child(5) { --segment-color: #54555d; }
+.rating-segment:nth-child(6) { --segment-color: #665651; }
+.rating-segment:nth-child(7) { --segment-color: #7a5c49; }
+.rating-segment:nth-child(8) { --segment-color: #8f613f; }
+.rating-segment:nth-child(9) { --segment-color: #a86a37; }
+.rating-segment:nth-child(10) { --segment-color: #c07a33; }
 
 .badge-flag.listener { background: #5b88ff; }
 
@@ -681,7 +789,7 @@ body.modal-open {
     padding: 8px 10px;
     font-size: 13px;
   }
-  .vote-panel {
+  .rating-panel {
     margin-left: auto;
     width: auto;
     max-width: 100%;
@@ -719,7 +827,7 @@ body.modal-open {
       <select id="sortSelect">
         <option value="score">↑↓ by Score</option>
         <option value="newest">↑↓ by Recent</option>
-        <option value="listener">↑↓ by Votes</option>
+        <option value="listener">↑↓ by Ratings</option>
       </select>
     </div>
   </div>
@@ -790,12 +898,13 @@ let currentFilter = "rob";
 let currentSort = "score";
 let lastScoreFetchKey = "";
 const listenerScores = {};
-const VOTE_STORAGE_KEY = "nccc_film_votes";
+const RATING_STORAGE_KEY = "nccc_film_ratings";
+const DEVICE_ID_KEY = "nccc_device_id";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const visitorId = getVisitorId();
-const localVotes = loadLocalVotes();
+const deviceId = getOrCreateDeviceId();
+const localRatings = loadLocalRatings();
 let openTooltip = null;
 
 const PAGE_SIZE = 10;
@@ -1017,23 +1126,46 @@ function handleTranscriptKeydown(event) {
   }
 }
 
-function loadLocalVotes() {
+function getOrCreateDeviceId() {
+  const existing = localStorage.getItem(DEVICE_ID_KEY);
+  if (existing) return existing;
+  const created = crypto.randomUUID();
+  localStorage.setItem(DEVICE_ID_KEY, created);
+  return created;
+}
+
+function loadLocalRatings() {
   try {
-    const stored = localStorage.getItem(VOTE_STORAGE_KEY);
+    const stored = localStorage.getItem(RATING_STORAGE_KEY);
     return stored ? JSON.parse(stored) : {};
   } catch (error) {
-    console.warn("Failed to load local votes.", error);
+    console.warn("Failed to load local ratings.", error);
     return {};
   }
 }
 
-function saveLocalVotes() {
-  localStorage.setItem(VOTE_STORAGE_KEY, JSON.stringify(localVotes));
+function saveLocalRatings() {
+  localStorage.setItem(RATING_STORAGE_KEY, JSON.stringify(localRatings));
 }
 
-function formatListenerScore(score) {
-  const safeScore = Number(score) || 0;
-  return safeScore >= 0 ? `+${safeScore}` : `${safeScore}`;
+function formatListenerRating(score) {
+  const safeScore = Number(score);
+  if (!Number.isFinite(safeScore) || safeScore <= 0) return "—";
+  const rounded = Math.round(safeScore * 10) / 10;
+  const display = Number.isInteger(rounded) ? `${rounded}` : rounded.toFixed(1);
+  return `${display}/10`;
+}
+
+function buildRatingSegments(filmId, storedRating) {
+  return Array.from({ length: 10 }, (_, index) => {
+    const value = index + 1;
+    const isSelected = storedRating ? value <= storedRating : false;
+    return `
+      <button class="rating-segment${isSelected ? " selected" : ""}" type="button" data-film-id="${filmId}" data-rating="${value}" aria-label="Rate ${value} out of 10" aria-pressed="${isSelected}">
+        ${value}
+      </button>
+    `;
+  }).join("");
 }
 
 /* ✅ set active class based on the button actually clicked */
@@ -1138,7 +1270,7 @@ async function render(options = {}) {
 
   visibleFilms.forEach((film, index) => {
     const listenerScore = listenerScores[film.id] ?? 0;
-    const storedVote = localVotes[film.id] ?? null;
+    const storedRating = localRatings[film.id] ?? null;
     const transcriptButton = film.transcriptTxt
       ? `<button class="transcript-link" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
       : "";
@@ -1208,17 +1340,23 @@ async function render(options = {}) {
               <a class="btn podcast" href="${film.link}" target="_blank">Play Episode ▶</a>
               ${transcriptButton}
             </div>
-            <div class="vote-panel">
-              <div class="vote-actions" aria-label="Listener voting">
-                <button class="vote-button ${storedVote === 1 ? "selected" : ""}" data-film-id="${film.id}" data-vote="1" aria-pressed="${storedVote === 1}">👍</button>
-                <button class="vote-button ${storedVote === -1 ? "selected" : ""}" data-film-id="${film.id}" data-vote="-1" aria-pressed="${storedVote === -1}">👎</button>
+            <div class="rating-panel ${storedRating ? "open locked" : ""}" data-rating-panel data-film-id="${film.id}">
+              <div class="rating-shell">
+                <button class="rate-toggle" type="button" aria-expanded="${storedRating ? "true" : "false"}">Rate</button>
+                <div class="rating-bar" role="group" aria-label="Rate ${film.title}">
+                  ${buildRatingSegments(film.id, storedRating)}
+                </div>
+              </div>
+              <div class="rating-status" ${storedRating ? "" : "hidden"}>
+                <span class="rating-status-text">${storedRating ? `You rated: ${storedRating}/10` : ""}</span>
+                <button class="rating-change" type="button">Change</button>
               </div>
               <p class="listener-score" data-listener-score="${film.id}">
-                <span class="listener-score-text">Listeners Score: ${formatListenerScore(listenerScore)}</span>
+                <span class="listener-score-text">Listeners Rating: ${formatListenerRating(listenerScore)}</span>
                 <span class="listener-info-wrap">
-                  <button class="listener-info" type="button" aria-label="Listener score info" aria-expanded="false" aria-controls="listener-tooltip-${film.id}">i</button>
+                  <button class="listener-info" type="button" aria-label="Listener rating info" aria-expanded="false" aria-controls="listener-tooltip-${film.id}">i</button>
                   <span class="listener-tooltip" id="listener-tooltip-${film.id}" role="tooltip">
-                    This score is the combined total of all listener votes (+1 for 👍, -1 for 👎)
+                    This is the average listener rating on a 1–10 scale.
                   </span>
                 </span>
               </p>
@@ -1304,42 +1442,104 @@ document.getElementById("sortSelect").onchange = (e) => {
 };
 
 container.addEventListener("click", async (event) => {
-  const button = event.target.closest(".vote-button");
-  if (!button) return;
-  if (!supabaseClient) return;
-  const filmId = button.dataset.filmId;
-  const voteValue = Number(button.dataset.vote);
-  const film = allFilms.find(entry => entry.id === filmId);
-  if (!film) return;
+  const toggle = event.target.closest(".rate-toggle");
+  if (toggle) {
+    const panel = toggle.closest(".rating-panel");
+    if (!panel) return;
+    panel.classList.add("open");
+    toggle.setAttribute("aria-expanded", "true");
+    return;
+  }
 
-  const { data, error } = await supabaseClient.rpc("toggle_film_vote", {
+  const changeButton = event.target.closest(".rating-change");
+  if (changeButton) {
+    const panel = changeButton.closest(".rating-panel");
+    if (!panel) return;
+    const filmId = panel.dataset.filmId;
+    if (!filmId) return;
+    delete localRatings[filmId];
+    saveLocalRatings();
+    updateRatingUI(filmId, listenerScores[filmId] ?? 0, null);
+    panel.classList.add("open");
+    return;
+  }
+
+  const segment = event.target.closest(".rating-segment");
+  if (!segment) return;
+  const panel = segment.closest(".rating-panel");
+  if (!panel || panel.classList.contains("locked")) return;
+  if (!supabaseClient) return;
+  const filmId = segment.dataset.filmId;
+  const ratingValue = Number(segment.dataset.rating);
+  const film = allFilms.find(entry => entry.id === filmId);
+  if (!film || !ratingValue) return;
+
+  const { data, error } = await supabaseClient.rpc("submit_film_rating", {
     p_film_id: filmId,
-    p_device_id: visitorId,
-    p_vote: voteValue,
+    p_device_id: deviceId,
+    p_rating: ratingValue,
     p_title: film.title ?? null
   });
 
   if (error) {
-    console.error("Vote update failed.", error);
-    statusEl.textContent = `Vote failed: ${error.message || "Unknown error"}`;
+    console.error("Rating update failed.", error);
+    statusEl.textContent = `Rating failed: ${error.message || "Unknown error"}`;
     return;
   }
   statusEl.textContent = "";
 
   const response = Array.isArray(data) ? data[0] : data;
   if (!response) return;
+  const listenerRating = response.listener_rating ?? response.listener_score ?? 0;
+  const yourRating = response.your_rating ?? response.your_vote ?? ratingValue;
 
-  listenerScores[filmId] = response.listener_score ?? 0;
-  film.listener_score = response.listener_score ?? 0;
+  listenerScores[filmId] = listenerRating;
+  film.listener_score = listenerRating;
 
-  if (response.your_vote === null) {
-    delete localVotes[filmId];
+  if (!yourRating) {
+    delete localRatings[filmId];
   } else {
-    localVotes[filmId] = response.your_vote;
+    localRatings[filmId] = yourRating;
   }
-  saveLocalVotes();
-  updateVoteUI(filmId, response.listener_score, response.your_vote);
+  saveLocalRatings();
+  updateRatingUI(filmId, listenerRating, yourRating);
   render({ skipScoreRefresh: true });
+});
+
+container.addEventListener("mouseover", (event) => {
+  const segment = event.target.closest(".rating-segment");
+  if (!segment) return;
+  const panel = segment.closest(".rating-panel");
+  if (!panel || panel.classList.contains("locked")) return;
+  const value = Number(segment.dataset.rating);
+  setRatingPreview(panel, value);
+});
+
+container.addEventListener("mouseout", (event) => {
+  const bar = event.target.closest(".rating-bar");
+  if (!bar) return;
+  const panel = bar.closest(".rating-panel");
+  if (!panel || panel.classList.contains("locked")) return;
+  if (event.relatedTarget && bar.contains(event.relatedTarget)) return;
+  clearRatingPreview(panel);
+});
+
+container.addEventListener("focusin", (event) => {
+  const segment = event.target.closest(".rating-segment");
+  if (!segment) return;
+  const panel = segment.closest(".rating-panel");
+  if (!panel || panel.classList.contains("locked")) return;
+  const value = Number(segment.dataset.rating);
+  setRatingPreview(panel, value);
+});
+
+container.addEventListener("focusout", (event) => {
+  const bar = event.target.closest(".rating-bar");
+  if (!bar) return;
+  const panel = bar.closest(".rating-panel");
+  if (!panel || panel.classList.contains("locked")) return;
+  if (event.relatedTarget && bar.contains(event.relatedTarget)) return;
+  clearRatingPreview(panel);
 });
 
 container.addEventListener("click", (event) => {
@@ -1399,15 +1599,52 @@ window.addEventListener("resize", () => {
   }
 });
 
-function updateVoteUI(filmId, listenerScore, yourVote) {
-  document.querySelectorAll(`.vote-button[data-film-id="${filmId}"]`).forEach(btn => {
-    const btnVote = Number(btn.dataset.vote);
-    const isSelected = yourVote === btnVote;
-    btn.classList.toggle("selected", isSelected);
-    btn.setAttribute("aria-pressed", String(isSelected));
+function updateRatingUI(filmId, listenerRating, yourRating) {
+  document.querySelectorAll(`.rating-panel[data-film-id="${filmId}"]`).forEach(panel => {
+    const rateToggle = panel.querySelector(".rate-toggle");
+    const status = panel.querySelector(".rating-status");
+    const statusText = panel.querySelector(".rating-status-text");
+    const segments = panel.querySelectorAll(".rating-segment");
+    const hasRating = Boolean(yourRating);
+
+    panel.classList.toggle("locked", hasRating);
+    panel.classList.add("open");
+
+    if (rateToggle) {
+      rateToggle.setAttribute("aria-expanded", "true");
+    }
+    if (status) {
+      status.hidden = !hasRating;
+    }
+    if (statusText) {
+      statusText.textContent = hasRating ? `You rated: ${yourRating}/10` : "";
+    }
+
+    segments.forEach(segment => {
+      const value = Number(segment.dataset.rating);
+      const isSelected = hasRating && value <= yourRating;
+      segment.classList.toggle("selected", isSelected);
+      segment.setAttribute("aria-pressed", String(isSelected));
+    });
+    clearRatingPreview(panel);
   });
+
   document.querySelectorAll(`[data-listener-score="${filmId}"] .listener-score-text`).forEach(el => {
-    el.textContent = `Listeners Score: ${formatListenerScore(listenerScore)}`;
+    el.textContent = `Listeners Rating: ${formatListenerRating(listenerRating)}`;
+  });
+}
+
+function setRatingPreview(panel, value) {
+  const segments = panel.querySelectorAll(".rating-segment");
+  segments.forEach(segment => {
+    const segmentValue = Number(segment.dataset.rating);
+    segment.classList.toggle("preview", segmentValue <= value);
+  });
+}
+
+function clearRatingPreview(panel) {
+  panel.querySelectorAll(".rating-segment.preview").forEach(segment => {
+    segment.classList.remove("preview");
   });
 }
 
