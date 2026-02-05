@@ -190,10 +190,6 @@ label {
 }
 
 .flag {
-  font-size: 12px;
-  font-weight: bold;
-  padding: 6px 10px;
-  border-radius: 12px;
   text-transform: uppercase;
 }
 .flag.rob { background: #3e5f3e; color: #d8f0d8; }
@@ -204,7 +200,7 @@ label {
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
   gap: 18px;
   align-items: start;
-  padding-top: 84px;
+  padding-top: 72px;
 }
 
 .poster-wrap {
@@ -375,6 +371,18 @@ label {
   max-width: min(50%, 360px);
 }
 
+.rosette {
+  font-size: 11px;
+  font-weight: 900;
+  padding: 6px 10px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  line-height: 1;
+  border: 1px solid rgba(255,255,255,0.18);
+}
+
 .badge {
   border-radius: 18px;
   padding: 14px;
@@ -418,15 +426,7 @@ label {
 }
 
 .badge-flag {
-  font-size: 11px;
-  font-weight: 900;
-  padding: 6px 10px;
-  border-radius: 999px;
-  text-transform: uppercase;
-  letter-spacing: 0.06em;
-  border: 1px solid rgba(255,255,255,0.18);
   color: #fff;
-  white-space: nowrap;
 }
 
 .hero-rosettes .flag {
@@ -977,6 +977,24 @@ body.modal-open {
     padding: 5px 8px;
   }
   .listener-score { flex-wrap: wrap; }
+}
+
+@media (min-width: 1024px) {
+  .hero-rosettes {
+    display: flex;
+    flex-wrap: nowrap;
+    justify-content: flex-end;
+    gap: 8px;
+    white-space: nowrap;
+    overflow-x: auto;
+    max-width: min(58%, 560px);
+    scrollbar-width: thin;
+  }
+
+  .hero-rosettes .rosette {
+    font-size: clamp(10px, 0.72vw, 11px);
+    padding: clamp(5px, 0.42vw, 6px) clamp(8px, 0.8vw, 10px);
+  }
 }
 
 @media (max-width: 760px) {
@@ -1716,10 +1734,10 @@ async function render(options = {}) {
     card.innerHTML = `
       <div class="hero-rank">#${index + 1}</div>
       <div class="hero-rosettes" aria-label="Episode rosettes">
-          <span class="flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
-          ${film.rob && film === best ? '<span class="badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
-          ${film.rob && listenerBest && film === listenerBest ? '<span class="badge-flag listener">Listeners Pick ❤️</span>' : ''}
-          ${film.rob && film === newest ? '<span class="badge-flag new">NEW 🆕</span>' : ''}
+          <span class="rosette flag ${film.rob ? "rob" : "real"}">${film.rob ? "Rob’s Film" : "Real Film"}</span>
+          ${film.rob && film === best ? '<span class="rosette badge-flag best">Kev&#39;s Pick 🏅</span>' : ''}
+          ${film.rob && listenerBest && film === listenerBest ? '<span class="rosette badge-flag listener">Listeners Pick ❤️</span>' : ''}
+          ${film.rob && film === newest ? '<span class="rosette badge-flag new">NEW 🆕</span>' : ''}
       </div>
 
       <div class="hero-layout">
@@ -2128,7 +2146,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
