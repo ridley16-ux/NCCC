@@ -363,8 +363,8 @@ label {
 
 .score-card--stat {
   min-width: 0;
-  border: 1px solid rgba(186, 103, 52, 0.82);
-  background: #b06b3f;
+  border: 1px solid rgba(124, 74, 45, 0.88);
+  background: rgba(92, 54, 31, 0.8);
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
 }
 
@@ -1039,7 +1039,22 @@ body.modal-open {
   }
 
   .score-row {
-    grid-template-columns: 1fr;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 8px;
+  }
+
+  .score-card {
+    border-radius: 14px;
+    padding: 10px;
+  }
+
+  .score-label {
+    font-size: 11px;
+    letter-spacing: 0.06em;
+  }
+
+  .score-value {
+    font-size: 24px;
   }
 }
 
