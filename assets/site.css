@@ -6,6 +6,7 @@
   --nav-pad-x-desktop: 20px;
   --nav-pad-y-mobile: 10px;
   --nav-pad-x-mobile: 14px;
+  --sticky-menu-height: 162px;
 }
 
 .sticky-menu {
@@ -18,8 +19,27 @@
   z-index: 1000;
   background: #0f0f0f;
   padding: 16px 16px 12px;
-  margin: 0 0 24px;
+  margin: 0;
   box-shadow: 0 10px 24px rgba(0, 0, 0, 0.55);
+}
+
+
+.header-extras {
+  position: sticky;
+  top: var(--sticky-menu-height);
+  z-index: 950;
+  background: #0f0f0f;
+  padding: 12px 16px 16px;
+  margin: 0 0 24px;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.4);
+}
+
+.header-extras:empty {
+  display: none;
+}
+
+.header-extras .controls {
+  margin-bottom: 0;
 }
 
 .sticky-divider {
@@ -81,6 +101,10 @@
 }
 
 @media (max-width: 720px) {
+  :root {
+    --sticky-menu-height: 154px;
+  }
+
   .nav-links {
     gap: var(--nav-gap-mobile);
     max-width: 100%;
