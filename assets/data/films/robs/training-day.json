@@ -1,0 +1,16 @@
+{
+  "id": "rob-training-day",
+  "rob": true,
+  "title": "Training Day",
+  "starring": "Jenna Ortega, Jesse Eisenberg",
+  "poster": "/assets/img/posters/robs/training-day-rob.webp",
+  "coherence": 8,
+  "entertainment": 7,
+  "originality": 7,
+
+  "podcastDate": "2026-01-11",
+  "summary": "At a flashy BigTech open day, a cynical postgrad accidentally invents an AI that can rewrite reality by changing numbers, uses it to fix small injustices, triggers devastating unintended consequences, and ultimately sacrifices her freedom to stop governments and corporations from weaponising it.",
+  "link": "#",
+  "linkType": "podcast"
+
+}
