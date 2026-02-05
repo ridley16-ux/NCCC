@@ -1369,9 +1369,12 @@ body.modal-open {
   }
 
   .filters-toolbar {
-    display: flex;
-    align-items: center;
-    gap: 14px;
+    display: grid;
+    grid-template-columns: minmax(160px, 220px) minmax(160px, 220px) minmax(280px, 1fr);
+    grid-template-rows: auto auto auto;
+    column-gap: 14px;
+    row-gap: 6px;
+    align-items: end;
     width: 100%;
   }
 
@@ -1381,37 +1384,66 @@ body.modal-open {
     padding: 0;
   }
 
-  .filter-row {
-    justify-content: flex-start;
-    align-items: flex-end;
-    gap: 14px;
-    flex-wrap: nowrap;
-  }
-
-  .control-row {
-    display: flex;
-    align-items: flex-end;
-    gap: 14px;
-  }
-
+  .filter-row,
+  .control-row,
   .filters-toolbar__group {
-    display: flex;
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
-    min-width: 0;
+    display: contents;
   }
 
   .filter,
-  .sort {
-    flex-direction: column;
-    align-items: stretch;
-    gap: 6px;
+  .sort,
+  .film-search-row,
+  .film-search-wrap {
+    display: contents;
   }
 
-  .filters-toolbar__group--search {
-    flex: 1 1 auto;
-    min-width: 280px;
+  .filter > label,
+  .sort > label,
+  .film-search-wrap > label {
+    margin: 0;
+    font-size: 13px;
+    line-height: 1.2;
+    min-height: 16px;
+    align-self: end;
+  }
+
+  .filter > label {
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  .sort > label {
+    grid-column: 2;
+    grid-row: 1;
+  }
+
+  .film-search-wrap > label {
+    grid-column: 3;
+    grid-row: 1;
+  }
+
+  .filter > select {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .sort > select {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .search-field {
+    grid-column: 3;
+    grid-row: 2;
+    min-width: 0;
+    align-self: end;
+  }
+
+  .film-search-suggestions {
+    grid-column: 3;
+    grid-row: 3;
+    margin-top: 6px;
+    min-height: 1em;
   }
 
   .film-search-row,
@@ -1422,17 +1454,30 @@ body.modal-open {
     pointer-events: auto;
   }
 
-  .film-search-row {
-    flex: 1 1 auto;
-    min-width: 280px;
+  .filter select,
+  .sort select,
+  .film-search-input {
+    height: 44px;
+    min-height: 44px;
+    box-sizing: border-box;
   }
 
-  .film-search-wrap {
-    width: 100%;
+  .filter select,
+  .sort select,
+  .film-search-input {
+    border-width: 2px;
   }
 
-  .search-field {
-    min-width: 0;
+  .filter select:focus,
+  .filter select:focus-visible,
+  .sort select:focus,
+  .sort select:focus-visible,
+  .film-search-input:focus,
+  .film-search-input:focus-visible,
+  .film-search-input:active {
+    outline: none;
+    box-shadow: none;
+    border-color: #d46a2a;
   }
 
   .film-search-input {
