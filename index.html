@@ -1357,7 +1357,7 @@ body.modal-open {
 
   .filters-toolbar {
     display: flex;
-    align-items: flex-end;
+    align-items: center;
     gap: 14px;
     width: 100%;
   }
@@ -2532,7 +2532,10 @@ function updateFilmSearchSuggestions(matchCount) {
 function updateFilmSearchLabel(resultCount = 0) {
   const { label } = getFilmSearchElements();
   if (!label) return;
-  label.textContent = "Search";
+  const hasSearchQuery = filmSearchQuery.length > 0;
+  label.textContent = hasSearchQuery
+    ? `Search - ${resultCount} results`
+    : "Search";
 }
 
 
