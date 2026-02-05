@@ -108,12 +108,15 @@ label {
 /* Filters + Sort */
 .controls {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  gap: 12px;
+  gap: 16px;
   margin-bottom: 0;           /* ✅ header owns spacing now */
   flex-wrap: wrap;
   width: 100%;
+  max-width: 900px;
+  margin-left: auto;
+  margin-right: auto;
 }
 
 .filter {
@@ -126,7 +129,6 @@ label {
 
 .sort {
   flex: 0 0 auto;
-  margin-left: auto;
   display: flex;
   align-items: center;
   gap: 6px;
@@ -2184,7 +2186,6 @@ loadFilms();
 
 </body>
 </html>
-
 
 
 
