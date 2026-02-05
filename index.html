@@ -22,7 +22,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.16.0" />
+<meta name="website-version" content="1.16.1" />
 <meta property="og:title" content="No Context Cinema Club – Films" />
 <meta property="og:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/" />
@@ -742,6 +742,7 @@ body.modal-open {
 </div>
 
 <div id="site-footer"></div>
+<script src="assets/js/shared.js"></script>
 <script>
   const headerContainer = document.getElementById("site-header");
   const headerExtrasTemplate = document.getElementById("header-extras-template");
@@ -790,11 +791,10 @@ let currentSort = "score";
 let lastScoreFetchKey = "";
 const listenerScores = {};
 const VOTE_STORAGE_KEY = "nccc_film_votes";
-const DEVICE_ID_KEY = "nccc_device_id";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
-const deviceId = getOrCreateDeviceId();
+const visitorId = getVisitorId();
 const localVotes = loadLocalVotes();
 let openTooltip = null;
 
@@ -1015,14 +1015,6 @@ function handleTranscriptKeydown(event) {
     event.preventDefault();
     first.focus();
   }
-}
-
-function getOrCreateDeviceId() {
-  const existing = localStorage.getItem(DEVICE_ID_KEY);
-  if (existing) return existing;
-  const created = crypto.randomUUID();
-  localStorage.setItem(DEVICE_ID_KEY, created);
-  return created;
 }
 
 function loadLocalVotes() {
@@ -1322,7 +1314,7 @@ container.addEventListener("click", async (event) => {
 
   const { data, error } = await supabaseClient.rpc("toggle_film_vote", {
     p_film_id: filmId,
-    p_device_id: deviceId,
+    p_device_id: visitorId,
     p_vote: voteValue,
     p_title: film.title ?? null
   });
