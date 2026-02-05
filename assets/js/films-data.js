@@ -1,4 +1,4 @@
-const DEFAULT_MANIFEST_URL = "./films/manifest.json";
+const DEFAULT_MANIFEST_URL = "/assets/data/films/manifest.json";
 
 function parseLocalDate(dateString) {
   if (!dateString) return null;
