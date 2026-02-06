@@ -1873,7 +1873,8 @@ body.modal-open {
           <select id="sortSelect" class="mobile-filter-control" data-default-value="rating-desc">
             <option value="rating-desc">Rating (High to Low)</option>
             <option value="rating-asc">Rating (Low to High)</option>
-            <option value="recent">Most Recent</option>
+            <option value="podcast-desc">Podcast Date (New to Old)</option>
+            <option value="podcast-asc">Podcast Date (Old to New)</option>
             <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
             <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
           </select>
@@ -3239,19 +3240,20 @@ function sortFilms(films) {
       return bScore - aScore;
     });
   }
-  if (currentSort === "recent") {
+  if (currentSort === "podcast-desc" || currentSort === "podcast-asc") {
     const fallbackComparator = (a, b) => {
       const scoreDiff = getCompositeScore(b) - getCompositeScore(a);
       if (scoreDiff !== 0) return scoreDiff;
       return String(a.title || "").localeCompare(String(b.title || ""));
     };
+    const direction = currentSort === "podcast-desc" ? -1 : 1;
     return stableSortFilms(films, (a, b) => {
       const aDate = getPodcastedAtTimestamp(a);
       const bDate = getPodcastedAtTimestamp(b);
       if (aDate === null && bDate === null) return fallbackComparator(a, b);
       if (aDate === null) return 1;
       if (bDate === null) return -1;
-      if (aDate !== bDate) return bDate - aDate;
+      if (aDate !== bDate) return (aDate - bDate) * direction;
       return fallbackComparator(a, b);
     });
   }
