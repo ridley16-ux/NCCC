@@ -1898,7 +1898,7 @@ const AWARDS = [
     label: "Kev’s Pick",
     emoji: "🏆",
     rosetteClass: "kev",
-    description: "The film Kev has rated highest.",
+    description: "Awarded to the film that Kev loves the most.",
     getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
       const kevRating = getKevRating10(film, aggregates);
       return Number.isFinite(kevRating) ? kevRating : null;
@@ -1909,7 +1909,7 @@ const AWARDS = [
     label: "Listener Pick",
     emoji: "❤️",
     rosetteClass: "listener",
-    description: "Top listener rating based on audience scores.",
+    description: "Awarded to the film that listeners can't live without.",
     getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
       const listenerAvg = getListenerAverage10(film, aggregates);
       const listenerCount = getListenerCount(film, aggregates);
@@ -1922,7 +1922,7 @@ const AWARDS = [
     label: "New",
     emoji: "🆕",
     rosetteClass: "new",
-    description: "Most recently added Rob film.",
+    description: "The most recently podcasted film. Not really an award but nice to know.",
     getWinners: (films) => getTopAwardWinners(films, (film) => {
       const newest = getNewestFilmTimestamp(film);
       return Number.isFinite(newest) ? newest : null;
@@ -1931,9 +1931,9 @@ const AWARDS = [
   {
     key: "most-underrated",
     label: "Most Underrated",
-    emoji: "🟢⬆️",
+    emoji: "⬆️",
     rosetteClass: "rosette--underrated",
-    description: "Kev scored it lower than listeners, with the biggest gap.",
+    description: "Awarded to the film which has the largest postive difference from the listener score to Kev's score",
     getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
       const listenerAvg = getListenerAverage10(film, aggregates);
       const kevRating = getKevRating10(film, aggregates);
@@ -1948,7 +1948,7 @@ const AWARDS = [
     label: "Most Overrated",
     emoji: "🔴⬇️",
     rosetteClass: "rosette--overrated",
-    description: "Kev scored it higher than listeners, with the biggest gap.",
+    description: "Awarded to the film which has the largest negative difference from the listener score to Kev's score",
     getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
       const listenerAvg = getListenerAverage10(film, aggregates);
       const kevRating = getKevRating10(film, aggregates);
@@ -1963,7 +1963,7 @@ const AWARDS = [
     label: "Most Divisive",
     emoji: "⚡",
     rosetteClass: "rosette--divisive",
-    description: "Biggest disagreement in listener ratings.",
+    description: "Awarded to the film with the biggest rating varience. Some listeners love it, some (probably most) hate it",
     getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
       const listenerCount = getListenerCount(film, aggregates);
       if (listenerCount <= 0) return null;
@@ -2243,10 +2243,10 @@ function formatAwardsUpdatedLabel(timestamp) {
   if (!date) return "Last updated: —";
   const diffMs = Date.now() - date.getTime();
   const diffMinutes = Math.floor(diffMs / (60 * 1000));
-  if (diffMinutes < 1) return "Last updated: just now";
-  if (diffMinutes < 60) return `Last updated: ${diffMinutes} mins ago`;
+  if (diffMinutes < 1) return "Check out our Film Awards, awarded to Rob's films and voted on by you and Kev. Last updated: just now";
+  if (diffMinutes < 60) return `Check out our Film Awards, awarded to Rob's films and voted on by you and Kev. Last updated: ${diffMinutes} mins ago`;
   const formatted = date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
-  return `Last updated: ${formatted}`;
+  return `Check out our Film Awards, awarded to Rob's films and voted on by you and Kev. Last updated: ${formatted}`;
 }
 
 function setRatingError(panel, message) {
