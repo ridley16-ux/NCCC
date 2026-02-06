@@ -124,42 +124,6 @@ label {
   padding: 0 16px;
 }
 
-.controls {
-  --control-icon-size: 14px;
-  --control-icon-chevron-size: 10px;
-  --control-icon-gap: 6px;
-  --control-icon-right: 10px;
-  --control-icon-area: 42px;
-  --control-icon-hit-area: 36px;
-  --control-icon-muted: rgba(255, 255, 255, 0.35);
-  --control-icon-mobile: rgba(255, 255, 255, 0.35);
-  --control-icon-active: #d46a2a;
-}
-
-.ui-icon {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: var(--control-icon-size);
-  height: var(--control-icon-size);
-  color: var(--control-icon-muted);
-  pointer-events: none;
-}
-
-.ui-icon svg {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
-
-.ui-icon--muted {
-  opacity: 0.9;
-}
-
-.ui-icon--mobile {
-  color: var(--control-icon-mobile);
-}
-
 .filter-row {
   display: flex;
   justify-content: center;
@@ -288,8 +252,8 @@ label {
   top: 50%;
   right: 2px;
   transform: translateY(-50%);
-  width: var(--control-icon-hit-area);
-  height: var(--control-icon-hit-area);
+  width: 40px;
+  height: 40px;
   border: 0;
   padding: 0;
   border-radius: 999px;
@@ -313,43 +277,9 @@ label {
   display: none;
 }
 
-.select-field {
-  position: relative;
-}
-
-.select-icon {
-  position: absolute;
-  top: 50%;
-  transform: translateY(-50%);
-  pointer-events: none;
-}
-
-.select-icon--filter,
-.select-icon--sort {
-  right: calc(var(--control-icon-right) + var(--control-icon-chevron-size) + var(--control-icon-gap));
-}
-
-.select-icon--chevron {
-  width: var(--control-icon-chevron-size);
-  height: var(--control-icon-chevron-size);
-  right: var(--control-icon-right);
-  color: rgba(255, 255, 255, 0.45);
-}
-
-.search-icon {
-  position: absolute;
-  top: 50%;
-  right: var(--control-icon-right);
-  transform: translateY(-50%);
-}
-
-.search-field.has-value .search-icon {
-  opacity: 0;
-}
-
 .search-icon,
 .select-icon {
-  display: inline-flex;
+  display: none;
 }
 
 .film-search-input {
@@ -364,7 +294,7 @@ label {
   box-sizing: border-box;
   font-size: 16px;
   line-height: 1.2;
-  padding-right: var(--control-icon-area);
+  padding-right: 52px;
 }
 
 .film-search-input:hover {
@@ -403,7 +333,6 @@ label {
   color: #fff;
   border: 1px solid rgba(255, 255, 255, 0.1);
   padding: 0 14px;
-  padding-right: var(--control-icon-area);
   height: 44px;
   min-height: 44px;
   box-sizing: border-box;
@@ -1348,9 +1277,7 @@ body.modal-open {
     --control-icon-gap: 6px;
     --control-icon-right: 12px;
     --control-icon-area: 52px;
-    --control-icon-hit-area: 44px;
-    --control-icon-muted: rgba(255, 255, 255, 0.6);
-    --control-icon-mobile: rgba(255, 255, 255, 0.75);
+    --control-icon-muted: rgba(255, 255, 255, 0.55);
     --control-icon-active: #d46a2a;
   }
   .filters-row {
@@ -1446,6 +1373,7 @@ body.modal-open {
     width: var(--control-icon-size);
     height: var(--control-icon-size);
     right: calc(var(--control-icon-right) + var(--control-icon-chevron-size) + var(--control-icon-gap));
+    color: var(--control-icon-muted);
   }
   .select-field.has-nondefault .select-icon--filter,
   .select-field.has-nondefault .select-icon--sort {
@@ -1578,6 +1506,7 @@ body.modal-open {
     width: var(--control-icon-size);
     height: var(--control-icon-size);
     transform: translateY(-50%);
+    color: var(--control-icon-muted);
     pointer-events: none;
   }
   .search-icon svg {
@@ -1585,7 +1514,7 @@ body.modal-open {
     width: 100%;
     height: 100%;
   }
-  .search-field.has-value .search-icon {
+  .search-field.is-active .search-icon {
     opacity: 0;
   }
   .search-clear:hover,
@@ -1674,7 +1603,7 @@ body.modal-open {
     display: contents;
   }
   .select-field {
-    position: relative;
+    display: contents;
   }
 
   .filter > label,
@@ -1702,12 +1631,14 @@ body.modal-open {
     grid-row: 1;
   }
 
-  .filter > .select-field {
+  .filter > select,
+  .filter > .select-field > select {
     grid-column: 1;
     grid-row: 2;
   }
 
-  .sort > .select-field {
+  .sort > select,
+  .sort > .select-field > select {
     grid-column: 2;
     grid-row: 2;
   }
@@ -1740,10 +1671,6 @@ body.modal-open {
     height: 44px;
     min-height: 44px;
     box-sizing: border-box;
-  }
-
-  .select-field > select {
-    width: 100%;
   }
 
   .filter select,
@@ -1915,7 +1842,7 @@ body.modal-open {
             <option value="real">Real Films</option>
             <option value="rob" selected>Rob’s Films</option>
           </select>
-          <span class="select-icon select-icon--filter ui-icon ui-icon--muted ui-icon--mobile" aria-hidden="true">
+          <span class="select-icon select-icon--filter" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
               <path fill="currentColor" d="M3 5.75A.75.75 0 0 1 3.75 5h16.5a.75.75 0 0 1 .56 1.25l-6.31 7.1v4.56a.75.75 0 0 1-.35.63l-3 1.91A.75.75 0 0 1 10 19.8v-6.45L3.19 6.25A.75.75 0 0 1 3 5.75Z"/>
             </svg>
@@ -1949,7 +1876,7 @@ body.modal-open {
             <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
             <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
           </select>
-          <span class="select-icon select-icon--sort ui-icon ui-icon--muted ui-icon--mobile" aria-hidden="true">
+          <span class="select-icon select-icon--sort" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
               <path fill="currentColor" d="M7 4a1 1 0 0 1 1 1v11.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4.01 4.01a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.41-1.42L6 16.59V5a1 1 0 0 1 1-1Zm10 0a1 1 0 0 1 .71.29l4 4a1 1 0 0 1-1.42 1.42L18 7.41V19a1 1 0 1 1-2 0V7.41l-2.3 2.3a1 1 0 1 1-1.4-1.42l4-4A1 1 0 0 1 17 4Z"/>
             </svg>
@@ -1968,12 +1895,12 @@ body.modal-open {
         <label id="filmSearchLabel" for="filmSearchInput">Search</label>
         <div class="search-field">
           <input id="filmSearchInput" class="film-search-input mobile-filter-control" type="search" placeholder="Search films by title or cast" autocomplete="off" />
-          <span class="search-icon ui-icon ui-icon--muted ui-icon--mobile" aria-hidden="true">
+          <span class="search-icon" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
               <path fill="currentColor" d="M11 4a7 7 0 1 0 4.95 11.95l3.55 3.55a1 1 0 0 0 1.42-1.42l-3.55-3.55A7 7 0 0 0 11 4Zm0 2a5 5 0 1 1 0 10 5 5 0 0 1 0-10Z"/>
             </svg>
           </span>
-          <button type="button" id="filmSearchClear" class="search-clear" aria-label="Clear search" role="button" hidden>×</button>
+          <button type="button" id="filmSearchClear" class="search-clear" aria-label="Clear search" hidden>×</button>
         </div>
         <div id="filmSearchSuggestions" class="film-search-suggestions" aria-live="polite"></div>
       </div>
@@ -3734,9 +3661,11 @@ function updateFilmSearchClearVisibility() {
   const { clear, input, searchField } = getFilmSearchElements();
   if (!clear || !input) return;
   const hasValue = input.value.trim().length > 0;
-  clear.hidden = !hasValue;
+  const isFocused = document.activeElement === input;
+  const isActive = hasValue || isFocused;
+  clear.hidden = !isActive;
   if (searchField) {
-    searchField.classList.toggle("has-value", hasValue);
+    searchField.classList.toggle("is-active", isActive);
   }
 }
 
@@ -3902,11 +3831,8 @@ document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("click", (event) => {
     const clearButton = event.target?.closest("#filmSearchClear");
     if (!clearButton) return;
-    const { input } = getFilmSearchElements();
-    if (!input) return;
-    input.value = "";
-    input.dispatchEvent(new Event("input", { bubbles: true }));
-    input.focus({ preventScroll: true });
+    setFilmSearchQuery("", { keepFocus: false });
+    getFilmSearchElements().input?.blur();
   });
 
   document.addEventListener("change", (event) => {
