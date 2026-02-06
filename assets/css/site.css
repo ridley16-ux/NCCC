@@ -6,6 +6,12 @@
   --nav-pad-x-desktop: 20px;
   --nav-pad-y-mobile: 10px;
   --nav-pad-x-mobile: 14px;
+  --rosette-kev-pick: #C55FA6;
+  --rosette-listener-pick: #4F7DFF;
+  --rosette-new: #2F8F6B;
+  --rosette-most-underrated: #3FAE6A;
+  --rosette-most-overrated: #C84B4B;
+  --rosette-most-divisive: #7A5BCF;
 }
 
 body {
