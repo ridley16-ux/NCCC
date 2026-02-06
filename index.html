@@ -1201,6 +1201,13 @@ body.modal-open {
   gap: 6px;
 }
 
+.film-award-heading {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
 .film-award-title {
   margin: 0;
   font-size: 18px;
@@ -2656,12 +2663,14 @@ function renderFilmAwards() {
     const winnersLine = formatAwardWinnersLine(winners);
     return `
       <article class="film-award-row" data-award="${award.key}">
-        <span class="rosette ${award.rosetteClass}">
-          ${escapeHtml(award.label)}
-          <span class="badge-icon" aria-hidden="true">${award.emoji}</span>
-        </span>
         <div class="film-award-meta">
-          <h3 class="film-award-title">${escapeHtml(award.label)}</h3>
+          <div class="film-award-heading">
+            <span class="rosette ${award.rosetteClass}">
+              ${escapeHtml(award.label)}
+              <span class="badge-icon" aria-hidden="true">${award.emoji}</span>
+            </span>
+            <h3 class="film-award-title">${escapeHtml(award.label)}</h3>
+          </div>
           <p class="film-award-description">${escapeHtml(award.description)}</p>
         </div>
         <p class="film-award-winner">${winnersLine}</p>
