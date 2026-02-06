@@ -12,6 +12,9 @@
   --rosette-most-underrated: #3FAE6A;
   --rosette-most-overrated: #C84B4B;
   --rosette-most-divisive: #7A5BCF;
+  --rosette-lost-plot-bg: #2E6E7A;
+  --rosette-fixed-it-bg: #7A5A2E;
+  --rosette-consensus-bg: #3C5B8F;
 }
 
 body {
