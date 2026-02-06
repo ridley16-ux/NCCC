@@ -2208,6 +2208,44 @@ function parseTimestamp(value) {
   return null;
 }
 
+function isSameCalendarDay(a, b) {
+  return a.getFullYear() === b.getFullYear()
+    && a.getMonth() === b.getMonth()
+    && a.getDate() === b.getDate();
+}
+
+function getMonthDifference(start, end) {
+  let months = (end.getFullYear() - start.getFullYear()) * 12
+    + (end.getMonth() - start.getMonth());
+  if (end.getDate() < start.getDate()) {
+    months -= 1;
+  }
+  return Math.max(months, 0);
+}
+
+function timeSinceLabel(dateValue) {
+  const parsed = parseTimestamp(dateValue);
+  if (!parsed) return "—";
+  const now = new Date();
+  if (isSameCalendarDay(parsed, now)) return "today";
+  const diffMs = now.getTime() - parsed.getTime();
+  if (!Number.isFinite(diffMs)) return "—";
+  const daysDiff = Math.max(0, Math.floor(diffMs / 86400000));
+  if (daysDiff >= 1 && daysDiff <= 6) return "1–6 days ago";
+  const weeksDiff = Math.floor(daysDiff / 7);
+  if (weeksDiff >= 1 && weeksDiff <= 4) return "1–4 weeks ago";
+  const monthsDiff = getMonthDifference(parsed, now);
+  if (monthsDiff >= 4 && monthsDiff <= 11) return "4–11 months ago";
+  if (monthsDiff >= 12) {
+    const years = Math.floor(monthsDiff / 12);
+    const remainingMonths = monthsDiff % 12;
+    const yearsLabel = years === 1 ? "1 year" : `${years} years`;
+    if (remainingMonths === 0) return `${yearsLabel} ago`;
+    return `${yearsLabel} ${remainingMonths} months ago`;
+  }
+  return "4–11 months ago";
+}
+
 function calcRobScore(film) {
   const total = film.coherence + film.entertainment + film.originality;
   film.totalScore = total;
@@ -2658,6 +2696,13 @@ function getPodcastedAtTimestamp(film) {
     ?? null;
   const parsed = parseTimestamp(dateValue);
   return parsed ? parsed.getTime() : null;
+}
+
+function getPodcastedDateValue(film) {
+  return film?.podcasted_at
+    ?? film?.podcastedAt
+    ?? film?.podcastDate
+    ?? null;
 }
 
 function computeStandardDeviation(values) {
@@ -3539,8 +3584,23 @@ async function render(options = {}) {
 
   currentTotal = films.length;
   const visibleFilms = films.slice(0, visibleCount);
+  const totalVisible = visibleFilms.length;
+  const isPodcastSort = currentSort === "podcast-desc" || currentSort === "podcast-asc";
+  const isDescendingRank = currentSort === "rating-desc" || currentSort === "listener-desc";
+  const isAscendingRank = currentSort === "rating-asc" || currentSort === "listener-asc";
 
   visibleFilms.forEach((film, index) => {
+    let rankText = "—";
+    if (isDescendingRank) {
+      rankText = String(index + 1);
+    } else if (isAscendingRank) {
+      rankText = String(totalVisible - index);
+    } else if (isPodcastSort) {
+      rankText = timeSinceLabel(getPodcastedDateValue(film));
+    } else {
+      rankText = String(index + 1);
+    }
+    const rankLabel = isPodcastSort ? rankText : `#${rankText}`;
     const listenerScore = listenerScores[film.id] ?? 0;
     const audienceData = audienceScores[film.id];
     const audienceRaw = getPercentRaw(audienceData?.weighted_percent);
@@ -3603,7 +3663,7 @@ async function render(options = {}) {
       .join("");
 
     card.innerHTML = `
-      <div class="hero-rank">#${index + 1}</div>
+      <div class="hero-rank">${rankLabel}</div>
       <div class="rosette-stack" aria-label="Episode rosettes">
         ${rosetteMarkup}
       </div>
