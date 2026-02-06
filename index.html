@@ -1873,6 +1873,7 @@ body.modal-open {
           <select id="sortSelect" class="mobile-filter-control" data-default-value="rating-desc">
             <option value="rating-desc">Rating (High to Low)</option>
             <option value="rating-asc">Rating (Low to High)</option>
+            <option value="recent">Most Recent</option>
             <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
             <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
           </select>
@@ -2596,6 +2597,13 @@ function normalizeFilmTitle(value) {
   return String(value || "").trim().toLowerCase();
 }
 
+function normalizeFilmTitleForMatch(value) {
+  return String(value || "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim();
+}
+
 function findMatchingRealFilm(film, films = []) {
   if (!film?.title) return null;
   const targetTitle = normalizeFilmTitle(film.title);
@@ -2630,12 +2638,23 @@ function getRottenTomatoesScore10(film, aggregates = {}) {
 }
 
 function getNewestFilmTimestamp(film) {
-  const dateValue = film.created_at
+  const dateValue = film.podcasted_at
+    ?? film.podcastedAt
+    ?? film.podcastDate
+    ?? film.created_at
     ?? film.createdAt
     ?? film.published_at
     ?? film.publishedAt
-    ?? film.podcastDate
     ?? film.date;
+  const parsed = parseTimestamp(dateValue);
+  return parsed ? parsed.getTime() : null;
+}
+
+function getPodcastedAtTimestamp(film) {
+  const dateValue = film.podcasted_at
+    ?? film.podcastedAt
+    ?? film.podcastDate
+    ?? null;
   const parsed = parseTimestamp(dateValue);
   return parsed ? parsed.getTime() : null;
 }
@@ -3129,6 +3148,70 @@ function getFilteredFilms() {
   return films;
 }
 
+function buildRobFilmIndexes(films) {
+  const robBySlug = new Map();
+  const robByTitle = new Map();
+  films.filter((film) => film.rob).forEach((film) => {
+    if (typeof film.id === "string" && film.id.startsWith("rob-")) {
+      robBySlug.set(film.id.slice(4), film);
+    }
+    const normalizedTitle = normalizeFilmTitleForMatch(film.title);
+    if (!normalizedTitle) return;
+    const list = robByTitle.get(normalizedTitle) ?? [];
+    list.push(film);
+    robByTitle.set(normalizedTitle, list);
+  });
+  return { robBySlug, robByTitle };
+}
+
+function resolveRobMatchForReal(realFilm, indexes, ambiguousMatches) {
+  if (!realFilm) return null;
+  if (typeof realFilm.id === "string" && realFilm.id.startsWith("real-")) {
+    const robMatch = indexes.robBySlug.get(realFilm.id.slice(5));
+    if (robMatch) return robMatch;
+  }
+  const normalizedTitle = normalizeFilmTitleForMatch(realFilm.title);
+  if (!normalizedTitle) return null;
+  const matches = indexes.robByTitle.get(normalizedTitle) ?? [];
+  if (matches.length > 1) {
+    ambiguousMatches.push({ title: realFilm.title, ids: matches.map((film) => film.id) });
+    return null;
+  }
+  return matches[0] ?? null;
+}
+
+function assignPodcastedDates(films) {
+  const indexes = buildRobFilmIndexes(films);
+  const unmatchedReals = [];
+  const ambiguousMatches = [];
+
+  films.forEach((film) => {
+    if (film.rob) {
+      film.podcasted_at = film.podcasted_at ?? film.podcastDate ?? film.podcastedAt ?? null;
+      return;
+    }
+
+    const match = resolveRobMatchForReal(film, indexes, ambiguousMatches);
+    if (match?.podcasted_at || match?.podcastDate || match?.podcastedAt) {
+      // Inherit the Rob film's podcasted date so real films stay in sync.
+      film.podcasted_at = match.podcasted_at ?? match.podcastDate ?? match.podcastedAt ?? null;
+      return;
+    }
+    film.podcasted_at = null;
+    unmatchedReals.push(film);
+  });
+
+  const shouldWarn = ["localhost", "127.0.0.1"].includes(window.location.hostname);
+  if (shouldWarn && (unmatchedReals.length || ambiguousMatches.length)) {
+    const unmatchedTitles = unmatchedReals.map((film) => film.title).filter(Boolean);
+    const ambiguousTitles = ambiguousMatches.map((entry) => entry.title).filter(Boolean);
+    console.warn(
+      "Unmatched real films for podcast dates.",
+      { unmatchedTitles, ambiguousTitles }
+    );
+  }
+}
+
 function sortFilms(films) {
   if (currentSort === "rating-asc") {
     return stableSortFilms(films, (a, b) => getCompositeScore(a) - getCompositeScore(b));
@@ -3154,6 +3237,22 @@ function sortFilms(films) {
       if (aScore === -1) return 1;
       if (bScore === -1) return -1;
       return bScore - aScore;
+    });
+  }
+  if (currentSort === "recent") {
+    const fallbackComparator = (a, b) => {
+      const scoreDiff = getCompositeScore(b) - getCompositeScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
+      return String(a.title || "").localeCompare(String(b.title || ""));
+    };
+    return stableSortFilms(films, (a, b) => {
+      const aDate = getPodcastedAtTimestamp(a);
+      const bDate = getPodcastedAtTimestamp(b);
+      if (aDate === null && bDate === null) return fallbackComparator(a, b);
+      if (aDate === null) return 1;
+      if (bDate === null) return -1;
+      if (aDate !== bDate) return bDate - aDate;
+      return fallbackComparator(a, b);
     });
   }
   return stableSortFilms(films, (a, b) => getCompositeScore(b) - getCompositeScore(a));
@@ -3772,6 +3871,7 @@ async function loadFilms() {
       film.originalIndex = index;
     });
 
+    assignPodcastedDates(films);
     allFilms = films;
     lastScoreFetchKey = "";     // force a fetch on first render
     resetPagination();
