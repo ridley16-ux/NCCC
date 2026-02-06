@@ -651,6 +651,9 @@ label {
 .rosette.listener { background: #5b88ff; }
 .rosette.new { background: #8f9905; }
 .rosette.other { background: #565656; }
+.rosette.rosette--underrated { background: #2f7e51; color: #e9fff1; }
+.rosette.rosette--overrated { background: #964444; color: #ffecec; }
+.rosette.rosette--divisive { background: #6d4b91; color: #f3eaff; }
 
 .divider {
   height: 1px;
@@ -1761,6 +1764,10 @@ const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON
 const localRatings = loadLocalRatings();
 let openTooltip = null;
 
+const INSIGHT_MIN_VOTES = 10;
+const INSIGHT_GAP_MIN = 5;
+const INSIGHT_DIVISIVE_MIN = 12;
+
 const PAGE_SIZE = 10;
 let visibleCount = PAGE_SIZE;
 let loadingMore = false;
@@ -2098,6 +2105,136 @@ function parseListenerRatingValue(value) {
   return Math.round(score);
 }
 
+function normaliseScoreToPercent(value) {
+  const score = Number(value);
+  if (!Number.isFinite(score)) return null;
+  if (score >= 0 && score <= 10) return score * 10;
+  if (score >= 0 && score <= 100) return score;
+  return null;
+}
+
+function getInsightEligibleData(film) {
+  const kevScoreNorm = normaliseScoreToPercent(film.kevScore ?? film.score);
+  const listenerScoreNorm = normaliseScoreToPercent(
+    audienceScores[film.id]?.weighted_percent
+      ?? film.listenerScore
+      ?? film.listenerRating
+      ?? film.listenerPercent
+      ?? film.listener_score
+  );
+  const listenerVotesRaw = audienceScores[film.id]?.listener_count
+    ?? film.listenerVotes
+    ?? (Array.isArray(film.listenerRatings) ? film.listenerRatings.length : null);
+  const listenerVotes = Number(listenerVotesRaw);
+  const validVotes = Number.isFinite(listenerVotes) ? listenerVotes : 0;
+
+  return {
+    kevScoreNorm,
+    listenerScoreNorm,
+    listenerVotes: validVotes
+  };
+}
+
+function computeStandardDeviation(values) {
+  const parsed = values
+    .map((value) => Number(value))
+    .filter((value) => Number.isFinite(value));
+  if (parsed.length < 2) return null;
+  const mean = parsed.reduce((sum, value) => sum + value, 0) / parsed.length;
+  const variance = parsed.reduce((sum, value) => sum + ((value - mean) ** 2), 0) / parsed.length;
+  return Math.sqrt(variance);
+}
+
+function getDivisiveMetric(film) {
+  const audienceData = audienceScores[film.id] || {};
+  const listenerRatings = Array.isArray(film.listenerRatings)
+    ? film.listenerRatings
+    : (Array.isArray(audienceData.listener_ratings) ? audienceData.listener_ratings : null);
+
+  if (listenerRatings?.length >= 2) {
+    const normalisedRatings = listenerRatings
+      .map(normaliseScoreToPercent)
+      .filter((value) => Number.isFinite(value));
+    if (normalisedRatings.length >= 2) {
+      return computeStandardDeviation(normalisedRatings);
+    }
+  }
+
+  const spreadRaw = audienceData.rating_spread
+    ?? film.ratingSpread
+    ?? film.listenerRatingSpread;
+  const spreadNorm = normaliseScoreToPercent(spreadRaw);
+  if (spreadNorm !== null) return spreadNorm;
+
+  const minRating = normaliseScoreToPercent(audienceData.min_rating ?? film.listenerMinRating ?? film.listenerRatingMin);
+  const maxRating = normaliseScoreToPercent(audienceData.max_rating ?? film.listenerMaxRating ?? film.listenerRatingMax);
+  if (minRating !== null && maxRating !== null && maxRating >= minRating) {
+    return maxRating - minRating;
+  }
+
+  return null;
+}
+
+function compareInsightCandidates(a, b) {
+  if (b.metric !== a.metric) return b.metric - a.metric;
+  if (b.votes !== a.votes) return b.votes - a.votes;
+  return a.title.localeCompare(b.title, "en-GB", { sensitivity: "base" });
+}
+
+function computeInsightRosettes(films) {
+  const candidates = films
+    .filter((film) => film.rob)
+    .map((film) => {
+      const insight = getInsightEligibleData(film);
+      return {
+        film,
+        title: String(film.title || ""),
+        kevScoreNorm: insight.kevScoreNorm,
+        listenerScoreNorm: insight.listenerScoreNorm,
+        votes: insight.listenerVotes
+      };
+    });
+
+  const ratedCandidates = candidates.filter((candidate) => (
+    candidate.votes >= INSIGHT_MIN_VOTES
+    && candidate.kevScoreNorm !== null
+    && candidate.listenerScoreNorm !== null
+  ));
+
+  const underratedPool = ratedCandidates
+    .map((candidate) => ({
+      ...candidate,
+      metric: candidate.listenerScoreNorm - candidate.kevScoreNorm
+    }))
+    .filter((candidate) => candidate.metric >= INSIGHT_GAP_MIN)
+    .sort(compareInsightCandidates);
+
+  const overratedPool = ratedCandidates
+    .map((candidate) => ({
+      ...candidate,
+      metric: candidate.kevScoreNorm - candidate.listenerScoreNorm
+    }))
+    .filter((candidate) => candidate.metric >= INSIGHT_GAP_MIN)
+    .sort(compareInsightCandidates);
+
+  const divisivePool = candidates
+    .map((candidate) => {
+      const metric = candidate.votes >= INSIGHT_MIN_VOTES ? getDivisiveMetric(candidate.film) : null;
+      return {
+        ...candidate,
+        metric
+      };
+    })
+    .filter((candidate) => Number.isFinite(candidate.metric) && candidate.metric >= INSIGHT_DIVISIVE_MIN)
+    .sort(compareInsightCandidates);
+
+  return {
+    underratedFilmId: underratedPool[0]?.film.id ?? null,
+    overratedFilmId: overratedPool[0]?.film.id ?? null,
+    divisiveFilmId: divisivePool[0]?.film.id ?? null
+  };
+}
+
 function getListenerRatingValue(film) {
   const audienceValue = formatAudienceScore(audienceScores[film.id]?.weighted_percent);
   if (audienceValue !== null) return audienceValue;
@@ -2361,6 +2498,7 @@ async function render(options = {}) {
   const listenerBest = eligibleListenerFilms.length
     ? stableSortFilms(eligibleListenerFilms, compareAudience)[0]
     : null;
+  const insightRosettes = computeInsightRosettes(allFilms.filter(f => f.active));
 
   currentTotal = films.length;
   const visibleFilms = films.slice(0, visibleCount);
@@ -2404,15 +2542,47 @@ async function render(options = {}) {
       rosettes.push({ className: "new", label: "NEW", icon: ' <span class="badge-icon" aria-hidden="true">🆕</span>' });
     }
 
+    if (showListenerUI && film.rob && film.id === insightRosettes.underratedFilmId) {
+      rosettes.push({
+        className: "rosette--underrated",
+        label: "Most Underrated",
+        icon: ' <span class="badge-icon" aria-hidden="true">⬆️</span>',
+        title: "Listeners rated this much higher than Kev."
+      });
+    }
+
+    if (showListenerUI && film.rob && film.id === insightRosettes.overratedFilmId) {
+      rosettes.push({
+        className: "rosette--overrated",
+        label: "Most Overrated",
+        icon: ' <span class="badge-icon" aria-hidden="true">⬇️</span>',
+        title: "Kev rated this much higher than listeners."
+      });
+    }
+
+    if (showListenerUI && film.rob && film.id === insightRosettes.divisiveFilmId) {
+      rosettes.push({
+        className: "rosette--divisive",
+        label: "Most Divisive",
+        icon: ' <span class="badge-icon" aria-hidden="true">⚡</span>',
+        title: "Listeners disagreed the most on this one."
+      });
+    }
+
     if (Array.isArray(film.rosettes)) {
       film.rosettes.forEach((rosette) => {
         if (!rosette?.label) return;
-        rosettes.push({ className: rosette.className || "other", label: rosette.label, icon: rosette.icon || "" });
+        rosettes.push({
+          className: rosette.className || "other",
+          label: rosette.label,
+          icon: rosette.icon || "",
+          title: rosette.title || ""
+        });
       });
     }
 
     const rosetteMarkup = rosettes
-      .map(({ className, label, icon }) => `<span class="rosette ${className}">${label}${icon}</span>`)
+      .map(({ className, label, icon, title }) => `<span class="rosette ${className}"${title ? ` title="${escapeHtml(title)}"` : ""}>${label}${icon}</span>`)
       .join("");
 
     card.innerHTML = `
