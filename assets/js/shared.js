@@ -32,6 +32,13 @@
     return created;
   }
 
+  function roundPercent(value) {
+    const percent = Number(value);
+    if (!Number.isFinite(percent)) return null;
+    // Sanity checks: 73.3 -> 73, 73.5 -> 74, 73.49 -> 73.
+    return Math.round(percent);
+  }
+
   function syncStickyHeaderHeight() {
     const stickyHeader = document.querySelector("#site-header .sticky-menu");
     if (!stickyHeader || !document.body) return;
@@ -53,6 +60,7 @@
   }
 
   window.getVisitorId = getVisitorId;
+  window.roundPercent = roundPercent;
 
   window.addEventListener("resize", syncStickyHeaderHeight, { passive: true });
   document.addEventListener("header:ready", syncStickyHeaderHeight);
