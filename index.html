@@ -2057,6 +2057,13 @@ function getAudienceSortValues(film) {
   };
 }
 
+function isAudienceDrivenSort(sortValue = currentSort) {
+  return sortValue === "listener-asc"
+    || sortValue === "listener-desc"
+    || sortValue === "audience"
+    || sortValue === "votes";
+}
+
 function compareAudience(a, b) {
   const aValues = getAudienceSortValues(a);
   const bValues = getAudienceSortValues(b);
@@ -2351,9 +2358,8 @@ async function render(options = {}) {
     const values = getAudienceSortValues(film);
     return values.weighted !== -1 || values.listenerCount !== 0;
   });
-  const listenerBestCandidates = eligibleListenerFilms.length ? eligibleListenerFilms : robFilmsInView;
-  const listenerBest = listenerBestCandidates.length
-    ? stableSortFilms(listenerBestCandidates, compareAudience)[0]
+  const listenerBest = eligibleListenerFilms.length
+    ? stableSortFilms(eligibleListenerFilms, compareAudience)[0]
     : null;
 
   currentTotal = films.length;
@@ -2777,20 +2783,37 @@ container.addEventListener("change", async (event) => {
   }
   const visitorId = getVisitorId();
 
-  const { error } = await supabaseClient
-    .from("film_votes")
-    .upsert(
-      {
+  let castVoteResponse;
+  try {
+    castVoteResponse = await fetch("https://johklrouorflqfmzpiaw.supabase.co/functions/v1/cast_vote", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        apikey: SUPABASE_ANON_KEY,
+        Authorization: `Bearer ${SUPABASE_ANON_KEY}`
+      },
+      body: JSON.stringify({
         film_id: filmId,
         visitor_id: visitorId,
         rating: ratingValue
-      },
-      { onConflict: "film_id,visitor_id" }
-    );
-
-  if (error) {
+      })
+    });
+  } catch (error) {
     console.error("Rating update failed.", error);
-    setRatingError(panel, error.message ? `Rating failed: ${error.message}` : "Rating failed. Try again.");
+    setRatingError(panel, "Rating failed. Try again.");
+    return;
+  }
+
+  let castVotePayload = null;
+  try {
+    castVotePayload = await castVoteResponse.json();
+  } catch (error) {
+    console.error("Failed to parse cast_vote response.", error);
+  }
+
+  if (!castVoteResponse.ok || castVotePayload?.error) {
+    const errorMessage = castVotePayload?.error || castVotePayload?.message;
+    setRatingError(panel, errorMessage ? `Rating failed: ${errorMessage}` : "Rating failed. Try again.");
     return;
   }
 
@@ -2800,13 +2823,25 @@ container.addEventListener("change", async (event) => {
   localRatings[filmId] = yourRating;
   saveLocalRatings();
   updateRatingUI(filmId, listenerRating, yourRating);
-  await refreshAudienceScoreForFilm(filmId);
-  if (currentSort === "listener-asc" || currentSort === "listener-desc") {
-    await render();
-    const updatedCard = document.querySelector(`.film-card[data-film-id="${filmId}"]`);
-    if (updatedCard) {
-      updatedCard.scrollIntoView({ block: "center", behavior: "smooth" });
-    }
+
+  const weightedPercent = Number(castVotePayload?.weighted_percent);
+  const listenerCount = Number(castVotePayload?.listener_count);
+
+  audienceScores[filmId] = {
+    weighted_percent: Number.isFinite(weightedPercent)
+      ? weightedPercent
+      : audienceScores[filmId]?.weighted_percent,
+    listener_count: Number.isFinite(listenerCount)
+      ? listenerCount
+      : audienceScores[filmId]?.listener_count ?? 0
+  };
+
+  updateAudienceScoreUI(filmId, audienceScores[filmId], { highlight: true });
+
+  if (isAudienceDrivenSort()) {
+    const savedY = window.scrollY;
+    await render({ skipScoreRefresh: true });
+    window.scrollTo(0, savedY);
   }
 });
 
