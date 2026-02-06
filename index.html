@@ -277,6 +277,11 @@ label {
   display: none;
 }
 
+.search-icon,
+.select-icon {
+  display: none;
+}
+
 .film-search-input {
   width: 100%;
   background: #2c2c2c;
@@ -1266,6 +1271,15 @@ body.modal-open {
     gap: 10px;
     align-items: stretch;
   }
+  .mobile-controls {
+    --control-icon-size: 18px;
+    --control-icon-chevron-size: 12px;
+    --control-icon-gap: 6px;
+    --control-icon-right: 12px;
+    --control-icon-area: 52px;
+    --control-icon-muted: rgba(255, 255, 255, 0.55);
+    --control-icon-active: #d46a2a;
+  }
   .filters-row {
     max-width: none;
     padding: 0;
@@ -1331,7 +1345,7 @@ body.modal-open {
   .film-search-input {
     width: 100%;
     margin: 0;
-    border: 1px solid rgba(255, 255, 255, 0.1);
+    border: 2px solid #3f3f3f;
     font-weight: 600;
     height: 44px;
     min-height: 44px;
@@ -1339,8 +1353,37 @@ body.modal-open {
     font-size: 16px;
     box-sizing: border-box;
   }
-  .film-search-input {
-    border: 2px solid #3f3f3f;
+  .select-field {
+    position: relative;
+  }
+  .select-icon {
+    display: inline-flex;
+    position: absolute;
+    top: 50%;
+    transform: translateY(-50%);
+    pointer-events: none;
+  }
+  .select-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .select-icon--filter,
+  .select-icon--sort {
+    width: var(--control-icon-size);
+    height: var(--control-icon-size);
+    right: calc(var(--control-icon-right) + var(--control-icon-chevron-size) + var(--control-icon-gap));
+    color: var(--control-icon-muted);
+  }
+  .select-field.has-nondefault .select-icon--filter,
+  .select-field.has-nondefault .select-icon--sort {
+    color: var(--control-icon-active);
+  }
+  .select-icon--chevron {
+    width: var(--control-icon-chevron-size);
+    height: var(--control-icon-chevron-size);
+    right: var(--control-icon-right);
+    color: rgba(255, 255, 255, 0.45);
   }
   .film-search-toggle {
     flex: 0 0 44px;
@@ -1408,8 +1451,10 @@ body.modal-open {
     outline: none;
     -webkit-tap-highlight-color: transparent;
   }
-  .film-search-input {
-    padding-right: 52px;
+  .film-search-input,
+  .filter select,
+  .sort select {
+    padding-right: var(--control-icon-area);
   }
   .film-search-input:focus,
   .film-search-input:active,
@@ -1436,7 +1481,7 @@ body.modal-open {
   .search-clear {
     position: absolute;
     top: 50%;
-    right: 2px;
+    right: 4px;
     transform: translateY(-50%);
     width: 44px;
     height: 44px;
@@ -1451,6 +1496,25 @@ body.modal-open {
     font-size: 24px;
     line-height: 1;
     cursor: pointer;
+  }
+  .search-icon {
+    display: inline-flex;
+    position: absolute;
+    top: 50%;
+    right: var(--control-icon-right);
+    width: var(--control-icon-size);
+    height: var(--control-icon-size);
+    transform: translateY(-50%);
+    color: var(--control-icon-muted);
+    pointer-events: none;
+  }
+  .search-icon svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
+  .search-field.is-active .search-icon {
+    opacity: 0;
   }
   .search-clear:hover,
   .search-clear:focus-visible,
@@ -1537,6 +1601,9 @@ body.modal-open {
   .film-search-wrap {
     display: contents;
   }
+  .select-field {
+    display: contents;
+  }
 
   .filter > label,
   .sort > label,
@@ -1563,12 +1630,14 @@ body.modal-open {
     grid-row: 1;
   }
 
-  .filter > select {
+  .filter > select,
+  .filter > .select-field > select {
     grid-column: 1;
     grid-row: 2;
   }
 
-  .sort > select {
+  .sort > select,
+  .sort > .select-field > select {
     grid-column: 2;
     grid-row: 2;
   }
@@ -1706,6 +1775,7 @@ body.modal-open {
     min-height: 44px;
     border-radius: 999px;
     padding: 0 14px;
+    padding-right: var(--control-icon-area);
   }
   .mobile-controls .film-search-row {
     background: transparent;
@@ -1765,11 +1835,23 @@ body.modal-open {
       <div class="control-row">
       <div class="filter control filters-toolbar__group">
         <label for="filmFilter">Show films</label>
-        <select id="filmFilter" class="mobile-filter-control">
-          <option value="all">All Films</option>
-          <option value="real">Real Films</option>
-          <option value="rob" selected>Rob’s Films</option>
-        </select>
+        <div class="select-field select-field--filter">
+          <select id="filmFilter" class="mobile-filter-control" data-default-value="rob">
+            <option value="all">All Films</option>
+            <option value="real">Real Films</option>
+            <option value="rob" selected>Rob’s Films</option>
+          </select>
+          <span class="select-icon select-icon--filter" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path fill="currentColor" d="M3 5.75A.75.75 0 0 1 3.75 5h16.5a.75.75 0 0 1 .56 1.25l-6.31 7.1v4.56a.75.75 0 0 1-.35.63l-3 1.91A.75.75 0 0 1 10 19.8v-6.45L3.19 6.25A.75.75 0 0 1 3 5.75Z"/>
+            </svg>
+          </span>
+          <span class="select-icon select-icon--chevron" aria-hidden="true">
+            <svg viewBox="0 0 12 8" focusable="false" aria-hidden="true">
+              <path fill="currentColor" d="M1.41.59 6 5.17 10.59.59 12 2l-6 6-6-6z"/>
+            </svg>
+          </span>
+        </div>
       </div>
 
       <button id="filmSearchToggle" class="film-search-toggle mobile-filter-control" type="button" aria-expanded="false" aria-controls="filmSearchRow" aria-label="Toggle search">
@@ -1786,12 +1868,24 @@ body.modal-open {
 
       <div class="sort control filters-toolbar__group">
         <label for="sortSelect">Sort by</label>
-        <select id="sortSelect" class="mobile-filter-control">
-          <option value="rating-desc">Rating (High to Low)</option>
-          <option value="rating-asc">Rating (Low to High)</option>
-          <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
-          <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
-        </select>
+        <div class="select-field select-field--sort">
+          <select id="sortSelect" class="mobile-filter-control" data-default-value="rating-desc">
+            <option value="rating-desc">Rating (High to Low)</option>
+            <option value="rating-asc">Rating (Low to High)</option>
+            <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
+            <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
+          </select>
+          <span class="select-icon select-icon--sort" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path fill="currentColor" d="M7 4a1 1 0 0 1 1 1v11.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4.01 4.01a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.41-1.42L6 16.59V5a1 1 0 0 1 1-1Zm10 0a1 1 0 0 1 .71.29l4 4a1 1 0 0 1-1.42 1.42L18 7.41V19a1 1 0 1 1-2 0V7.41l-2.3 2.3a1 1 0 1 1-1.4-1.42l4-4A1 1 0 0 1 17 4Z"/>
+            </svg>
+          </span>
+          <span class="select-icon select-icon--chevron" aria-hidden="true">
+            <svg viewBox="0 0 12 8" focusable="false" aria-hidden="true">
+              <path fill="currentColor" d="M1.41.59 6 5.17 10.59.59 12 2l-6 6-6-6z"/>
+            </svg>
+          </span>
+        </div>
       </div>
     </div>
 
@@ -1800,6 +1894,11 @@ body.modal-open {
         <label id="filmSearchLabel" for="filmSearchInput">Search</label>
         <div class="search-field">
           <input id="filmSearchInput" class="film-search-input mobile-filter-control" type="search" placeholder="Search films by title or cast" autocomplete="off" />
+          <span class="search-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
+              <path fill="currentColor" d="M10.5 3a7.5 7.5 0 1 1 4.79 13.27l4.22 4.23a.75.75 0 1 1-1.06 1.06l-4.23-4.22A7.5 7.5 0 0 1 10.5 3Zm0 1.5a6 6 0 1 0 0 12 6 6 0 0 0 0-12Z"/>
+            </svg>
+          </span>
           <button type="button" id="filmSearchClear" class="search-clear" aria-label="Clear search" hidden>×</button>
         </div>
         <div id="filmSearchSuggestions" class="film-search-suggestions" aria-live="polite"></div>
@@ -3092,6 +3191,7 @@ function syncFilterControls() {
   if (input) input.value = filmSearchQuery;
   updateListenerSortAvailability();
   updateFilmSearchClearVisibility();
+  updateMobileSelectIcons();
 }
 
 async function refreshListenerScores(films) {
@@ -3536,6 +3636,7 @@ function getFilmSearchElements() {
     row: document.getElementById("filmSearchRow"),
     input: document.getElementById("filmSearchInput"),
     clear: document.getElementById("filmSearchClear"),
+    searchField: document.querySelector("#filmSearchRow .search-field"),
     suggestions: document.getElementById("filmSearchSuggestions"),
     label: document.getElementById("filmSearchLabel")
   };
@@ -3556,13 +3657,31 @@ function setFilmSearchQuery(value, { keepFocus = false } = {}) {
 }
 
 function updateFilmSearchClearVisibility() {
-  const { clear, input } = getFilmSearchElements();
+  const { clear, input, searchField } = getFilmSearchElements();
   if (!clear || !input) return;
-  clear.hidden = input.value.trim().length === 0;
+  const hasValue = input.value.trim().length > 0;
+  const isFocused = document.activeElement === input;
+  const isActive = hasValue || isFocused;
+  clear.hidden = !isActive;
+  if (searchField) {
+    searchField.classList.toggle("is-active", isActive);
+  }
 }
 
 function isMobileViewport() {
   return window.matchMedia("(max-width: 768px)").matches;
+}
+
+function updateSelectIconState(select) {
+  const field = select?.closest(".select-field");
+  if (!field || !select) return;
+  const defaultValue = select.dataset.defaultValue ?? select.querySelector("option")?.value ?? "";
+  field.classList.toggle("has-nondefault", select.value !== defaultValue);
+}
+
+function updateMobileSelectIcons() {
+  updateSelectIconState(getFilterSelect());
+  updateSelectIconState(getSortSelect());
 }
 
 function hasAdvancedFiltersApplied() {
@@ -3690,17 +3809,29 @@ document.addEventListener("DOMContentLoaded", () => {
     setFilmSearchQuery(event.target.value);
   });
 
+  document.addEventListener("focusin", (event) => {
+    if (event.target?.id !== "filmSearchInput") return;
+    updateFilmSearchClearVisibility();
+  });
+
+  document.addEventListener("focusout", (event) => {
+    if (event.target?.id !== "filmSearchInput") return;
+    updateFilmSearchClearVisibility();
+  });
+
   document.addEventListener("keydown", (event) => {
     if (event.target?.id !== "filmSearchInput" || event.key !== "Escape") return;
     if (!event.target.value.trim()) return;
     event.preventDefault();
-    setFilmSearchQuery("", { keepFocus: true });
+    setFilmSearchQuery("", { keepFocus: false });
+    event.target.blur();
   });
 
   document.addEventListener("click", (event) => {
     const clearButton = event.target?.closest("#filmSearchClear");
     if (!clearButton) return;
-    setFilmSearchQuery("", { keepFocus: true });
+    setFilmSearchQuery("", { keepFocus: false });
+    getFilmSearchElements().input?.blur();
   });
 
   document.addEventListener("change", (event) => {
@@ -3710,12 +3841,14 @@ document.addEventListener("DOMContentLoaded", () => {
       refreshSearchFilterToggleState();
       resetPagination();
       render();
+      updateMobileSelectIcons();
     }
     if (event.target?.id === "sortSelect") {
       currentSort = event.target.value;
       refreshSearchFilterToggleState();
       resetPagination();
       render();
+      updateMobileSelectIcons();
     }
   });
 
