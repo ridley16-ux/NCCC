@@ -1884,9 +1884,9 @@ const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON
 const localRatings = loadLocalRatings();
 let openTooltip = null;
 
-const INSIGHT_MIN_VOTES = 10;
-const INSIGHT_GAP_MIN = 5;
-const INSIGHT_DIV_MIN = 12;
+const INSIGHT_MIN_VOTES = 1;
+const INSIGHT_GAP_MIN = 1;
+const INSIGHT_DIV_MIN = 1;
 const AWARDS_CONTENT_ID = "film-awards-content";
 let awardsExpanded = false;
 let awardsLastUpdatedAt = null;
@@ -1950,7 +1950,7 @@ const AWARDS = [
   {
     key: "most-overrated",
     label: "Most Overrated",
-    emoji: "🔴⬇️",
+    emoji: "⬇️",
     rosetteClass: "rosette--overrated",
     description: "Awarded to the film which has the largest negative difference from the listener score to Kev's score",
     getWinners: (films, aggregates) => getBestSingleWinner(
@@ -3076,7 +3076,7 @@ async function render(options = {}) {
     if (showListenerUI && film.rob && film.id === insightRosettes.overratedFilmId) {
       rosettes.push({
         className: "rosette--overrated",
-        label: "Most Overrated",
+        label: "Most Overrated1",
         icon: ' <span class="badge-icon" aria-hidden="true">⬇️</span>',
         title: "Kev rated this much higher than listeners."
       });
