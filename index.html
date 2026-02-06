@@ -1766,7 +1766,7 @@ let openTooltip = null;
 
 const INSIGHT_MIN_VOTES = 10;
 const INSIGHT_GAP_MIN = 5;
-const INSIGHT_DIVISIVE_MIN = 12;
+const INSIGHT_DIV_MIN = 12;
 
 const PAGE_SIZE = 10;
 let visibleCount = PAGE_SIZE;
@@ -2181,6 +2181,12 @@ function compareInsightCandidates(a, b) {
   return a.title.localeCompare(b.title, "en-GB", { sensitivity: "base" });
 }
 
+function compareDivisiveCandidates(a, b) {
+  if (b.weightedDiv !== a.weightedDiv) return b.weightedDiv - a.weightedDiv;
+  if (b.votes !== a.votes) return b.votes - a.votes;
+  return a.title.localeCompare(b.title, "en-GB", { sensitivity: "base" });
+}
+
 function computeInsightRosettes(films) {
   const candidates = films
     .filter((film) => film.rob)
@@ -2219,14 +2225,24 @@ function computeInsightRosettes(films) {
 
   const divisivePool = candidates
     .map((candidate) => {
-      const metric = candidate.votes >= INSIGHT_MIN_VOTES ? getDivisiveMetric(candidate.film) : null;
+      const baseDiv = candidate.votes >= INSIGHT_MIN_VOTES ? getDivisiveMetric(candidate.film) : null;
+      // Weight divisiveness by vote volume so tiny samples do not beat broadly divisive films.
+      const weightedDiv = Number.isFinite(baseDiv)
+        ? baseDiv * Math.log10(candidate.votes + 1)
+        : null;
       return {
         ...candidate,
-        metric
+        baseDiv,
+        weightedDiv
       };
     })
-    .filter((candidate) => Number.isFinite(candidate.metric) && candidate.metric >= INSIGHT_DIVISIVE_MIN)
-    .sort(compareInsightCandidates);
+    .filter((candidate) => (
+      Number.isFinite(candidate.baseDiv)
+      && candidate.baseDiv >= INSIGHT_DIV_MIN
+      && Number.isFinite(candidate.weightedDiv)
+      && candidate.weightedDiv > 0
+    ))
+    .sort(compareDivisiveCandidates);
 
   return {
     underratedFilmId: underratedPool[0]?.film.id ?? null,
