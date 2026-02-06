@@ -1118,18 +1118,74 @@ body.modal-open {
   border-top: 1px solid var(--line);
 }
 
+.film-awards__toggle {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 0 0 16px;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+}
+
+.film-awards__toggle:focus-visible {
+  outline: 2px solid rgba(245, 197, 107, 0.6);
+  outline-offset: 4px;
+  border-radius: 10px;
+}
+
+.film-awards__heading {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
 .film-awards__title {
-  margin: 0 0 16px;
+  margin: 0;
   font-size: 22px;
 }
 
-.film-awards__grid {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: 16px;
+.film-awards__updated {
+  font-size: 14px;
+  color: var(--muted);
 }
 
-.film-award-card {
+.film-awards__chevron {
+  width: 22px;
+  height: 22px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  transition: transform 0.25s ease;
+}
+
+.film-awards__toggle[aria-expanded="true"] .film-awards__chevron {
+  transform: rotate(180deg);
+}
+
+.film-awards__content {
+  overflow: hidden;
+  max-height: 0;
+  opacity: 0;
+  transition: max-height 0.35s ease, opacity 0.2s ease;
+}
+
+.film-awards__content.is-open {
+  opacity: 1;
+}
+
+.film-awards__list {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  padding-bottom: 16px;
+}
+
+.film-award-row {
   background: var(--card);
   border: 1px solid rgba(255, 255, 255, 0.06);
   border-radius: 14px;
@@ -1139,13 +1195,10 @@ body.modal-open {
   gap: 12px;
 }
 
-.film-award-card .rosette {
-  font-size: 11px;
-}
-
-.rosette.rosette--award {
-  background: #6c5533;
-  color: #fff1d6;
+.film-award-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
 }
 
 .film-award-title {
@@ -1160,58 +1213,10 @@ body.modal-open {
   line-height: 1.5;
 }
 
-.film-award-winners {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.award-winner {
-  display: inline-flex;
-  align-items: center;
-  gap: 8px;
-  padding: 6px 10px;
-  border-radius: 10px;
-  background: rgba(255, 255, 255, 0.06);
-  color: inherit;
-  text-decoration: none;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.award-winner:hover {
-  background: rgba(255, 255, 255, 0.12);
-  transform: translateY(-1px);
-}
-
-.award-winner:focus-visible {
-  outline: 2px solid rgba(245, 197, 107, 0.6);
-  outline-offset: 2px;
-}
-
-.award-winner__poster {
-  width: 38px;
-  height: 56px;
-  border-radius: 6px;
-  object-fit: cover;
-  flex: 0 0 auto;
-}
-
-.award-winner__title {
-  font-size: 13px;
-  font-weight: 600;
-}
-
-.award-winner--more {
-  font-size: 13px;
-  color: var(--muted);
-  background: transparent;
-  padding: 6px 4px;
-}
-
-@media (min-width: 720px) {
-  .film-awards__grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
+.film-award-winner {
+  margin: 0;
+  font-size: 14px;
+  color: rgba(255, 255, 255, 0.9);
 }
 
 #scroll-sentinel {
@@ -1875,38 +1880,88 @@ let openTooltip = null;
 const INSIGHT_MIN_VOTES = 10;
 const INSIGHT_GAP_MIN = 5;
 const INSIGHT_DIV_MIN = 12;
+const AWARDS_CONTENT_ID = "film-awards-content";
+let awardsExpanded = false;
+let awardsLastUpdatedAt = null;
 
-// AWARDS config: key/label/description plus a winner selector from the current Rob films dataset.
+// Award calculation approach: central config with winner selectors for the live Rob films dataset.
 const AWARDS = [
   {
-    key: "kev-crown",
-    label: "Kev’s Crown",
-    description: "Highest Kev score across Rob’s films.",
-    badgeIcon: "🏅",
-    getWinners: (films) => getTopAwardWinners(films, (film) => Number(film.kevScore ?? film.score))
+    key: "kev-pick",
+    label: "Kev’s Pick",
+    emoji: "🏆",
+    rosetteClass: "kev",
+    description: "The film Kev has rated highest.",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const kevRating = getKevRating10(film, aggregates);
+      return Number.isFinite(kevRating) ? kevRating : null;
+    })
   },
   {
-    key: "listener-favourite",
-    label: "Listener Favourite",
+    key: "listener-pick",
+    label: "Listener Pick",
+    emoji: "❤️",
+    rosetteClass: "listener",
     description: "Top listener rating based on audience scores.",
-    badgeIcon: "❤️",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const listenerAvg = getListenerAverage10(film, aggregates);
+      const listenerCount = getListenerCount(film, aggregates);
+      if (!Number.isFinite(listenerAvg) || listenerCount <= 0) return null;
+      return listenerAvg;
+    })
+  },
+  {
+    key: "new",
+    label: "New",
+    emoji: "🆕",
+    rosetteClass: "new",
+    description: "Most recently added Rob film.",
     getWinners: (films) => getTopAwardWinners(films, (film) => {
-      const { weighted, listenerCount } = getAudienceSortValues(film);
-      if (weighted === -1 || listenerCount === 0) return null;
-      return weighted;
+      const newest = getNewestFilmTimestamp(film);
+      return Number.isFinite(newest) ? newest : null;
+    })
+  },
+  {
+    key: "most-underrated",
+    label: "Most Underrated",
+    emoji: "🟢⬆️",
+    rosetteClass: "rosette--underrated",
+    description: "Kev scored it lower than listeners, with the biggest gap.",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const listenerAvg = getListenerAverage10(film, aggregates);
+      const kevRating = getKevRating10(film, aggregates);
+      const listenerCount = getListenerCount(film, aggregates);
+      if (listenerCount <= 0 || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+      const gap = listenerAvg - kevRating;
+      return gap > 0 ? gap : null;
+    })
+  },
+  {
+    key: "most-overrated",
+    label: "Most Overrated",
+    emoji: "🔴⬇️",
+    rosetteClass: "rosette--overrated",
+    description: "Kev scored it higher than listeners, with the biggest gap.",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const listenerAvg = getListenerAverage10(film, aggregates);
+      const kevRating = getKevRating10(film, aggregates);
+      const listenerCount = getListenerCount(film, aggregates);
+      if (listenerCount <= 0 || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+      const gap = kevRating - listenerAvg;
+      return gap > 0 ? gap : null;
     })
   },
   {
     key: "most-divisive",
     label: "Most Divisive",
-    description: "Biggest spread in listener ratings once there are enough votes.",
-    badgeIcon: "⚡",
-    getWinners: (films) => getTopAwardWinners(films, (film) => {
-      const { listenerCount } = getAudienceSortValues(film);
-      if (listenerCount < INSIGHT_MIN_VOTES) return null;
-      const metric = getDivisiveMetric(film);
-      if (!Number.isFinite(metric) || metric < INSIGHT_DIV_MIN) return null;
-      return metric;
+    emoji: "⚡",
+    rosetteClass: "rosette--divisive",
+    description: "Biggest disagreement in listener ratings.",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const listenerCount = getListenerCount(film, aggregates);
+      if (listenerCount <= 0) return null;
+      const metric = getDivisiveAwardMetric(film, aggregates);
+      return Number.isFinite(metric) ? metric : null;
     })
   }
 ];
@@ -1941,6 +1996,22 @@ function safeDate(d) {
 function formatUkDate(d) {
   const dt = parseLocalDate(d);
   return dt ? dt.toLocaleDateString("en-GB").replaceAll("/", "-") : d;
+}
+
+function parseTimestamp(value) {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === "number") {
+    const numericDate = new Date(value);
+    return Number.isNaN(numericDate.getTime()) ? null : numericDate;
+  }
+  if (typeof value === "string") {
+    const localDate = parseLocalDate(value);
+    if (localDate) return localDate;
+    const parsed = new Date(value);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
 }
 
 function calcRobScore(film) {
@@ -2160,6 +2231,17 @@ function formatAudienceScore(value) {
   return Math.round(score);
 }
 
+function formatAwardsUpdatedLabel(timestamp) {
+  const date = parseTimestamp(timestamp);
+  if (!date) return "Last updated: —";
+  const diffMs = Date.now() - date.getTime();
+  const diffMinutes = Math.floor(diffMs / (60 * 1000));
+  if (diffMinutes < 1) return "Last updated: just now";
+  if (diffMinutes < 60) return `Last updated: ${diffMinutes} mins ago`;
+  const formatted = date.toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" });
+  return `Last updated: ${formatted}`;
+}
+
 function setRatingError(panel, message) {
   if (!panel) return;
   const errorEl = panel.querySelector(".rating-error");
@@ -2279,6 +2361,46 @@ function getInsightEligibleData(film) {
   };
 }
 
+function getListenerCount(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id];
+  const listenerVotesRaw = audienceData?.listener_count
+    ?? film.listenerVotes
+    ?? (Array.isArray(film.listenerRatings) ? film.listenerRatings.length : null);
+  const listenerVotes = Number(listenerVotesRaw);
+  return Number.isFinite(listenerVotes) ? listenerVotes : 0;
+}
+
+function getListenerAverage10(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id];
+  const weightedPercent = audienceData?.weighted_percent
+    ?? film.listenerScore
+    ?? film.listenerRating
+    ?? film.listenerPercent
+    ?? film.listener_score;
+  const normalized = normaliseScoreToPercent(weightedPercent);
+  return normalized !== null ? normalized / 10 : null;
+}
+
+function getKevRating10(film) {
+  const kevValue = film.kev_rating_10
+    ?? film.kevRating10
+    ?? film.kevScore
+    ?? film.score;
+  const normalized = normaliseScoreToPercent(kevValue);
+  return normalized !== null ? normalized / 10 : null;
+}
+
+function getNewestFilmTimestamp(film) {
+  const dateValue = film.created_at
+    ?? film.createdAt
+    ?? film.published_at
+    ?? film.publishedAt
+    ?? film.podcastDate
+    ?? film.date;
+  const parsed = parseTimestamp(dateValue);
+  return parsed ? parsed.getTime() : null;
+}
+
 function computeStandardDeviation(values) {
   const parsed = values
     .map((value) => Number(value))
@@ -2317,6 +2439,17 @@ function getDivisiveMetric(film) {
   }
 
   return null;
+}
+
+function getDivisiveAwardMetric(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id] ?? {};
+  const hasPerVoteRatings = Array.isArray(film.listenerRatings)
+    || Array.isArray(audienceData.listener_ratings);
+  const baseSpread = getDivisiveMetric(film);
+  if (!Number.isFinite(baseSpread)) return null;
+  if (hasPerVoteRatings) return baseSpread;
+  const listenerCount = getListenerCount(film, aggregates);
+  return listenerCount > 0 ? baseSpread * listenerCount : baseSpread;
 }
 
 function compareInsightCandidates(a, b) {
@@ -2436,29 +2569,75 @@ function getTopAwardWinners(films, getValue) {
   return winners;
 }
 
+function getAwardsUpdatedAt(films, aggregates = {}) {
+  const candidates = [];
+  if (awardsLastUpdatedAt) candidates.push(awardsLastUpdatedAt);
+  films.forEach((film) => {
+    const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id];
+    const filmUpdated = parseTimestamp(
+      film.agg_updated_at
+        ?? film.aggUpdatedAt
+        ?? film.aggregatedAt
+        ?? film.updated_at
+        ?? film.updatedAt
+    );
+    const audienceUpdated = parseTimestamp(
+      audienceData?.agg_updated_at
+        ?? audienceData?.aggUpdatedAt
+        ?? audienceData?.updated_at
+        ?? audienceData?.updatedAt
+    );
+    if (filmUpdated) candidates.push(filmUpdated);
+    if (audienceUpdated) candidates.push(audienceUpdated);
+  });
+  if (!candidates.length) return null;
+  return candidates.reduce((latest, value) => (value > latest ? value : latest));
+}
+
+function setAwardsLastUpdated(timestamp) {
+  const parsed = parseTimestamp(timestamp);
+  if (!parsed) return;
+  if (!awardsLastUpdatedAt || parsed > awardsLastUpdatedAt) {
+    awardsLastUpdatedAt = parsed;
+  }
+}
+
 function shouldShowFilmAwards() {
   // Visibility gating: Rob’s films only, no search query, and default sort state.
   const hasDefaultSort = currentSort === "rating-desc";
   return currentFilter === "rob" && filmSearchQuery.trim() === "" && hasDefaultSort;
 }
 
-function buildAwardWinnersMarkup(winners) {
-  const visibleWinners = winners.slice(0, 3);
-  const extraCount = Math.max(winners.length - visibleWinners.length, 0);
-  const winnerMarkup = visibleWinners.map((film) => {
-    const title = escapeHtml(String(film.title || "Untitled"));
-    const poster = escapeHtml(String(film.poster || ""));
-    return `
-      <a class="award-winner" href="#film-${film.id}">
-        <img class="award-winner__poster" src="${poster}" alt="Poster for ${title}" loading="lazy" />
-        <span class="award-winner__title">${title}</span>
-      </a>
-    `;
-  }).join("");
-  const moreMarkup = extraCount
-    ? `<span class="award-winner award-winner--more" aria-label="${extraCount} more winners">+${extraCount} more</span>`
-    : "";
-  return `${winnerMarkup}${moreMarkup}`;
+function formatAwardWinnersLine(winners) {
+  if (!winners.length) return "Winner: —";
+  const titles = winners.map((film) => escapeHtml(String(film.title || "Untitled"))).join(", ");
+  return winners.length > 1 ? `Winners: ${titles}` : `Winner: ${titles}`;
+}
+
+function setAwardsExpanded(isExpanded, { immediate = false } = {}) {
+  awardsExpanded = isExpanded;
+  if (!awardsSection) return;
+  const toggleButton = awardsSection.querySelector(".film-awards__toggle");
+  const content = awardsSection.querySelector(".film-awards__content");
+  if (!toggleButton || !content) return;
+  toggleButton.setAttribute("aria-expanded", String(isExpanded));
+  content.setAttribute("aria-hidden", String(!isExpanded));
+  const updateHeights = () => {
+    content.style.maxHeight = isExpanded ? `${content.scrollHeight}px` : "0px";
+    content.style.opacity = isExpanded ? "1" : "0";
+  };
+  if (immediate) {
+    content.classList.toggle("is-open", isExpanded);
+    updateHeights();
+    return;
+  }
+  if (isExpanded) {
+    content.classList.add("is-open");
+    requestAnimationFrame(updateHeights);
+  } else {
+    requestAnimationFrame(updateHeights);
+    content.addEventListener("transitionend", () => content.classList.remove("is-open"), { once: true });
+  }
 }
 
 function renderFilmAwards() {
@@ -2466,42 +2645,60 @@ function renderFilmAwards() {
   if (!shouldShowFilmAwards()) {
     awardsSection.innerHTML = "";
     awardsSection.hidden = true;
+    awardsExpanded = false;
     return;
   }
 
   const robFilms = allFilms.filter((film) => film.active && film.rob);
-  const awardCards = AWARDS.map((award) => {
-    const winners = award.getWinners(robFilms);
-    if (!winners.length) return "";
+  const awardsContext = { audienceScores };
+  const awardRows = AWARDS.map((award) => {
+    const winners = award.getWinners(robFilms, awardsContext);
+    const winnersLine = formatAwardWinnersLine(winners);
     return `
-      <article class="film-award-card" data-award="${award.key}">
-        <span class="rosette rosette--award">Award <span class="badge-icon" aria-hidden="true">${award.badgeIcon}</span></span>
-        <div>
+      <article class="film-award-row" data-award="${award.key}">
+        <span class="rosette ${award.rosetteClass}">
+          ${escapeHtml(award.label)}
+          <span class="badge-icon" aria-hidden="true">${award.emoji}</span>
+        </span>
+        <div class="film-award-meta">
           <h3 class="film-award-title">${escapeHtml(award.label)}</h3>
           <p class="film-award-description">${escapeHtml(award.description)}</p>
         </div>
-        <div class="film-award-winners">
-          ${buildAwardWinnersMarkup(winners)}
-        </div>
+        <p class="film-award-winner">${winnersLine}</p>
       </article>
     `;
-  }).filter(Boolean).join("");
-
-  if (!awardCards) {
-    awardsSection.innerHTML = "";
-    awardsSection.hidden = true;
-    return;
-  }
+  }).join("");
 
   awardsSection.hidden = false;
+  const lastUpdatedLabel = formatAwardsUpdatedLabel(getAwardsUpdatedAt(robFilms, awardsContext));
   awardsSection.innerHTML = `
     <div class="film-awards__inner">
-      <h2 id="film-awards-title" class="film-awards__title">Film Awards</h2>
-      <div class="film-awards__grid">
-        ${awardCards}
+      <button class="film-awards__toggle" type="button" aria-expanded="false" aria-controls="${AWARDS_CONTENT_ID}">
+        <span class="film-awards__heading">
+          <span id="film-awards-title" class="film-awards__title">Film Awards</span>
+          <span class="film-awards__updated">${lastUpdatedLabel}</span>
+        </span>
+        <span class="film-awards__chevron" aria-hidden="true">
+          <svg viewBox="0 0 24 24" width="20" height="20" focusable="false" aria-hidden="true">
+            <path fill="currentColor" d="M12 15.5a.75.75 0 0 1-.53-.22l-5.5-5.5a.75.75 0 0 1 1.06-1.06L12 13.69l4.97-4.97a.75.75 0 0 1 1.06 1.06l-5.5 5.5a.75.75 0 0 1-.53.22Z"/>
+          </svg>
+        </span>
+      </button>
+      <div id="${AWARDS_CONTENT_ID}" class="film-awards__content" role="region" aria-labelledby="film-awards-title" aria-hidden="true">
+        <div class="film-awards__list">
+          ${awardRows}
+        </div>
       </div>
     </div>
   `;
+
+  const toggleButton = awardsSection.querySelector(".film-awards__toggle");
+  if (toggleButton) {
+    toggleButton.addEventListener("click", () => {
+      setAwardsExpanded(!awardsExpanded);
+    });
+  }
+  setAwardsExpanded(awardsExpanded, { immediate: true });
 }
 
 function getFilteredFilms() {
@@ -2626,6 +2823,18 @@ async function fetchAudienceScores() {
       listener_count: row.listener_count
     };
   });
+}
+
+async function fetchAwardsLastUpdated() {
+  // Timestamp logic: use the latest available aggregation timestamp when present.
+  try {
+    const response = await fetch("/assets/data/films/votes.json");
+    if (!response.ok) return;
+    const payload = await response.json();
+    setAwardsLastUpdated(payload?.updatedAt ?? payload?.updated_at);
+  } catch (error) {
+    console.warn("Failed to load awards updated timestamp.", error);
+  }
 }
 
 function triggerAudienceNudge(target) {
@@ -3087,6 +3296,7 @@ async function loadFilms() {
     allFilms = films;
     lastScoreFetchKey = "";     // force a fetch on first render
     resetPagination();
+    await fetchAwardsLastUpdated();
     await fetchAudienceScores();
     await render();
     syncFilterControls();
@@ -3255,6 +3465,8 @@ container.addEventListener("change", async (event) => {
   };
 
   updateAudienceScoreUI(filmId, audienceScores[filmId], { highlight: true });
+  setAwardsLastUpdated(new Date());
+  renderFilmAwards();
 
   if (isAudienceDrivenSort()) {
     const savedY = window.scrollY;
