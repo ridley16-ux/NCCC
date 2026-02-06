@@ -3572,12 +3572,6 @@ async function render(options = {}) {
 
   films = sortFilms(films);
 
-  const rankById = new Map();
-  films.forEach((film, index) => {
-    if (!film?.id) return;
-    rankById.set(film.id, index + 1);
-  });
-
   const robFilmsAll = allFilms.filter(f => f.active && f.rob);
   const awardsContext = { audienceScores, allFilms };
   const visibleAwards = getVisibleAwards(robFilmsAll, awardsContext);
@@ -3590,11 +3584,23 @@ async function render(options = {}) {
 
   currentTotal = films.length;
   const visibleFilms = films.slice(0, visibleCount);
+  const totalVisible = visibleFilms.length;
+  const isPodcastSort = currentSort === "podcast-desc" || currentSort === "podcast-asc";
+  const isDescendingRank = currentSort === "rating-desc" || currentSort === "listener-desc";
+  const isAscendingRank = currentSort === "rating-asc" || currentSort === "listener-asc";
 
-  visibleFilms.forEach((film) => {
-    const rankValue = rankById.get(film.id);
-    const hasRank = Number.isFinite(rankValue);
-    const rankLabel = hasRank ? `#${rankValue}` : "";
+  visibleFilms.forEach((film, index) => {
+    let rankText = "—";
+    if (isDescendingRank) {
+      rankText = String(index + 1);
+    } else if (isAscendingRank) {
+      rankText = String(totalVisible - index);
+    } else if (isPodcastSort) {
+      rankText = timeSinceLabel(getPodcastedDateValue(film));
+    } else {
+      rankText = String(index + 1);
+    }
+    const rankLabel = isPodcastSort ? rankText : `#${rankText}`;
     const listenerScore = listenerScores[film.id] ?? 0;
     const audienceData = audienceScores[film.id];
     const audienceRaw = getPercentRaw(audienceData?.weighted_percent);
@@ -3657,7 +3663,7 @@ async function render(options = {}) {
       .join("");
 
     card.innerHTML = `
-      <div class="hero-rank"${hasRank ? "" : " hidden"}>${rankLabel}</div>
+      <div class="hero-rank">${rankLabel}</div>
       <div class="rosette-stack" aria-label="Episode rosettes">
         ${rosetteMarkup}
       </div>
