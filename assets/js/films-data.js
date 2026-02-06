@@ -1,5 +1,16 @@
 const DEFAULT_MANIFEST_URL = "/assets/data/films/manifest.json";
 
+function getPodcastedAtValue(film) {
+  if (!film) return null;
+  return film.podcasted_at
+    ?? film.podcastedAt
+    ?? film.podcastDate
+    ?? film.published_at
+    ?? film.publishedAt
+    ?? film.date
+    ?? null;
+}
+
 function parseLocalDate(dateString) {
   if (!dateString) return null;
   const [year, month, day] = dateString.split("-").map(Number);
@@ -32,7 +43,8 @@ export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL } = {})
       continue;
     }
     const film = await res.json();
-    film.active = Boolean(entry.active) && isFilmLive(film.podcastDate);
+    film.podcasted_at = getPodcastedAtValue(film);
+    film.active = Boolean(entry.active) && isFilmLive(film.podcasted_at);
     films.push(film);
   }
 
