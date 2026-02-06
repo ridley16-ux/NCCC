@@ -1972,7 +1972,7 @@ const AWARDS = [
     emoji: "⚡",
     rosetteClass: "rosette--divisive",
     description: "Awarded to the film with the biggest rating varience. Some listeners love it, some (probably most) hate it",
-    getWinners: (films, aggregates) => getBestSingleWinner(
+    getWinners: (films, aggregates) => getBestSingleWinnerWithTiebreak(
       films,
       (film) => {
         const listenerCount = getListenerCount(film, aggregates);
@@ -1980,7 +1980,18 @@ const AWARDS = [
         const metric = getDivisiveAwardMetric(film, aggregates);
         return Number.isFinite(metric) && metric >= INSIGHT_DIV_MIN ? metric : null;
       },
-      (film) => getListenerCount(film, aggregates)
+      (film) => getListenerCount(film, aggregates),
+      (film) => {
+        const listenerAvg10 = getListenerAverage10(film, aggregates);
+        const kevAvg10 = getKevRating10(film, aggregates);
+        const gapVsKev = Number.isFinite(listenerAvg10) && Number.isFinite(kevAvg10)
+          ? Math.abs(listenerAvg10 - kevAvg10)
+          : -1;
+        return {
+          gapVsKev,
+          title: String(film.title || "")
+        };
+      }
     )
   }
 ];
@@ -2400,7 +2411,7 @@ function getListenerAverage10(film, aggregates = {}) {
   return normalized !== null ? normalized / 10 : null;
 }
 
-function getKevRating10(film) {
+function getKevRating10(film, _aggregates = {}) {
   const kevValue = film.kev_rating_10
     ?? film.kevRating10
     ?? film.kevScore
@@ -2479,6 +2490,8 @@ function compareInsightCandidates(a, b) {
 
 function compareDivisiveCandidates(a, b) {
   if (b.weightedDiv !== a.weightedDiv) return b.weightedDiv - a.weightedDiv;
+  // Tie-breakers: bigger gap vs Kev, more votes, then alphabetical title.
+  if (b.gapVsKev !== a.gapVsKev) return b.gapVsKev - a.gapVsKev;
   if (b.votes !== a.votes) return b.votes - a.votes;
   return a.title.localeCompare(b.title, "en-GB", { sensitivity: "base" });
 }
@@ -2521,6 +2534,11 @@ function computeInsightRosettes(films) {
 
   const divisivePool = candidates
     .map((candidate) => {
+      const listenerAvg10 = Number(getListenerAverage10(candidate.film, { audienceScores }));
+      const kevAvg10 = Number(getKevRating10(candidate.film, { audienceScores }));
+      const gapVsKev = Number.isFinite(listenerAvg10) && Number.isFinite(kevAvg10)
+        ? Math.abs(listenerAvg10 - kevAvg10)
+        : -1;
       const baseDiv = candidate.votes >= INSIGHT_MIN_VOTES ? getDivisiveMetric(candidate.film) : null;
       // Weight divisiveness by vote volume so tiny samples do not beat broadly divisive films.
       const weightedDiv = Number.isFinite(baseDiv)
@@ -2528,6 +2546,9 @@ function computeInsightRosettes(films) {
         : null;
       return {
         ...candidate,
+        listenerAvg10,
+        kevAvg10,
+        gapVsKev,
         baseDiv,
         weightedDiv
       };
@@ -2626,6 +2647,67 @@ function getBestSingleWinner(films, getMetric, getVotes) {
         bestFilm = film;
         bestMetric = metric;
         bestVotes = safeVotes;
+        bestTitle = title;
+      }
+    }
+  });
+  return bestFilm ? [bestFilm] : [];
+}
+
+function getBestSingleWinnerWithTiebreak(films, getMetric, getVotes, getTie) {
+  let bestFilm = null;
+  let bestMetric = null;
+  let bestVotes = null;
+  let bestGap = -1;
+  let bestTitle = "";
+  films.forEach((film) => {
+    const metric = getMetric(film);
+    if (!Number.isFinite(metric)) return;
+    const votes = getVotes(film);
+    const safeVotes = Number.isFinite(votes) ? votes : 0;
+    const tieData = getTie ? getTie(film) : {};
+    const gapVsKev = Number.isFinite(tieData?.gapVsKev) ? tieData.gapVsKev : -1;
+    const title = String(tieData?.title ?? film.title ?? "");
+    if (bestFilm === null) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestGap = gapVsKev;
+      bestTitle = title;
+      return;
+    }
+    if (metric > bestMetric) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestGap = gapVsKev;
+      bestTitle = title;
+      return;
+    }
+    // Tie-breakers: gap vs Kev, votes, then alphabetical title.
+    if (metric === bestMetric && gapVsKev > bestGap) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestGap = gapVsKev;
+      bestTitle = title;
+      return;
+    }
+    if (metric === bestMetric && gapVsKev === bestGap && safeVotes > bestVotes) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestGap = gapVsKev;
+      bestTitle = title;
+      return;
+    }
+    if (metric === bestMetric && gapVsKev === bestGap && safeVotes === bestVotes) {
+      const comparison = title.localeCompare(bestTitle, "en-GB", { sensitivity: "base" });
+      if (comparison < 0) {
+        bestFilm = film;
+        bestMetric = metric;
+        bestVotes = safeVotes;
+        bestGap = gapVsKev;
         bestTitle = title;
       }
     }
@@ -2888,6 +2970,75 @@ async function fetchAudienceScores() {
       listener_count: row.listener_count
     };
   });
+}
+
+async function fetchListenerVotes(films = []) {
+  if (!supabaseClient) return {};
+  const robIds = films.filter((film) => film.rob).map((film) => film.id);
+  if (!robIds.length) return {};
+  const votesByFilmId = {};
+  const pageSize = 1000;
+  let fromIndex = 0;
+  while (true) {
+    const toIndex = fromIndex + pageSize - 1;
+    const { data, error } = await supabaseClient
+      .from("film_votes")
+      .select("film_id, rating")
+      .in("film_id", robIds)
+      .range(fromIndex, toIndex);
+    if (error) {
+      console.error("Failed to fetch listener votes.", error);
+      break;
+    }
+    if (!data?.length) break;
+    data.forEach((row) => {
+      if (!votesByFilmId[row.film_id]) {
+        votesByFilmId[row.film_id] = [];
+      }
+      votesByFilmId[row.film_id].push(row.rating);
+    });
+    if (data.length < pageSize) break;
+    fromIndex += pageSize;
+  }
+
+  Object.entries(votesByFilmId).forEach(([filmId, ratings]) => {
+    const existing = audienceScores[filmId] ?? {};
+    audienceScores[filmId] = {
+      ...existing,
+      listener_ratings: ratings
+    };
+  });
+
+  return votesByFilmId;
+}
+
+async function refreshListenerVotesForFilm(filmId) {
+  if (!supabaseClient || !filmId) return null;
+  const pageSize = 1000;
+  let fromIndex = 0;
+  const ratings = [];
+  while (true) {
+    const toIndex = fromIndex + pageSize - 1;
+    const { data, error } = await supabaseClient
+      .from("film_votes")
+      .select("film_id, rating")
+      .eq("film_id", filmId)
+      .range(fromIndex, toIndex);
+    if (error) {
+      console.error("Failed to refresh listener votes.", error);
+      return null;
+    }
+    if (!data?.length) break;
+    data.forEach((row) => ratings.push(row.rating));
+    if (data.length < pageSize) break;
+    fromIndex += pageSize;
+  }
+  const existing = audienceScores[filmId] ?? {};
+  audienceScores[filmId] = {
+    ...existing,
+    listener_ratings: ratings
+  };
+  return ratings;
 }
 
 async function fetchAwardsLastUpdated() {
@@ -3334,6 +3485,7 @@ async function loadFilms() {
     resetPagination();
     await fetchAwardsLastUpdated();
     await fetchAudienceScores();
+    await fetchListenerVotes(films);
     await render();
     syncFilterControls();
     updatePodcastEpisodeSchema();
@@ -3501,6 +3653,7 @@ container.addEventListener("change", async (event) => {
   };
 
   updateAudienceScoreUI(filmId, audienceScores[filmId], { highlight: true });
+  await refreshListenerVotesForFilm(filmId);
   setAwardsLastUpdated(new Date());
   renderFilmAwards();
 
