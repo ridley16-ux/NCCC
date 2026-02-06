@@ -107,18 +107,6 @@ Deno.serve(async (req) => {
       );
     }
 
-    const { error: filmUpsertError } = await supabase
-      .from("films")
-      .upsert({ film_id }, { onConflict: "film_id" });
-
-    if (filmUpsertError) {
-      console.error("filmUpsertError", filmUpsertError);
-      return Response.json(
-        { error: "Failed to ensure film exists", detail: errToDetail(filmUpsertError), version: FUNCTION_VERSION },
-        { status: 500, headers: corsHeaders }
-      );
-    }
-
     const { error: metaError } = await supabase
       .from("film_meta")
       .upsert({ film_id, kev_percent: catalogRow.kev_percent }, { onConflict: "film_id" });
