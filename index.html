@@ -1934,14 +1934,18 @@ const AWARDS = [
     emoji: "⬆️",
     rosetteClass: "rosette--underrated",
     description: "Awarded to the film which has the largest postive difference from the listener score to Kev's score",
-    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
-      const listenerAvg = getListenerAverage10(film, aggregates);
-      const kevRating = getKevRating10(film, aggregates);
-      const listenerCount = getListenerCount(film, aggregates);
-      if (listenerCount <= 0 || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
-      const gap = listenerAvg - kevRating;
-      return gap > 0 ? gap : null;
-    })
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+        const gap = listenerAvg - kevRating;
+        return gap >= INSIGHT_GAP_MIN / 10 ? gap : null;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
   },
   {
     key: "most-overrated",
@@ -1949,14 +1953,18 @@ const AWARDS = [
     emoji: "🔴⬇️",
     rosetteClass: "rosette--overrated",
     description: "Awarded to the film which has the largest negative difference from the listener score to Kev's score",
-    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
-      const listenerAvg = getListenerAverage10(film, aggregates);
-      const kevRating = getKevRating10(film, aggregates);
-      const listenerCount = getListenerCount(film, aggregates);
-      if (listenerCount <= 0 || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
-      const gap = kevRating - listenerAvg;
-      return gap > 0 ? gap : null;
-    })
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+        const gap = kevRating - listenerAvg;
+        return gap >= INSIGHT_GAP_MIN / 10 ? gap : null;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
   },
   {
     key: "most-divisive",
@@ -1964,12 +1972,16 @@ const AWARDS = [
     emoji: "⚡",
     rosetteClass: "rosette--divisive",
     description: "Awarded to the film with the biggest rating varience. Some listeners love it, some (probably most) hate it",
-    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
-      const listenerCount = getListenerCount(film, aggregates);
-      if (listenerCount <= 0) return null;
-      const metric = getDivisiveAwardMetric(film, aggregates);
-      return Number.isFinite(metric) ? metric : null;
-    })
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES) return null;
+        const metric = getDivisiveAwardMetric(film, aggregates);
+        return Number.isFinite(metric) && metric >= INSIGHT_DIV_MIN ? metric : null;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
   }
 ];
 
@@ -2576,6 +2588,51 @@ function getTopAwardWinners(films, getValue) {
   return winners;
 }
 
+function getBestSingleWinner(films, getMetric, getVotes) {
+  let bestFilm = null;
+  let bestMetric = null;
+  let bestVotes = null;
+  let bestTitle = "";
+  films.forEach((film) => {
+    const metric = getMetric(film);
+    if (!Number.isFinite(metric)) return;
+    const votes = getVotes(film);
+    const safeVotes = Number.isFinite(votes) ? votes : 0;
+    const title = String(film.title || "");
+    if (bestFilm === null) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestTitle = title;
+      return;
+    }
+    if (metric > bestMetric) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestTitle = title;
+      return;
+    }
+    if (metric === bestMetric && safeVotes > bestVotes) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestTitle = title;
+      return;
+    }
+    if (metric === bestMetric && safeVotes === bestVotes) {
+      const comparison = title.localeCompare(bestTitle, "en-GB", { sensitivity: "base" });
+      if (comparison < 0) {
+        bestFilm = film;
+        bestMetric = metric;
+        bestVotes = safeVotes;
+        bestTitle = title;
+      }
+    }
+  });
+  return bestFilm ? [bestFilm] : [];
+}
+
 function getAwardsUpdatedAt(films, aggregates = {}) {
   const candidates = [];
   if (awardsLastUpdatedAt) candidates.push(awardsLastUpdatedAt);
@@ -2615,10 +2672,10 @@ function shouldShowFilmAwards() {
   return currentFilter === "rob" && filmSearchQuery.trim() === "" && hasDefaultSort;
 }
 
-function formatAwardWinnersLine(winners) {
-  if (!winners.length) return "Winner: —";
-  const titles = winners.map((film) => escapeHtml(String(film.title || "Untitled"))).join(", ");
-  return winners.length > 1 ? `Winners: ${titles}` : `Winner: ${titles}`;
+function formatAwardWinnersLine(winners, { emptyText = "Winner: Not enough votes yet" } = {}) {
+  if (!winners.length) return emptyText;
+  const title = escapeHtml(String(winners[0].title || "Untitled"));
+  return `Winner: ${title}`;
 }
 
 function setAwardsExpanded(isExpanded, { immediate = false } = {}) {
