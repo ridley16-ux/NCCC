@@ -2046,7 +2046,7 @@ function parseTimestamp(value) {
 function calcRobScore(film) {
   const total = film.coherence + film.entertainment + film.originality;
   film.totalScore = total;
-  film.score = Math.ceil((total / 30) * 100);
+  film.score = (total / 30) * 100;
   film.kevScore = film.kevScore ?? film.score;
   film.scoreLabel = "🎙️ Kev’s Score";
 }
@@ -2255,9 +2255,14 @@ function formatListenerRating(score) {
 }
 
 function formatAudienceScore(value) {
-  const score = Number(value);
-  if (!Number.isFinite(score)) return null;
-  return Math.round(score);
+  const score = getPercentRaw(value);
+  if (score === null) return null;
+  return roundPercent(score);
+}
+
+function formatPercentLabel(value) {
+  const rounded = roundPercent(value);
+  return rounded === null ? "—" : `${rounded}%`;
 }
 
 function formatAwardsUpdatedLabel(timestamp) {
@@ -2357,7 +2362,12 @@ function parseListenerRatingValue(value) {
   const cleanedValue = typeof value === "string" ? value.replace(/%/g, "").trim() : value;
   const score = Number(cleanedValue);
   if (!Number.isFinite(score)) return null;
-  return Math.round(score);
+  return score;
+}
+
+function getPercentRaw(value) {
+  const score = Number(value);
+  return Number.isFinite(score) ? score : null;
 }
 
 function normaliseScoreToPercent(value) {
@@ -2568,12 +2578,13 @@ function computeInsightRosettes(films) {
 }
 
 function getListenerRatingValue(film) {
-  const audienceValue = formatAudienceScore(audienceScores[film.id]?.weighted_percent);
+  const audienceValue = getPercentRaw(audienceScores[film.id]?.weighted_percent);
   if (audienceValue !== null) return audienceValue;
   const fallbackValue = parseListenerRatingValue(
     film.listenerRating ?? film.listenerPercent ?? film.listenerScore ?? film.listener_score
   );
-  return fallbackValue !== null ? fallbackValue : -1;
+  const normalized = normaliseScoreToPercent(fallbackValue);
+  return normalized !== null ? normalized : -1;
 }
 
 function getCompositeScore(film) {
@@ -3068,7 +3079,8 @@ function triggerAudienceNudge(target) {
 
 function updateAudienceScoreUI(filmId, audienceData, options = {}) {
   const { highlight = false } = options;
-  const audiencePercent = formatAudienceScore(audienceData?.weighted_percent);
+  const audienceRaw = getPercentRaw(audienceData?.weighted_percent);
+  const audiencePercent = audienceRaw !== null ? roundPercent(audienceRaw) : null;
   const audienceVotes = Number(audienceData?.listener_count ?? 0);
   const audienceLabel = audiencePercent !== null
     ? `Audience: ${audiencePercent}%`
@@ -3090,9 +3102,9 @@ function updateAudienceScoreUI(filmId, audienceData, options = {}) {
     }
     if (scoreRow) {
       const audienceValueEl = scoreRow.querySelector('[data-score-half="audience"] [data-score-number]');
-      scoreRow.dataset.audienceScore = audiencePercent ?? "";
+      scoreRow.dataset.audienceScore = audienceRaw ?? "";
       if (audienceValueEl) {
-        audienceValueEl.textContent = audiencePercent !== null ? `${audiencePercent}%` : "—";
+        audienceValueEl.textContent = formatPercentLabel(audienceRaw);
       }
       applyScoreCardHighlight(scoreRow);
     }
@@ -3171,7 +3183,8 @@ async function render(options = {}) {
   visibleFilms.forEach((film, index) => {
     const listenerScore = listenerScores[film.id] ?? 0;
     const audienceData = audienceScores[film.id];
-    const audiencePercent = formatAudienceScore(audienceData?.weighted_percent);
+    const audienceRaw = getPercentRaw(audienceData?.weighted_percent);
+    const audiencePercent = audienceRaw !== null ? roundPercent(audienceRaw) : null;
     const audienceVotes = Number(audienceData?.listener_count ?? 0);
     const audienceLabel = audiencePercent !== null
       ? `Audience: ${audiencePercent}%`
@@ -3179,6 +3192,8 @@ async function render(options = {}) {
     const audienceVotesLabel = audiencePercent !== null
       ? `${audienceVotes} vote(s)`
       : "0 votes";
+    const kevScoreDisplay = formatPercentLabel(film.score);
+    const audienceScoreDisplay = formatPercentLabel(audienceRaw);
     const storedRating = localRatings[film.id] ?? null;
     const transcriptButton = film.transcriptTxt
       ? `<button class="transcript-link" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
@@ -3254,18 +3269,18 @@ async function render(options = {}) {
               <p class="meta-line">Podcasted: ${formatUkDate(film.podcastDate)}</p>
             </div>
 
-            <div class="score-row" data-score-row data-kev-score="${film.score}" data-audience-score="${audiencePercent ?? ""}">
+            <div class="score-row" data-score-row data-kev-score="${film.score}" data-audience-score="${audienceRaw ?? ""}">
               <div class="score-card score-card--stat" data-score-card="kev">
                 <div class="score-stat" data-score-half="kev">
                   <div class="score-label">Kev’s Score</div>
-                  <div class="score-value" data-score-value>${film.score}%</div>
+                  <div class="score-value" data-score-value>${kevScoreDisplay}</div>
                 </div>
               </div>
               <div class="score-card score-card--stat" data-score-card="audience">
                 <div class="score-stat" data-score-half="audience">
                   <div class="score-label">Listener Score</div>
                   <div class="score-value" data-score-value>
-                    <span data-score-number>${audiencePercent !== null ? `${audiencePercent}%` : "—"}</span><span class="score-trend" data-score-trend aria-hidden="true"></span>
+                    <span data-score-number>${audienceScoreDisplay}</span><span class="score-trend" data-score-trend aria-hidden="true"></span>
                   </div>
                 </div>
               </div>
@@ -3328,7 +3343,7 @@ async function render(options = {}) {
             </div>
             <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
               <div class="badge-label">Rotten Tomatoes</div>
-              <div class="badge-value">🍅 ${film.score}%</div>
+              <div class="badge-value">🍅 ${kevScoreDisplay}</div>
             </aside>
           </div>
 
