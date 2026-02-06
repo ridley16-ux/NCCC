@@ -692,52 +692,36 @@ label {
   gap: 6px;
 }
 
-.cta-primary,
-.cta-secondary {
+.btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 44px;
-  padding: 10px 18px;
+  padding: 12px 16px;
   border-radius: 14px;
-  border: 1px solid transparent;
+  border: 1px solid rgba(0, 0, 0, 0.2);
   font-weight: 800;
   text-decoration: none;
-  line-height: 1;
-  transition: background-color 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, color 0.2s ease;
 }
 
-.cta-primary {
+.btn.rt {
+  background: var(--accent-rt);
+  color: #000;
+  box-shadow: 0 10px 24px rgba(245, 197, 107, 0.25);
+}
+
+.btn.podcast {
   background: var(--accent-rob);
-  border-color: rgba(0, 0, 0, 0.2);
   color: #fff;
   box-shadow: 0 10px 24px rgba(212, 106, 42, 0.22);
 }
 
-.cta-primary:hover {
-  background: #c95b2b;
-}
-
-.cta-secondary {
-  background: transparent;
-  border-color: rgba(255, 255, 255, 0.35);
-  color: rgba(255, 255, 255, 0.9);
-  box-shadow: none;
-}
-
-.cta-secondary:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-.cta-primary:focus-visible,
-.cta-secondary:focus-visible {
+.btn:focus {
   outline: 3px solid rgba(245, 197, 107, 0.45);
   outline-offset: 2px;
 }
-.cta-primary:focus-visible { outline-color: rgba(212, 106, 42, 0.35); }
+.btn.podcast:focus { outline-color: rgba(212, 106, 42, 0.35); }
 
-.cta-tertiary {
+.transcript-link {
   appearance: none;
   background: none;
   border: none;
@@ -750,28 +734,15 @@ label {
   transition: color 0.2s ease;
 }
 
-.cta-tertiary:hover,
-.cta-tertiary:focus-visible {
+.transcript-link:hover,
+.transcript-link:focus-visible {
   color: #ffffff;
 }
 
-.cta-tertiary:focus-visible {
+.transcript-link:focus-visible {
   outline: 2px solid rgba(255, 255, 255, 0.6);
   outline-offset: 3px;
   border-radius: 6px;
-}
-
-.transcript-link {
-  font: inherit;
-}
-
-.transcript-link:hover,
-.transcript-link:focus-visible {
-  color: inherit;
-}
-
-.transcript-link:focus-visible {
-  outline: none;
 }
 
 .listener-score {
@@ -1214,12 +1185,6 @@ body.modal-open {
   opacity: 1;
 }
 
-.film-awards__intro {
-  margin: 0 0 16px;
-  color: rgba(255, 255, 255, 0.85);
-  font-size: 15px;
-}
-
 .film-awards__list {
   display: flex;
   flex-direction: column;
@@ -1578,8 +1543,7 @@ body.modal-open {
     width: 100%;
     align-items: stretch;
   }
-  .cta-actions .cta-primary,
-  .cta-actions .cta-secondary {
+  .cta-actions .btn {
     width: 100%;
   }
   .rating-shell {
@@ -2028,17 +1992,26 @@ const INSIGHT_DIV_MIN = 1;
 const AWARDS_CONTENT_ID = "film-awards-content";
 let awardsExpanded = false;
 let awardsLastUpdatedAt = null;
-const CTA_PRIMARY_TEXT = "▶ Play Now";
-const CTA_SECONDARY_TEXT = "⭐ Rate It";
 
 // Award calculation approach: central config with winner selectors for the live Rob films dataset.
 const AWARDS = [
+  {
+    key: "kev-pick",
+    label: "Kev’s Pick",
+    emoji: "🏆",
+    rosetteClass: "rosette--kev-pick",
+    description: "Awarded to the film that Kev loves the most.",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const kevRating = getKevRating10(film, aggregates);
+      return Number.isFinite(kevRating) ? kevRating : null;
+    })
+  },
   {
     key: "listener-pick",
     label: "Listener Pick",
     emoji: "❤️",
     rosetteClass: "rosette--listener-pick",
-    description: "The crowd favourite - no arguments allowed.",
+    description: "Awarded to the film that listeners can't live without.",
     getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
       const listenerAvg = getListenerAverage10(film, aggregates);
       const listenerCount = getListenerCount(film, aggregates);
@@ -2047,11 +2020,22 @@ const AWARDS = [
     })
   },
   {
+    key: "new",
+    label: "New",
+    emoji: "🆕",
+    rosetteClass: "rosette--new",
+    description: "The most recently podcasted film. Not really an award but nice to know.",
+    getWinners: (films) => getTopAwardWinners(films, (film) => {
+      const newest = getNewestFilmTimestamp(film);
+      return Number.isFinite(newest) ? newest : null;
+    })
+  },
+  {
     key: "most-underrated",
     label: "Most Underrated",
     emoji: "⬆️",
     rosetteClass: "rosette--most-underrated",
-    description: "The one listeners think deserved way more love than it got.",
+    description: "Awarded to the film which has the largest postive difference from the listener score to Kev's score",
     getWinners: (films, aggregates) => getBestSingleWinner(
       films,
       (film) => {
@@ -2066,11 +2050,30 @@ const AWARDS = [
     )
   },
   {
+    key: "most-overrated",
+    label: "Most Overrated",
+    emoji: "⬇️",
+    rosetteClass: "rosette--most-overrated",
+    description: "Awarded to the film which has the largest negative difference from the listener score to Kev's score",
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+        const gap = kevRating - listenerAvg;
+        return gap >= INSIGHT_GAP_MIN / 10 ? gap : null;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
+  },
+  {
     key: "most-divisive",
     label: "Most Divisive",
     emoji: "⚡",
     rosetteClass: "rosette--most-divisive",
-    description: "Half loved it. Half hated it. Absolute chaos.",
+    description: "Awarded to the film with the biggest rating varience. Some listeners love it, some (probably most) hate it",
     getWinners: (films, aggregates) => getBestSingleWinnerWithTiebreak(
       films,
       (film) => {
@@ -2094,52 +2097,11 @@ const AWARDS = [
     )
   },
   {
-    key: "kev-pick",
-    label: "Kev’s Pick",
-    emoji: "🏆",
-    rosetteClass: "rosette--kev-pick",
-    description: "The one our harshest critic thinks actually works.",
-    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
-      const kevRating = getKevRating10(film, aggregates);
-      return Number.isFinite(kevRating) ? kevRating : null;
-    })
-  },
-  {
-    key: "new",
-    label: "New",
-    emoji: "✨",
-    rosetteClass: "rosette--new",
-    description: "Freshly podcasted - be early to the verdict.",
-    getWinners: (films) => getTopAwardWinners(films, (film) => {
-      const newest = getNewestFilmTimestamp(film);
-      return Number.isFinite(newest) ? newest : null;
-    })
-  },
-  {
-    key: "most-overrated",
-    label: "Most Overrated",
-    emoji: "⬇️",
-    rosetteClass: "rosette--most-overrated",
-    description: "The hype was loud. The listener verdict wasn’t.",
-    getWinners: (films, aggregates) => getBestSingleWinner(
-      films,
-      (film) => {
-        const listenerAvg = getListenerAverage10(film, aggregates);
-        const kevRating = getKevRating10(film, aggregates);
-        const listenerCount = getListenerCount(film, aggregates);
-        if (listenerCount < INSIGHT_MIN_VOTES || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
-        const gap = kevRating - listenerAvg;
-        return gap >= INSIGHT_GAP_MIN / 10 ? gap : null;
-      },
-      (film) => getListenerCount(film, aggregates)
-    )
-  },
-  {
     key: "lost-plot",
     label: "Lost the Plot",
     emoji: "🌀",
     rosetteClass: "rosette--lost-plot",
-    description: "The furthest from the real film - unhinged in the best way.",
+    description: "Furthest from the real film.",
     shouldDisplay: (films, aggregates) => films.some((film) => (
       Number.isFinite(getRottenTomatoesScore10(film, aggregates))
     )),
@@ -2156,11 +2118,25 @@ const AWARDS = [
     )
   },
   {
+    key: "fixed-it",
+    label: "Fixed It",
+    emoji: "✨",
+    rosetteClass: "rosette--fixed-it",
+    description: "Kev’s score is higher than Rotten Tomatoes for the real film with the same name.",
+    emptyWinnersText: "Winners: —",
+    getWinners: (films, aggregates) => films.filter((film) => {
+      const kevRating = getKevRating10(film, aggregates);
+      const rottenScore = getRottenTomatoesScore10(film, aggregates);
+      if (!Number.isFinite(kevRating) || !Number.isFinite(rottenScore)) return false;
+      return kevRating > rottenScore;
+    })
+  },
+  {
     key: "consensus-achieved",
     label: "Consensus Achieved",
     emoji: "🤝",
     rosetteClass: "rosette--consensus",
-    description: "Kev and the listeners actually agree. Rare, beautiful peace.",
+    description: "Kev and listeners agreed the most.",
     getWinners: (films, aggregates) => getBestSingleWinnerLowest(
       films,
       (film) => {
@@ -2171,20 +2147,6 @@ const AWARDS = [
       },
       (film) => getListenerCount(film, aggregates)
     )
-  },
-  {
-    key: "fixed-it",
-    label: "Fixed It",
-    emoji: "✨",
-    rosetteClass: "rosette--fixed-it",
-    description: "Kev rates it higher than the real-film score. We improved it.",
-    emptyWinnersText: "Winners: —",
-    getWinners: (films, aggregates) => films.filter((film) => {
-      const kevRating = getKevRating10(film, aggregates);
-      const rottenScore = getRottenTomatoesScore10(film, aggregates);
-      if (!Number.isFinite(kevRating) || !Number.isFinite(rottenScore)) return false;
-      return kevRating > rottenScore;
-    })
   }
 ];
 
@@ -3136,7 +3098,6 @@ function renderFilmAwards() {
         </span>
       </button>
       <div id="${AWARDS_CONTENT_ID}" class="film-awards__content" role="region" aria-labelledby="film-awards-title" aria-hidden="true">
-        <p class="film-awards__intro">Not sure where to start? Let the awards guide you.</p>
         <div class="film-awards__list">
           ${awardRows}
         </div>
@@ -3494,7 +3455,7 @@ async function render(options = {}) {
     const audienceScoreDisplay = formatPercentLabel(audienceRaw);
     const storedRating = localRatings[film.id] ?? null;
     const transcriptButton = film.transcriptTxt
-      ? `<button class="transcript-link cta-tertiary" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
+      ? `<button class="transcript-link" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
       : "";
     const card = document.createElement("div");
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
@@ -3609,8 +3570,7 @@ async function render(options = {}) {
 
           <div class="cta">
             <div class="cta-actions">
-              <a class="cta-primary" href="${film.link}" target="_blank">${CTA_PRIMARY_TEXT}</a>
-              <button class="cta-secondary" type="button" data-rating-cta data-film-id="${film.id}">${CTA_SECONDARY_TEXT}</button>
+              <a class="btn podcast" href="${film.link}" target="_blank">Play Episode ▶</a>
               ${transcriptButton}
             </div>
             <div class="rating-panel ${storedRating ? "rated" : ""}" data-rating-panel data-film-id="${film.id}">
@@ -3651,10 +3611,8 @@ async function render(options = {}) {
           <p class="synopsis">${film.summary}</p>
 
           <div class="cta">
-            <div class="cta-actions">
-              <a class="cta-primary" href="${film.link}" target="_blank">${CTA_PRIMARY_TEXT}</a>
-              ${transcriptButton}
-            </div>
+            <a class="btn rt" href="${film.link}" target="_blank">Rotten Tomatoes</a>
+            ${transcriptButton}
           </div>
         </div>
       `}
@@ -4014,16 +3972,6 @@ container.addEventListener("change", async (event) => {
 
 
 container.addEventListener("click", (event) => {
-  const rateButton = event.target.closest("[data-rating-cta]");
-  if (rateButton) {
-    const card = rateButton.closest(".film-card");
-    const slider = card?.querySelector(".rating-slider");
-    if (slider) {
-      slider.scrollIntoView({ behavior: "smooth", block: "center" });
-      slider.focus({ preventScroll: true });
-    }
-    return;
-  }
   const trigger = event.target.closest(".transcript-link");
   if (!trigger) return;
   const txtUrl = trigger.dataset.transcriptTxt;
