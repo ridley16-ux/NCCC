@@ -2228,22 +2228,36 @@ function timeSinceLabel(dateValue) {
   if (!parsed) return "—";
   const now = new Date();
   if (isSameCalendarDay(parsed, now)) return "today";
-  const diffMs = now.getTime() - parsed.getTime();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const dateStart = new Date(parsed.getFullYear(), parsed.getMonth(), parsed.getDate());
+  const diffMs = todayStart.getTime() - dateStart.getTime();
   if (!Number.isFinite(diffMs)) return "—";
-  const daysDiff = Math.max(0, Math.floor(diffMs / 86400000));
-  if (daysDiff >= 1 && daysDiff <= 6) return "1–6 days ago";
-  const weeksDiff = Math.floor(daysDiff / 7);
-  if (weeksDiff >= 1 && weeksDiff <= 4) return "1–4 weeks ago";
-  const monthsDiff = getMonthDifference(parsed, now);
-  if (monthsDiff >= 4 && monthsDiff <= 11) return "4–11 months ago";
-  if (monthsDiff >= 12) {
-    const years = Math.floor(monthsDiff / 12);
-    const remainingMonths = monthsDiff % 12;
-    const yearsLabel = years === 1 ? "1 year" : `${years} years`;
-    if (remainingMonths === 0) return `${yearsLabel} ago`;
-    return `${yearsLabel} ${remainingMonths} months ago`;
+  const daysAgo = Math.max(0, Math.floor(diffMs / 86400000));
+
+  if (daysAgo >= 1 && daysAgo <= 6) {
+    return daysAgo === 1 ? "1 day ago" : `${daysAgo} days ago`;
   }
-  return "4–11 months ago";
+
+  if (daysAgo >= 7 && daysAgo <= 27) {
+    const weeksAgo = Math.floor(daysAgo / 7);
+    return weeksAgo === 1 ? "1 week ago" : `${weeksAgo} weeks ago`;
+  }
+
+  let monthsAgo = getMonthDifference(parsed, now);
+  if (monthsAgo < 1) monthsAgo = 1;
+
+  if (monthsAgo >= 1 && monthsAgo <= 11) {
+    return monthsAgo === 1 ? "1 month ago" : `${monthsAgo} months ago`;
+  }
+
+  const years = Math.floor(monthsAgo / 12);
+  const remMonths = monthsAgo % 12;
+  if (remMonths === 0) {
+    return years === 1 ? "1 year ago" : `${years} years ago`;
+  }
+  const yearPart = years === 1 ? "1 year" : `${years} years`;
+  const monthPart = remMonths === 1 ? "1 month" : `${remMonths} months`;
+  return `${yearPart} ${monthPart} ago`;
 }
 
 function calcRobScore(film) {
