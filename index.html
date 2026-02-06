@@ -649,7 +649,7 @@ label {
 .rosette.real { background: #444; color: #fff; }
 .rosette.kev { background: #E96CB0; }
 .rosette.listener { background: #5b88ff; }
-.rosette.new { background: #8f9905; }
+.rosette.new { background: #7ddbb2; }
 .rosette.other { background: #565656; }
 .rosette.rosette--underrated { background: #2f7e51; color: #e9fff1; }
 .rosette.rosette--overrated { background: #964444; color: #ffecec; }
@@ -3007,18 +3007,13 @@ async function render(options = {}) {
 
   films = sortFilms(films);
 
-  const robFilms = allFilms.filter(f => f.rob && f.active);
-  const newest = [...robFilms].sort((a,b) => safeDate(b.podcastDate) - safeDate(a.podcastDate))[0];
-  const best = [...robFilms].sort((a,b) => b.score - a.score)[0];
-  const robFilmsInView = films.filter(f => f.rob);
-  const eligibleListenerFilms = robFilmsInView.filter(film => {
-    const values = getAudienceSortValues(film);
-    return values.weighted !== -1 || values.listenerCount !== 0;
-  });
-  const listenerBest = eligibleListenerFilms.length
-    ? stableSortFilms(eligibleListenerFilms, compareAudience)[0]
-    : null;
-  const insightRosettes = computeInsightRosettes(allFilms.filter(f => f.active));
+  const robFilmsAll = allFilms.filter(f => f.active && f.rob);
+  const awardWinnersByKey = Object.fromEntries(
+    AWARDS.map((award) => ([
+      award.key,
+      new Set(award.getWinners(robFilmsAll, { audienceScores }).map((film) => film.id))
+    ]))
+  );
 
   currentTotal = films.length;
   const visibleFilms = films.slice(0, visibleCount);
@@ -3051,42 +3046,15 @@ async function render(options = {}) {
       }
     ];
 
-    if (film.rob && film === best) {
-      rosettes.push({ className: "kev", label: "Kev&#39;s Pick", icon: ' <span class="badge-icon" aria-hidden="true">🏅</span>' });
-    }
-
-    if (film.rob && listenerBest && film === listenerBest) {
-      rosettes.push({ className: "listener", label: "Listeners Pick", icon: ' <span class="badge-icon" aria-hidden="true">❤️</span>' });
-    }
-
-    if (film.rob && film === newest) {
-      rosettes.push({ className: "new", label: "NEW", icon: ' <span class="badge-icon" aria-hidden="true">🆕</span>' });
-    }
-
-    if (showListenerUI && film.rob && film.id === insightRosettes.underratedFilmId) {
-      rosettes.push({
-        className: "rosette--underrated",
-        label: "Most Underrated",
-        icon: ' <span class="badge-icon" aria-hidden="true">⬆️</span>',
-        title: "Listeners rated this much higher than Kev."
-      });
-    }
-
-    if (showListenerUI && film.rob && film.id === insightRosettes.overratedFilmId) {
-      rosettes.push({
-        className: "rosette--overrated",
-        label: "Most Overrated",
-        icon: ' <span class="badge-icon" aria-hidden="true">⬇️</span>',
-        title: "Kev rated this much higher than listeners."
-      });
-    }
-
-    if (showListenerUI && film.rob && film.id === insightRosettes.divisiveFilmId) {
-      rosettes.push({
-        className: "rosette--divisive",
-        label: "Most Divisive",
-        icon: ' <span class="badge-icon" aria-hidden="true">⚡</span>',
-        title: "Listeners disagreed the most on this one."
+    if (film.rob) {
+      AWARDS.forEach((award) => {
+        if (!awardWinnersByKey[award.key]?.has(film.id)) return;
+        rosettes.push({
+          className: award.rosetteClass,
+          label: award.label,
+          icon: `<span class="badge-icon" aria-hidden="true">${award.emoji}</span>`,
+          title: award.description || ""
+        });
       });
     }
 
@@ -3103,7 +3071,10 @@ async function render(options = {}) {
     }
 
     const rosetteMarkup = rosettes
-      .map(({ className, label, icon, title }) => `<span class="rosette ${className}"${title ? ` title="${escapeHtml(title)}"` : ""}>${label}${icon}</span>`)
+      .map(({ className, label, icon, title }) => {
+        const iconMarkup = icon ? ` ${icon.trim()}` : "";
+        return `<span class="rosette ${className}"${title ? ` title="${escapeHtml(title)}"` : ""}>${label}${iconMarkup}</span>`;
+      })
       .join("");
 
     card.innerHTML = `
