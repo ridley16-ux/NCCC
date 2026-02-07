@@ -43,9 +43,7 @@
     const stickyHeader = document.querySelector("#site-header .sticky-menu");
     if (!stickyHeader || !document.body) return;
     const height = stickyHeader.offsetHeight;
-    const heightValue = `${height}px`;
-    document.body.style.setProperty("--stickyHeaderH", heightValue);
-    document.documentElement?.style.setProperty("--stickyHeaderH", heightValue);
+    document.body.style.setProperty("--stickyHeaderH", `${height}px`);
   }
 
   function waitForStickyHeader() {

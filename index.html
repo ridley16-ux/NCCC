@@ -117,14 +117,6 @@ label {
   width: 100%;
 }
 
-.filters-toolbar {
-  position: relative;
-}
-
-.filters-toolbar__inner {
-  position: relative;
-}
-
 .filters-row {
   width: 100%;
   max-width: 900px;
@@ -218,22 +210,17 @@ label {
 }
 
 .film-search-row {
-  /* Prevent iOS scroll jump when filter panel toggles. */
+  max-height: 0;
   opacity: 0;
+  overflow: hidden;
   pointer-events: none;
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: calc(100% + 8px);
-  z-index: 1100;
-  transform: translateY(-4px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  transition: max-height 0.25s ease, opacity 0.2s ease;
 }
 
 .film-search-row.is-open {
+  max-height: 80px;
   opacity: 1;
   pointer-events: auto;
-  transform: translateY(0);
 }
 
 .film-search-wrap {
@@ -1334,14 +1321,14 @@ body.modal-open {
     align-items: stretch;
     gap: 6px;
     width: 100%;
-    max-height: none;
-    opacity: 1;
-    overflow: visible;
-    pointer-events: auto;
-    transition: none;
+    max-height: 0;
+    opacity: 0;
+    overflow: hidden;
+    pointer-events: none;
+    transition: max-height 0.23s ease, opacity 0.2s ease;
   }
   .controls.mobile-filters-open .sort {
-    max-height: none;
+    max-height: 120px;
     opacity: 1;
     pointer-events: auto;
     overflow: visible;
@@ -1427,20 +1414,22 @@ body.modal-open {
     box-shadow: 0 0 10px rgba(245, 197, 107, 0.22);
   }
   .film-search-row {
+    max-height: 0;
     opacity: 0;
-    overflow: visible;
+    overflow: hidden;
     pointer-events: none;
-    transition: opacity 0.2s ease, transform 0.2s ease, padding 0.2s ease;
+    transition: max-height 0.23s ease, opacity 0.2s ease, padding 0.2s ease;
     background: rgba(255, 255, 255, 0.03);
     border: 1px solid rgba(255, 255, 255, 0.08);
     border-radius: 16px;
     padding: 2px 12px;
   }
   .controls.mobile-filters-open .film-search-row {
+    max-height: 220px;
     opacity: 1;
     pointer-events: auto;
     padding: 12px;
-    margin-top: 0;
+    margin-top: 8px;
     overflow: visible;
   }
   .film-search-wrap {
@@ -1843,7 +1832,6 @@ body.modal-open {
 <template id="header-extras-template">
   <div class="controls mobile-controls">
     <div class="filters-toolbar">
-    <div class="filters-toolbar__inner">
     <div class="filters-row filter-row">
       <div class="control-row">
       <div class="filter control filters-toolbar__group">
@@ -1918,7 +1906,6 @@ body.modal-open {
         </div>
         <div id="filmSearchSuggestions" class="film-search-suggestions" aria-live="polite"></div>
       </div>
-    </div>
     </div>
     </div>
   </div>
