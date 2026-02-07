@@ -17,15 +17,9 @@
   --rosette-consensus-bg: #3C5B8F;
 }
 
-html {
-  scroll-padding-top: var(--stickyHeaderH, 0px);
-  overflow-anchor: none;
-}
-
 body {
   /* Updated by shared.js after header injection so page content can offset safely. */
   --stickyHeaderH: 0px;
-  overflow-anchor: none;
 }
 
 #site-header {
