@@ -610,6 +610,101 @@ label {
   color: #fff;
 }
 
+.rosette--award {
+  position: relative;
+  appearance: none;
+  border: none;
+  cursor: pointer;
+  background: inherit;
+  color: inherit;
+  font: inherit;
+}
+
+.rosette--award:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.6);
+  outline-offset: 2px;
+}
+
+.rosette-tooltip {
+  position: absolute;
+  bottom: calc(100% + 8px);
+  left: 50%;
+  z-index: 6;
+  background: #1b1b1b;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: rgba(255, 255, 255, 0.92);
+  padding: 8px 10px;
+  border-radius: 10px;
+  font-size: 12px;
+  line-height: 1.4;
+  max-width: 220px;
+  width: max-content;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  opacity: 0;
+  pointer-events: none;
+  transform: translate(-50%, -4px);
+  transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.rosette-tooltip--align-left {
+  left: 0;
+  transform: translate(0, -4px);
+}
+
+.rosette-tooltip--align-right {
+  left: auto;
+  right: 0;
+  transform: translate(0, -4px);
+}
+
+.rosette-tooltip--flip {
+  bottom: auto;
+  top: calc(100% + 8px);
+  transform: translate(-50%, 4px);
+}
+
+.rosette-tooltip--flip.rosette-tooltip--align-left {
+  transform: translate(0, 4px);
+}
+
+.rosette-tooltip--flip.rosette-tooltip--align-right {
+  transform: translate(0, 4px);
+}
+
+.rosette--award:hover .rosette-tooltip,
+.rosette--award:focus-visible .rosette-tooltip,
+.rosette--award.is-open .rosette-tooltip {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.rosette--award.is-open .rosette-tooltip.rosette-tooltip--align-left,
+.rosette--award:focus-visible .rosette-tooltip.rosette-tooltip--align-left,
+.rosette--award:hover .rosette-tooltip.rosette-tooltip--align-left {
+  transform: translate(0, 0);
+}
+
+.rosette--award.is-open .rosette-tooltip.rosette-tooltip--align-right,
+.rosette--award:focus-visible .rosette-tooltip.rosette-tooltip--align-right,
+.rosette--award:hover .rosette-tooltip.rosette-tooltip--align-right {
+  transform: translate(0, 0);
+}
+
+.rosette--award.is-open .rosette-tooltip.rosette-tooltip--flip,
+.rosette--award:focus-visible .rosette-tooltip.rosette-tooltip--flip,
+.rosette--award:hover .rosette-tooltip.rosette-tooltip--flip {
+  transform: translate(-50%, 0);
+}
+
+.rosette--award.is-open .rosette-tooltip.rosette-tooltip--flip.rosette-tooltip--align-left,
+.rosette--award.is-open .rosette-tooltip.rosette-tooltip--flip.rosette-tooltip--align-right,
+.rosette--award:focus-visible .rosette-tooltip.rosette-tooltip--flip.rosette-tooltip--align-left,
+.rosette--award:focus-visible .rosette-tooltip.rosette-tooltip--flip.rosette-tooltip--align-right,
+.rosette--award:hover .rosette-tooltip.rosette-tooltip--flip.rosette-tooltip--align-left,
+.rosette--award:hover .rosette-tooltip.rosette-tooltip--flip.rosette-tooltip--align-right {
+  transform: translate(0, 0);
+}
+
 .badge-icon {
   font-size: 0.9em;
   line-height: 1;
@@ -1987,6 +2082,7 @@ const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBh
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const localRatings = loadLocalRatings();
 let openTooltip = null;
+let openRosetteTooltip = null;
 
 const INSIGHT_MIN_VOTES = 1;
 const INSIGHT_GAP_MIN = 1;
@@ -3575,6 +3671,7 @@ async function refreshAudienceScoreForFilm(filmId) {
 async function render(options = {}) {
   container.innerHTML = "";
   closeOpenTooltip();
+  closeOpenRosetteTooltip();
 
   let films = getFilteredFilms();
   const showListenerUI = currentFilter !== "real";
@@ -3652,9 +3749,10 @@ async function render(options = {}) {
         if (!awardWinnersByKey[award.key]?.has(film.id)) return;
         rosettes.push({
           className: award.rosetteClass,
+          awardKey: award.key,
           label: award.label,
           icon: `<span class="badge-icon" aria-hidden="true">${award.emoji}</span>`,
-          title: award.description || ""
+          description: award.description || ""
         });
       });
     }
@@ -3672,15 +3770,26 @@ async function render(options = {}) {
     }
 
     const rosetteMarkup = rosettes
-      .map(({ className, label, icon, title }) => {
+      .map(({ className, label, icon, title, awardKey, description }) => {
         const iconMarkup = icon ? ` ${icon.trim()}` : "";
+        if (awardKey) {
+          const tooltipId = `rosette-tip-${film.id}-${awardKey}`;
+          return `
+            <button class="rosette rosette--award ${className}" type="button" data-award-key="${awardKey}" aria-describedby="${tooltipId}" aria-expanded="false">
+              ${label}${iconMarkup}
+              <span class="rosette-tooltip" role="tooltip" id="${tooltipId}">
+                ${escapeHtml(description)}
+              </span>
+            </button>
+          `;
+        }
         return `<span class="rosette ${className}"${title ? ` title="${escapeHtml(title)}"` : ""}>${label}${iconMarkup}</span>`;
       })
       .join("");
 
     card.innerHTML = `
       <div class="hero-rank">${rankLabel}</div>
-      <div class="rosette-stack" aria-label="Episode rosettes">
+      <div class="rosette-stack" aria-label="Episode rosettes" data-context="film-poster">
         ${rosetteMarkup}
       </div>
 
@@ -4161,6 +4270,36 @@ container.addEventListener("click", (event) => {
   });
 });
 
+container.addEventListener("click", (event) => {
+  const rosetteButton = event.target.closest(".rosette--award");
+  if (!rosetteButton || !container.contains(rosetteButton)) return;
+  event.preventDefault();
+  event.stopPropagation();
+  if (openRosetteTooltip && openRosetteTooltip !== rosetteButton) {
+    closeOpenRosetteTooltip();
+  }
+  const isOpen = rosetteButton.classList.toggle("is-open");
+  rosetteButton.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) {
+    openRosetteTooltip = rosetteButton;
+    requestAnimationFrame(() => setRosetteTooltipAlignment(rosetteButton));
+  } else {
+    openRosetteTooltip = null;
+  }
+});
+
+container.addEventListener("mouseover", (event) => {
+  const rosetteButton = event.target.closest(".rosette--award");
+  if (!rosetteButton || !container.contains(rosetteButton)) return;
+  requestAnimationFrame(() => setRosetteTooltipAlignment(rosetteButton));
+});
+
+container.addEventListener("focusin", (event) => {
+  const rosetteButton = event.target.closest(".rosette--award");
+  if (!rosetteButton || !container.contains(rosetteButton)) return;
+  requestAnimationFrame(() => setRosetteTooltipAlignment(rosetteButton));
+});
+
 transcriptModal?.addEventListener("click", (event) => {
   if (event.target.closest("[data-transcript-close]")) {
     closeTranscriptModal();
@@ -4192,9 +4331,16 @@ document.addEventListener("click", (event) => {
   closeOpenTooltip();
 });
 
+document.addEventListener("click", (event) => {
+  if (!openRosetteTooltip) return;
+  if (event.target.closest(".rosette--award")) return;
+  closeOpenRosetteTooltip();
+});
+
 document.addEventListener("keydown", (event) => {
   if (event.key === "Escape") {
     closeOpenTooltip();
+    closeOpenRosetteTooltip();
   }
 });
 
@@ -4203,6 +4349,9 @@ document.addEventListener("keydown", handleTranscriptKeydown);
 window.addEventListener("resize", () => {
   if (openTooltip) {
     setTooltipAlignment(openTooltip);
+  }
+  if (openRosetteTooltip) {
+    setRosetteTooltipAlignment(openRosetteTooltip);
   }
 });
 
@@ -4247,6 +4396,35 @@ function closeOpenTooltip() {
   openTooltip.classList.remove("open");
   if (button) button.setAttribute("aria-expanded", "false");
   openTooltip = null;
+}
+
+function closeOpenRosetteTooltip() {
+  if (!openRosetteTooltip) return;
+  openRosetteTooltip.classList.remove("is-open");
+  openRosetteTooltip.setAttribute("aria-expanded", "false");
+  openRosetteTooltip = null;
+}
+
+function setRosetteTooltipAlignment(button) {
+  if (!button) return;
+  const tooltip = button.querySelector(".rosette-tooltip");
+  if (!tooltip) return;
+  tooltip.classList.remove(
+    "rosette-tooltip--align-left",
+    "rosette-tooltip--align-right",
+    "rosette-tooltip--flip"
+  );
+  const margin = 12;
+  const rect = tooltip.getBoundingClientRect();
+  if (rect.top < margin) {
+    tooltip.classList.add("rosette-tooltip--flip");
+  }
+  const alignedRect = tooltip.getBoundingClientRect();
+  if (alignedRect.left < margin) {
+    tooltip.classList.add("rosette-tooltip--align-left");
+  } else if (alignedRect.right > window.innerWidth - margin) {
+    tooltip.classList.add("rosette-tooltip--align-right");
+  }
 }
 
 function setTooltipAlignment(wrapper) {
