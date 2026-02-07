@@ -426,15 +426,22 @@ label {
 .rosette-stack {
   position: absolute;
   top: calc(var(--poster-side-offset) - var(--badge-height) - var(--badge-above-poster-gap) + 2px);
+  left: var(--poster-side-offset);
   right: var(--poster-side-offset);
+
   display: flex;
   flex-direction: row;
-  align-items: flex-end;
+  justify-content: flex-end;
+  align-items: flex-start;
   gap: 6px;
   z-index: 4;
   pointer-events: auto;
-  white-space: nowrap;
-  flex-wrap: nowrap;
+
+  /* allow wrapping inside poster */
+  flex-wrap: wrap;
+
+  /* IMPORTANT: remove nowrap that forces overflow */
+  white-space: normal;
 }
 
 .poster {
@@ -1612,6 +1619,7 @@ body.modal-open {
   .rosette-stack {
     top: calc(var(--poster-side-offset) - (var(--badge-height) * 0.2) + 2px);
     right: var(--poster-side-offset);
+    left: auto;
     flex-direction: column;
     align-items: flex-end;
     flex-wrap: nowrap;
@@ -1773,11 +1781,13 @@ body.modal-open {
 
   .rosette-stack {
     top: calc(var(--poster-side-offset) - var(--badge-height) - var(--badge-above-poster-gap) + 2px);
+    left: var(--poster-side-offset);
     right: var(--poster-side-offset);
     gap: 8px;
     flex-direction: row;
-    align-items: center;
-    flex-wrap: nowrap;
+    justify-content: flex-end;
+    align-items: flex-start;
+    flex-wrap: wrap;
   }
 
   .rosette {
