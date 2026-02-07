@@ -3584,7 +3584,7 @@ async function render(options = {}) {
     films = getFilteredFilms();
   }
 
-  films = sortFilms(films);
+  const allResults = sortFilms(films);
 
   const robFilmsAll = allFilms.filter(f => f.active && f.rob);
   const awardsContext = { audienceScores, allFilms };
@@ -3596,23 +3596,25 @@ async function render(options = {}) {
     ]))
   );
 
-  currentTotal = films.length;
-  const visibleFilms = films.slice(0, visibleCount);
-  const totalVisible = visibleFilms.length;
+  currentTotal = allResults.length;
+  const visibleFilms = allResults.slice(0, visibleCount);
+  const totalFilms = allResults.length;
+  const renderOffset = 0;
   const isPodcastSort = currentSort === "podcast-desc" || currentSort === "podcast-asc";
   const isDescendingRank = currentSort === "rating-desc" || currentSort === "listener-desc";
   const isAscendingRank = currentSort === "rating-asc" || currentSort === "listener-asc";
 
   visibleFilms.forEach((film, index) => {
+    const globalIndex = index + renderOffset;
     let rankText = "—";
     if (isDescendingRank) {
-      rankText = String(index + 1);
+      rankText = String(globalIndex + 1);
     } else if (isAscendingRank) {
-      rankText = String(totalVisible - index);
+      rankText = String(totalFilms - globalIndex);
     } else if (isPodcastSort) {
       rankText = timeSinceLabel(getPodcastedDateValue(film));
     } else {
-      rankText = String(index + 1);
+      rankText = String(globalIndex + 1);
     }
     const rankLabel = isPodcastSort ? rankText : `#${rankText}`;
     const listenerScore = listenerScores[film.id] ?? 0;
