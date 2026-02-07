@@ -1457,6 +1457,100 @@ body.modal-open {
   .sort select {
     padding-right: var(--control-icon-area);
   }
+  .sort-dropdown {
+    display: none;
+  }
+  .sort-dropdown__toggle {
+    width: 100%;
+    margin: 0;
+    border: 2px solid #3f3f3f;
+    font-weight: 600;
+    height: 44px;
+    min-height: 44px;
+    border-radius: 16px;
+    font-size: 16px;
+    box-sizing: border-box;
+    background: #1c1c1c;
+    color: inherit;
+    text-align: left;
+    padding: 0 14px;
+    padding-right: var(--control-icon-area);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+  }
+  .sort-dropdown__toggle:focus,
+  .sort-dropdown__toggle:active {
+    outline: none;
+  }
+  .sort-dropdown__toggle:focus-visible {
+    border-color: #d46a2a;
+  }
+  .sort-dropdown__label {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .sort-dropdown__main {
+    font-weight: 600;
+  }
+  .sort-dropdown__descriptor {
+    font-size: 0.85em;
+    font-weight: 400;
+    text-transform: lowercase;
+    opacity: 0.8;
+  }
+  .sort-dropdown__menu {
+    display: none;
+    position: absolute;
+    top: calc(100% + 6px);
+    left: 0;
+    right: 0;
+    background: #1c1c1c;
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 14px;
+    padding: 6px;
+    margin: 0;
+    list-style: none;
+    z-index: 20;
+    max-height: 280px;
+    overflow-y: auto;
+    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.35);
+  }
+  .sort-dropdown.is-open .sort-dropdown__menu {
+    display: block;
+  }
+  .sort-dropdown__option {
+    width: 100%;
+    border: 0;
+    border-radius: 10px;
+    background: transparent;
+    color: inherit;
+    text-align: left;
+    padding: 10px 12px;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: baseline;
+    gap: 6px;
+    font-size: 15px;
+  }
+  .sort-dropdown__option[aria-selected="true"] {
+    background: rgba(245, 197, 107, 0.18);
+    color: #f5c56b;
+  }
+  .sort-dropdown__option:focus-visible {
+    outline: 2px solid rgba(245, 197, 107, 0.5);
+    outline-offset: 2px;
+  }
+  .sort-dropdown__option[disabled],
+  .sort-dropdown__option[aria-disabled="true"] {
+    opacity: 0.45;
+    cursor: not-allowed;
+  }
   .film-search-input:focus,
   .film-search-input:active,
   .sort select:focus,
@@ -1576,7 +1670,7 @@ body.modal-open {
 
   .filters-toolbar {
     display: grid;
-    grid-template-columns: minmax(160px, 220px) minmax(160px, 220px) minmax(280px, 1fr);
+    grid-template-columns: minmax(160px, 210px) minmax(240px, 1fr) minmax(220px, 300px);
     grid-template-rows: auto auto auto;
     column-gap: 14px;
     row-gap: 6px;
@@ -1604,6 +1698,12 @@ body.modal-open {
   }
   .select-field {
     display: contents;
+  }
+  .select-field--sort {
+    display: block;
+    position: relative;
+    grid-column: 2;
+    grid-row: 2;
   }
 
   .filter > label,
@@ -1694,6 +1794,21 @@ body.modal-open {
   .film-search-input {
     width: 100%;
     min-width: 0;
+  }
+
+  .sort-select--native {
+    position: absolute;
+    width: 1px;
+    height: 1px;
+    padding: 0;
+    margin: -1px;
+    overflow: hidden;
+    clip: rect(0 0 0 0);
+    clip-path: inset(50%);
+    border: 0;
+  }
+  .sort-dropdown {
+    display: block;
   }
 
   .film-search-toggle {
@@ -1870,7 +1985,7 @@ body.modal-open {
       <div class="sort control filters-toolbar__group">
         <label for="sortSelect">Sort by</label>
         <div class="select-field select-field--sort">
-          <select id="sortSelect" class="mobile-filter-control" data-default-value="rating-desc">
+          <select id="sortSelect" class="mobile-filter-control sort-select sort-select--native" data-default-value="rating-desc">
             <option value="rating-desc">Rating (High to Low)</option>
             <option value="rating-asc">Rating (Low to High)</option>
             <option value="podcast-desc">Podcast Date (New to Old)</option>
@@ -1878,6 +1993,12 @@ body.modal-open {
             <option value="listener-desc" data-listener-option>Listener Rating (High to Low)</option>
             <option value="listener-asc" data-listener-option>Listener Rating (Low to High)</option>
           </select>
+          <div class="sort-dropdown" data-sort-dropdown>
+            <button type="button" class="sort-dropdown__toggle mobile-filter-control" id="sortDropdownButton" aria-haspopup="listbox" aria-expanded="false" aria-controls="sortDropdownMenu">
+              <span class="sort-dropdown__label" data-sort-dropdown-label></span>
+            </button>
+            <ul class="sort-dropdown__menu" id="sortDropdownMenu" role="listbox" tabindex="-1" aria-labelledby="sortDropdownButton"></ul>
+          </div>
           <span class="select-icon select-icon--sort" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
               <path fill="currentColor" d="M7 4a1 1 0 0 1 1 1v11.59l2.3-2.3a1 1 0 1 1 1.4 1.42l-4.01 4.01a1 1 0 0 1-1.4 0l-4-4a1 1 0 1 1 1.41-1.42L6 16.59V5a1 1 0 0 1 1-1Zm10 0a1 1 0 0 1 .71.29l4 4a1 1 0 0 1-1.42 1.42L18 7.41V19a1 1 0 1 1-2 0V7.41l-2.3 2.3a1 1 0 1 1-1.4-1.42l4-4A1 1 0 0 1 17 4Z"/>
@@ -3355,6 +3476,7 @@ function updateListenerSortAvailability() {
     currentSort = "rating-desc";
     sortSelect.value = currentSort;
   }
+  refreshSortDropdownOptions();
 }
 
 function syncFilterControls() {
@@ -3367,6 +3489,7 @@ function syncFilterControls() {
   updateListenerSortAvailability();
   updateFilmSearchClearVisibility();
   updateMobileSelectIcons();
+  syncSortDropdownState();
 }
 
 async function refreshListenerScores(films) {
@@ -3889,6 +4012,228 @@ function updateMobileSelectIcons() {
   updateSelectIconState(getSortSelect());
 }
 
+const sortDropdownState = {
+  root: null,
+  button: null,
+  label: null,
+  menu: null,
+  options: []
+};
+
+function splitSortLabel(text) {
+  const match = text.match(/^(.*?)\s*\(([^)]+)\)\s*$/);
+  if (match) {
+    return {
+      main: match[1].trim(),
+      descriptor: match[2].trim().toLowerCase()
+    };
+  }
+  return { main: text.trim(), descriptor: "" };
+}
+
+function renderSortDropdownLabel(text, labelEl) {
+  if (!labelEl) return;
+  const { main, descriptor } = splitSortLabel(text);
+  labelEl.textContent = "";
+  const mainSpan = document.createElement("span");
+  mainSpan.className = "sort-dropdown__main";
+  mainSpan.textContent = main;
+  labelEl.appendChild(mainSpan);
+  if (descriptor) {
+    const descriptorSpan = document.createElement("span");
+    descriptorSpan.className = "sort-dropdown__descriptor";
+    descriptorSpan.textContent = `(${descriptor})`;
+    labelEl.appendChild(descriptorSpan);
+  }
+}
+
+function buildSortDropdownOptions() {
+  const sortSelect = getSortSelect();
+  if (!sortSelect || !sortDropdownState.menu) return;
+  const options = Array.from(sortSelect.options);
+  sortDropdownState.menu.textContent = "";
+  sortDropdownState.options = options.map((option) => {
+    const li = document.createElement("li");
+    const button = document.createElement("button");
+    button.type = "button";
+    button.className = "sort-dropdown__option";
+    button.dataset.value = option.value;
+    button.setAttribute("role", "option");
+    button.setAttribute("aria-selected", String(option.value === sortSelect.value));
+    if (option.disabled) {
+      button.disabled = true;
+      button.setAttribute("aria-disabled", "true");
+    }
+    if (option.hidden) {
+      button.hidden = true;
+      button.setAttribute("aria-hidden", "true");
+    }
+    const { main, descriptor } = splitSortLabel(option.textContent);
+    const mainSpan = document.createElement("span");
+    mainSpan.className = "sort-dropdown__main";
+    mainSpan.textContent = main;
+    button.appendChild(mainSpan);
+    if (descriptor) {
+      const descriptorSpan = document.createElement("span");
+      descriptorSpan.className = "sort-dropdown__descriptor";
+      descriptorSpan.textContent = `(${descriptor})`;
+      button.appendChild(descriptorSpan);
+    }
+    li.appendChild(button);
+    sortDropdownState.menu.appendChild(li);
+    return button;
+  });
+}
+
+function setSortDropdownOpen(isOpen) {
+  const { root, button, menu } = sortDropdownState;
+  if (!root || !button || !menu) return;
+  root.classList.toggle("is-open", isOpen);
+  button.setAttribute("aria-expanded", String(isOpen));
+  if (isOpen) {
+    const focusTarget = getSelectedSortDropdownOption() || getFirstEnabledSortDropdownOption();
+    if (focusTarget) {
+      focusTarget.focus({ preventScroll: true });
+    }
+  }
+}
+
+function getSortDropdownOptions() {
+  return sortDropdownState.options || [];
+}
+
+function getSelectedSortDropdownOption() {
+  return getSortDropdownOptions().find((option) => option.getAttribute("aria-selected") === "true" && !option.disabled && !option.hidden);
+}
+
+function getFirstEnabledSortDropdownOption() {
+  return getSortDropdownOptions().find((option) => !option.disabled && !option.hidden);
+}
+
+function moveSortDropdownFocus(direction) {
+  const options = getSortDropdownOptions().filter((option) => !option.disabled && !option.hidden);
+  if (!options.length) return;
+  const active = document.activeElement;
+  const currentIndex = Math.max(0, options.indexOf(active));
+  const nextIndex = (currentIndex + direction + options.length) % options.length;
+  options[nextIndex].focus({ preventScroll: true });
+}
+
+function selectSortDropdownValue(value) {
+  const sortSelect = getSortSelect();
+  if (!sortSelect) return;
+  if (sortSelect.value !== value) {
+    sortSelect.value = value;
+    sortSelect.dispatchEvent(new Event("change", { bubbles: true }));
+  } else {
+    syncSortDropdownState();
+  }
+  setSortDropdownOpen(false);
+  sortDropdownState.button?.focus({ preventScroll: true });
+}
+
+function syncSortDropdownState() {
+  const sortSelect = getSortSelect();
+  if (!sortSelect || !sortDropdownState.label) return;
+  const selectedOption = sortSelect.selectedOptions?.[0];
+  renderSortDropdownLabel(selectedOption?.textContent || "", sortDropdownState.label);
+  getSortDropdownOptions().forEach((option) => {
+    option.setAttribute("aria-selected", String(option.dataset.value === sortSelect.value));
+  });
+}
+
+function refreshSortDropdownOptions() {
+  if (!sortDropdownState.menu) return;
+  buildSortDropdownOptions();
+  syncSortDropdownState();
+}
+
+function updateSortDropdownAccessibility() {
+  const sortSelect = getSortSelect();
+  const useCustom = window.matchMedia("(min-width: 768px)").matches;
+  if (sortSelect) {
+    sortSelect.tabIndex = useCustom ? -1 : 0;
+  }
+  if (!useCustom) {
+    setSortDropdownOpen(false);
+  }
+}
+
+function initSortDropdown() {
+  const root = document.querySelector("[data-sort-dropdown]");
+  if (!root) return;
+  sortDropdownState.root = root;
+  sortDropdownState.button = root.querySelector(".sort-dropdown__toggle");
+  sortDropdownState.label = root.querySelector("[data-sort-dropdown-label]");
+  sortDropdownState.menu = root.querySelector(".sort-dropdown__menu");
+  buildSortDropdownOptions();
+  syncSortDropdownState();
+  updateSortDropdownAccessibility();
+
+  sortDropdownState.button?.addEventListener("click", () => {
+    const isOpen = root.classList.contains("is-open");
+    setSortDropdownOpen(!isOpen);
+  });
+
+  sortDropdownState.button?.addEventListener("keydown", (event) => {
+    if (event.key === "Enter" || event.key === " ") {
+      event.preventDefault();
+      const isOpen = root.classList.contains("is-open");
+      setSortDropdownOpen(!isOpen);
+    } else if (event.key === "ArrowDown") {
+      event.preventDefault();
+      setSortDropdownOpen(true);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      setSortDropdownOpen(true);
+      moveSortDropdownFocus(-1);
+    } else if (event.key === "Escape") {
+      setSortDropdownOpen(false);
+    }
+  });
+
+  sortDropdownState.menu?.addEventListener("click", (event) => {
+    const option = event.target?.closest(".sort-dropdown__option");
+    if (!option || option.disabled) return;
+    selectSortDropdownValue(option.dataset.value);
+  });
+
+  sortDropdownState.menu?.addEventListener("keydown", (event) => {
+    if (event.key === "ArrowDown") {
+      event.preventDefault();
+      moveSortDropdownFocus(1);
+    } else if (event.key === "ArrowUp") {
+      event.preventDefault();
+      moveSortDropdownFocus(-1);
+    } else if (event.key === "Home") {
+      event.preventDefault();
+      const first = getFirstEnabledSortDropdownOption();
+      first?.focus({ preventScroll: true });
+    } else if (event.key === "End") {
+      event.preventDefault();
+      const options = getSortDropdownOptions().filter((option) => !option.disabled && !option.hidden);
+      options[options.length - 1]?.focus({ preventScroll: true });
+    } else if (event.key === "Escape") {
+      event.preventDefault();
+      setSortDropdownOpen(false);
+      sortDropdownState.button?.focus({ preventScroll: true });
+    } else if (event.key === "Enter" || event.key === " ") {
+      const option = event.target?.closest(".sort-dropdown__option");
+      if (!option || option.disabled) return;
+      event.preventDefault();
+      selectSortDropdownValue(option.dataset.value);
+    }
+  });
+
+  document.addEventListener("click", (event) => {
+    if (!root.classList.contains("is-open")) return;
+    if (event.target?.closest("[data-sort-dropdown]")) return;
+    setSortDropdownOpen(false);
+  });
+
+  window.addEventListener("resize", updateSortDropdownAccessibility);
+}
+
 function hasAdvancedFiltersApplied() {
   return Boolean((filmSearchQuery && filmSearchQuery.length) || currentSort !== "rating-desc");
 }
@@ -3996,6 +4341,7 @@ async function loadFilms() {
 document.addEventListener("DOMContentLoaded", () => {
   document.addEventListener("header:ready", () => {
     syncFilterControls();
+    initSortDropdown();
     const shouldExpand = isMobileViewport() && hasAdvancedFiltersApplied();
     setFilmSearchOpen(shouldExpand);
     refreshSearchFilterToggleState();
@@ -4055,6 +4401,7 @@ document.addEventListener("DOMContentLoaded", () => {
       resetPagination();
       render();
       updateMobileSelectIcons();
+      syncSortDropdownState();
     }
   });
 
