@@ -3384,19 +3384,28 @@ async function fetchAudienceScores() {
   if (!supabaseClient) return;
   const { data, error } = await supabaseClient
     .from("film_scores_v1")
-    .select("film_id, weighted_percent, listener_count");
+    .select("film_id, weighted_percent, listener_count, agg_updated_at");
 
   if (error) {
     console.error("Failed to fetch audience scores.", error);
     return;
   }
 
+  let latestAggregate = null;
   data.forEach(row => {
     audienceScores[row.film_id] = {
       weighted_percent: row.weighted_percent,
-      listener_count: row.listener_count
+      listener_count: row.listener_count,
+      agg_updated_at: row.agg_updated_at
     };
+    const parsed = parseTimestamp(row.agg_updated_at);
+    if (parsed && (!latestAggregate || parsed > latestAggregate)) {
+      latestAggregate = parsed;
+    }
   });
+  if (latestAggregate) {
+    setAwardsLastUpdated(latestAggregate);
+  }
 }
 
 async function fetchListenerVotes(films = []) {
@@ -3471,10 +3480,14 @@ async function refreshListenerVotesForFilm(filmId) {
 async function fetchAwardsLastUpdated() {
   // Timestamp logic: use the latest available aggregation timestamp when present.
   try {
-    const response = await fetch("/assets/data/films/votes.json");
+    if (awardsLastUpdatedAt) return;
+    const response = await fetch("/assets/data/films/votes.json", { cache: "no-store" });
     if (!response.ok) return;
     const payload = await response.json();
-    setAwardsLastUpdated(payload?.updatedAt ?? payload?.updated_at);
+    const parsed = parseTimestamp(payload?.updatedAt ?? payload?.updated_at);
+    if (parsed) {
+      setAwardsLastUpdated(parsed);
+    }
   } catch (error) {
     console.warn("Failed to load awards updated timestamp.", error);
   }
