@@ -2027,6 +2027,9 @@ const AWARDS = [
     emoji: "🆕",
     rosetteClass: "rosette--new",
     description: "The most recently podcasted film. Not really an award but nice to know.",
+    singularLabel: "Most recent",
+    pluralLabel: "Most recent",
+    emptyWinnersText: "Most recent: —",
     getWinners: (films) => getTopAwardWinners(films, (film) => {
       const newest = getNewestFilmTimestamp(film);
       return Number.isFinite(newest) ? newest : null;
@@ -3088,11 +3091,18 @@ function shouldShowFilmAwards() {
   return currentFilter === "rob" && filmSearchQuery.trim() === "" && hasDefaultSort;
 }
 
-function formatAwardWinnersLine(winners, { emptyText = "Winner: Not enough votes yet", pluralLabel = "Winners" } = {}) {
+function formatAwardWinnersLine(
+  winners,
+  {
+    emptyText = "Winner: Not enough votes yet",
+    pluralLabel = "Winners",
+    singularLabel = "Winner"
+  } = {}
+) {
   if (!winners.length) return emptyText;
   if (winners.length === 1) {
     const title = escapeHtml(String(winners[0].title || "Untitled"));
-    return `Winner: ${title}`;
+    return `${singularLabel}: ${title}`;
   }
   const titles = winners.map((winner) => escapeHtml(String(winner.title || "Untitled")));
   return `${pluralLabel}: ${titles.join(", ")}`;
@@ -3144,7 +3154,11 @@ function renderFilmAwards() {
   const visibleAwards = getVisibleAwards(robFilms, awardsContext);
   const awardRows = visibleAwards.map((award) => {
     const winners = award.getWinners(robFilms, awardsContext);
-    const winnersLine = formatAwardWinnersLine(winners, { emptyText: award.emptyWinnersText });
+    const winnersLine = formatAwardWinnersLine(winners, {
+      emptyText: award.emptyWinnersText,
+      pluralLabel: award.pluralLabel,
+      singularLabel: award.singularLabel
+    });
     return `
       <article class="film-award-row" data-award="${award.key}">
         <div class="film-award-meta">
