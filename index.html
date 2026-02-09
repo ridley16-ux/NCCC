@@ -843,112 +843,6 @@ label {
   outline: none;
 }
 
-.transcript-modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  align-items: center;
-  justify-content: center;
-  z-index: 2000;
-}
-
-.transcript-modal.open {
-  display: flex;
-}
-
-.transcript-overlay {
-  position: absolute;
-  inset: 0;
-  background: rgba(0, 0, 0, 0.72);
-}
-
-.transcript-dialog {
-  position: relative;
-  width: min(92vw, 860px);
-  max-height: 80vh;
-  display: flex;
-  flex-direction: column;
-  background: #1b1b1b;
-  border: 1px solid #2b2b2b;
-  border-radius: 18px;
-  padding: 24px;
-  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55);
-  z-index: 1;
-}
-
-.transcript-header {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-
-.transcript-header h2 {
-  margin: 0;
-  font-size: 24px;
-}
-
-.transcript-close {
-  appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
-  color: #fff;
-  border-radius: 10px;
-  width: 36px;
-  height: 36px;
-  font-size: 18px;
-  cursor: pointer;
-}
-
-.transcript-close:focus-visible {
-  outline: 2px solid rgba(255, 255, 255, 0.6);
-  outline-offset: 2px;
-}
-
-.transcript-body {
-  margin-top: 16px;
-  padding-right: 6px;
-  overflow-y: auto;
-  flex: 1;
-  min-height: 0;
-}
-
-.transcript-status {
-  margin: 0;
-  font-size: 15px;
-  color: rgba(255, 255, 255, 0.8);
-}
-
-.transcript-cue {
-  display: grid;
-  grid-template-columns: 90px 1fr;
-  gap: 12px;
-  padding: 12px 0;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
-}
-
-.transcript-cue:last-child {
-  border-bottom: none;
-}
-
-.transcript-time {
-  font-size: 12px;
-  color: rgba(255, 255, 255, 0.55);
-  letter-spacing: 0.04em;
-  text-transform: uppercase;
-}
-
-.transcript-text {
-  font-size: 15px;
-  line-height: 1.6;
-  color: rgba(255, 255, 255, 0.92);
-  word-break: break-word;
-}
-
-body.modal-open {
-  overflow: hidden;
-}
-
 .listener-tooltip {
   position: absolute;
   top: 50%;
@@ -2033,17 +1927,6 @@ body.modal-open {
 <div id="loading" class="status loading" aria-live="polite" hidden></div>
 <div id="scroll-sentinel" aria-hidden="true"></div>
 
-<div class="transcript-modal" id="transcript-modal" aria-hidden="true">
-  <div class="transcript-overlay" data-transcript-close></div>
-  <div class="transcript-dialog" role="dialog" aria-modal="true" aria-labelledby="transcript-title">
-    <div class="transcript-header">
-      <h2 id="transcript-title">Transcript</h2>
-      <button class="transcript-close" type="button" data-transcript-close aria-label="Close transcript">✕</button>
-    </div>
-    <div class="transcript-body" id="transcript-body" tabindex="0"></div>
-  </div>
-</div>
-
 <div id="site-footer"></div>
 <script src="/assets/js/shared.js"></script>
 <script>
@@ -2287,11 +2170,6 @@ const statusEl = document.getElementById("status");
 const loadingEl = document.getElementById("loading");
 const sentinelEl = document.getElementById("scroll-sentinel");
 const awardsSection = document.getElementById("film-awards");
-const transcriptModal = document.getElementById("transcript-modal");
-const transcriptDialog = transcriptModal?.querySelector(".transcript-dialog");
-const transcriptBody = document.getElementById("transcript-body");
-const transcriptTitle = document.getElementById("transcript-title");
-let transcriptTrigger = null;
 
 function parseLocalDate(d) {
   if (!d) return null;
@@ -2393,178 +2271,6 @@ function escapeHtml(value) {
     .replaceAll(">", "&gt;")
     .replaceAll("\"", "&quot;")
     .replaceAll("'", "&#39;");
-}
-
-function formatTranscriptText(text) {
-  const lines = text.split("\n");
-  return lines
-    .map((line) => {
-      const trimmed = line.trim();
-      const voiceMatch = trimmed.match(/^<v\s+([^>]+)>\s*(.*)$/i);
-      if (voiceMatch) {
-        const speaker = escapeHtml(voiceMatch[1].trim());
-        const remainder = escapeHtml(voiceMatch[2].trim());
-        return remainder
-          ? `<strong>${speaker}:</strong> ${remainder}`
-          : `<strong>${speaker}:</strong>`;
-      }
-      const match = trimmed.match(/^([A-Z][A-Z0-9 ]+):\s*(.*)$/);
-      if (!match) return escapeHtml(line);
-      const speaker = escapeHtml(match[1]);
-      const remainder = escapeHtml(match[2]);
-      return `<strong>${speaker}:</strong> ${remainder}`;
-    })
-    .join("<br>");
-}
-
-function formatTranscriptTime(time) {
-  if (!time) return "";
-  const base = time.split(".")[0];
-  const parts = base.split(":");
-  if (parts.length === 2) {
-    return `00:${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}`;
-  }
-  if (parts.length === 3) {
-    return `${parts[0].padStart(2, "0")}:${parts[1].padStart(2, "0")}:${parts[2].padStart(2, "0")}`;
-  }
-  return base;
-}
-
-function parseTranscriptTxt(text) {
-  const cleaned = text.replace(/\r\n/g, "\n").replace(/\r/g, "\n");
-  const lines = cleaned.split("\n");
-  const cues = [];
-  const headerPattern = /^([^:]+):\s*(\d{1,2}:\d{2}(?::\d{2})?)/;
-  let index = 0;
-
-  while (index < lines.length) {
-    const line = lines[index].trim();
-    const match = line.match(headerPattern);
-
-    if (!match) {
-      index += 1;
-      continue;
-    }
-
-    const speaker = match[1].trim();
-    const startTime = match[2].trim();
-    index += 1;
-
-    const textLines = [];
-    while (index < lines.length && !lines[index].trim().match(headerPattern)) {
-      const textLine = lines[index].trim();
-      if (textLine) textLines.push(textLine);
-      index += 1;
-    }
-
-    const text = textLines.join("\n").trim();
-    if (text || speaker) {
-      cues.push({
-        startTime,
-        text: speaker ? `${speaker}: ${text}`.trim() : text,
-      });
-    }
-  }
-
-  return cues;
-}
-
-function setTranscriptStatus(message) {
-  if (!transcriptBody) return;
-  transcriptBody.innerHTML = `<p class="transcript-status">${message}</p>`;
-}
-
-function renderTranscript(cues) {
-  if (!transcriptBody) return;
-  transcriptBody.innerHTML = "";
-  cues.forEach((cue) => {
-    const cueEl = document.createElement("div");
-    cueEl.className = "transcript-cue";
-    cueEl.innerHTML = `
-      <div class="transcript-time">${escapeHtml(formatTranscriptTime(cue.startTime))}</div>
-      <div class="transcript-text">${formatTranscriptText(cue.text)}</div>
-    `;
-    transcriptBody.appendChild(cueEl);
-  });
-}
-
-function getFocusableElements() {
-  if (!transcriptDialog) return [];
-  return Array.from(
-    transcriptDialog.querySelectorAll(
-      "button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])"
-    )
-  ).filter((el) => !el.hasAttribute("disabled"));
-}
-
-let transcriptRequestId = 0;
-
-async function openTranscriptModal({ title, txtUrl, trigger }) {
-  if (!transcriptModal || !transcriptDialog || !transcriptBody) return;
-  transcriptTrigger = trigger;
-  if (transcriptTitle) {
-    transcriptTitle.textContent = title ? `Transcript: ${title}` : "Transcript";
-  }
-  transcriptModal.classList.add("open");
-  transcriptModal.setAttribute("aria-hidden", "false");
-  document.body.classList.add("modal-open");
-  setTranscriptStatus("Loading transcript...");
-  transcriptBody.scrollTop = 0;
-
-  const closeButton = transcriptModal.querySelector(".transcript-close");
-  if (closeButton) closeButton.focus();
-
-  const requestId = (transcriptRequestId += 1);
-
-  try {
-    const response = await fetch(txtUrl);
-    if (!response.ok) throw new Error(`Failed to load transcript (${response.status}).`);
-    const text = await response.text();
-    if (requestId !== transcriptRequestId) return;
-    const cues = parseTranscriptTxt(text);
-    if (!cues.length) {
-      setTranscriptStatus("Transcript is not available yet.");
-      return;
-    }
-    renderTranscript(cues);
-  } catch (error) {
-    console.error("Transcript fetch failed:", error);
-    if (requestId !== transcriptRequestId) return;
-    setTranscriptStatus("Sorry, we couldn’t load that transcript right now.");
-  }
-}
-
-function closeTranscriptModal() {
-  if (!transcriptModal) return;
-  transcriptModal.classList.remove("open");
-  transcriptModal.setAttribute("aria-hidden", "true");
-  document.body.classList.remove("modal-open");
-  transcriptRequestId += 1;
-  if (transcriptTrigger) {
-    transcriptTrigger.focus();
-    transcriptTrigger = null;
-  }
-}
-
-function handleTranscriptKeydown(event) {
-  if (!transcriptModal?.classList.contains("open")) return;
-  if (event.key === "Escape") {
-    event.preventDefault();
-    closeTranscriptModal();
-    return;
-  }
-  if (event.key !== "Tab") return;
-  const focusable = getFocusableElements();
-  if (!focusable.length) return;
-  const first = focusable[0];
-  const last = focusable[focusable.length - 1];
-  if (event.shiftKey && document.activeElement === first) {
-    event.preventDefault();
-    last.focus();
-  } else if (!event.shiftKey && document.activeElement === last) {
-    event.preventDefault();
-    first.focus();
-  }
 }
 
 function loadLocalRatings() {
@@ -3773,8 +3479,8 @@ async function render(options = {}) {
     const kevScoreDisplay = formatPercentLabel(film.score);
     const audienceScoreDisplay = formatPercentLabel(audienceRaw);
     const storedRating = localRatings[film.id] ?? null;
-    const transcriptButton = film.transcriptTxt
-      ? `<button class="transcript-link" type="button" data-transcript-txt="${film.transcriptTxt}" data-transcript-title="${film.title}">View transcript</button>`
+    const transcriptButton = film.transcriptPage
+      ? `<a class="transcript-link" href="${film.transcriptPage}">View transcript</a>`
       : "";
     const card = document.createElement("div");
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
@@ -4281,24 +3987,6 @@ container.addEventListener("change", async (event) => {
 
 
 container.addEventListener("click", (event) => {
-  const trigger = event.target.closest(".transcript-link");
-  if (!trigger) return;
-  const txtUrl = trigger.dataset.transcriptTxt;
-  if (!txtUrl) return;
-  openTranscriptModal({
-    title: trigger.dataset.transcriptTitle,
-    txtUrl,
-    trigger
-  });
-});
-
-transcriptModal?.addEventListener("click", (event) => {
-  if (event.target.closest("[data-transcript-close]")) {
-    closeTranscriptModal();
-  }
-});
-
-container.addEventListener("click", (event) => {
   const infoButton = event.target.closest(".listener-info");
   if (!infoButton) return;
   const wrapper = infoButton.closest(".listener-info-wrap");
@@ -4328,8 +4016,6 @@ document.addEventListener("keydown", (event) => {
     closeOpenTooltip();
   }
 });
-
-document.addEventListener("keydown", handleTranscriptKeydown);
 
 window.addEventListener("resize", () => {
   if (openTooltip) {
