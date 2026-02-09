@@ -999,7 +999,6 @@ body.modal-open {
   align-items: stretch;
   gap: 8px;
   min-width: 220px;
-  position: relative;
   box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.04);
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
@@ -1007,12 +1006,6 @@ body.modal-open {
 .rating-shell:focus-within {
   border-color: rgba(245, 197, 107, 0.55);
   box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
-}
-
-.rating-panel.is-voted .rating-shell {
-  border-color: rgba(245, 197, 107, 0.55);
-  background: rgba(245, 197, 107, 0.08);
-  box-shadow: inset 0 0 0 1px rgba(245, 197, 107, 0.2);
 }
 
 .rating-meta {
@@ -1102,63 +1095,19 @@ body.modal-open {
   align-self: flex-end;
   appearance: none;
   border: none;
-  background: rgba(245, 197, 107, 0.14);
+  background: none;
   color: #f5c56b;
-  font-size: 14px;
-  font-weight: 700;
-  width: 28px;
-  height: 28px;
-  border-radius: 999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
+  font-size: 12px;
+  font-weight: 600;
+  text-decoration: underline;
   cursor: pointer;
   padding: 0;
-  transition: background 0.2s ease, transform 0.2s ease;
-}
-
-.rating-clear:hover,
-.rating-clear:focus-visible {
-  background: rgba(245, 197, 107, 0.24);
-}
-
-.rating-clear:active {
-  transform: scale(0.96);
 }
 
 .rating-clear:focus-visible {
   outline: 2px solid rgba(245, 197, 107, 0.5);
   outline-offset: 2px;
   border-radius: 6px;
-}
-
-.rating-clear[hidden] {
-  display: none;
-}
-
-.rating-tick {
-  position: absolute;
-  right: 10px;
-  bottom: 10px;
-  width: 18px;
-  height: 18px;
-  border-radius: 999px;
-  background: rgba(46, 200, 122, 0.9);
-  color: #0d0d0d;
-  font-size: 11px;
-  font-weight: 800;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  opacity: 0;
-  transform: scale(0.8);
-  transition: opacity 0.2s ease, transform 0.2s ease;
-  pointer-events: none;
-}
-
-.rating-panel.is-voted .rating-tick {
-  opacity: 1;
-  transform: scale(1);
 }
 
 .rating-status {
@@ -1925,18 +1874,6 @@ body.modal-open {
 
 @media (max-width: 520px) {
   .bar-row { grid-template-columns: 110px 1fr 40px; }
-}
-
-@media (min-width: 768px) {
-  .rating-shell {
-    min-width: 260px;
-  }
-}
-
-@media (min-width: 1024px) {
-  .rating-shell {
-    min-width: 300px;
-  }
 }
 
 @media (max-width: 400px) {
@@ -3899,15 +3836,14 @@ async function render(options = {}) {
               <a class="button" href="${film.link}" target="_blank" aria-label="Play episode">▶️ Play now</a>
               ${transcriptButton}
             </div>
-            <div class="rating-panel ${storedRating ? "is-voted" : ""}" data-rating-panel data-film-id="${film.id}">
+            <div class="rating-panel ${storedRating ? "rated" : ""}" data-rating-panel data-film-id="${film.id}">
               <div class="rating-shell">
                 <div class="rating-meta">
                   <span class="rating-label">Your rating</span>
                   <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "-/10"}</span>
                 </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
-                <button class="rating-clear" type="button" ${storedRating ? "" : "hidden"} aria-label="Undo vote" title="Undo vote">↶</button>
-                <span class="rating-tick" aria-hidden="true">✓</span>
+                <button class="rating-clear" type="button" ${storedRating ? "" : "disabled"}>Reset</button>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
@@ -4366,11 +4302,11 @@ function updateRatingUI(filmId, listenerRating, yourRating) {
     const slider = panel.querySelector(".rating-slider");
     const hasRating = Boolean(yourRating);
 
-    panel.classList.toggle("is-voted", hasRating);
+    panel.classList.toggle("rated", hasRating);
     setRatingError(panel, "");
 
     if (clearButton) {
-      clearButton.hidden = !hasRating;
+      clearButton.disabled = !hasRating;
     }
     if (slider) {
       slider.value = hasRating ? String(yourRating) : "5";
