@@ -849,7 +849,7 @@ label {
 .transcript-modal-titlewrap {
   display: flex;
   align-items: center;
-  justify-content: space-between;
+  justify-content: flex-end;
   gap: 16px;
   width: 100%;
 }
@@ -3671,7 +3671,6 @@ body.modal-open {
   <div class="transcript-panel" role="document">
     <header class="transcript-modal-top">
       <div class="transcript-modal-titlewrap">
-        <h2 id="transcript-title">Transcript</h2>
         <button class="transcript-close" type="button" aria-label="Close transcript" data-transcript-close>×</button>
       </div>
     </header>
@@ -3687,14 +3686,13 @@ body.modal-open {
 
         <div class="transcript-hero-content">
           <div class="transcript-kicker">EPISODE TRANSCRIPT</div>
-          <h3 class="transcript-hero-title">Transcript</h3>
+          <h3 class="transcript-hero-title" id="transcript-title">Transcript</h3>
           <p class="transcript-hero-desc" hidden></p>
           <div class="transcript-hero-meta" hidden>
             <span class="transcript-hero-date"></span>
           </div>
           <div class="transcript-hero-ctas">
             <a class="btn btn-primary transcript-play" href="#" target="_self" rel="nofollow">▶ Play Episode</a>
-            <a class="btn btn-secondary transcript-browse" href="#">Browse all episodes</a>
           </div>
         </div>
       </div>
@@ -3950,7 +3948,6 @@ const sentinelEl = document.getElementById("scroll-sentinel");
 const awardsSection = document.getElementById("film-awards");
 const transcriptModal = document.getElementById("transcript-modal");
 const transcriptBody = document.getElementById("transcript-body");
-const transcriptTitle = document.getElementById("transcript-title");
 const transcriptHeroTitle = document.querySelector(".transcript-hero-title");
 const transcriptHeroDesc = document.querySelector(".transcript-hero-desc");
 const transcriptHeroMeta = document.querySelector(".transcript-hero-meta");
@@ -3959,7 +3956,6 @@ const transcriptPosterImg = document.querySelector(".transcript-poster-img");
 const transcriptPosterFallback = document.querySelector(".transcript-poster-fallback");
 const transcriptPosterInitials = document.querySelector(".transcript-poster-initials");
 const transcriptPlayLink = document.querySelector(".transcript-play");
-const transcriptBrowseLink = document.querySelector(".transcript-browse");
 let transcriptTrigger = null;
 
 function parseLocalDate(d) {
@@ -4076,12 +4072,6 @@ function formatTranscriptHeroDate(dateValue) {
     .toUpperCase();
 }
 
-function getBrowseEpisodesHref() {
-  const listenLink = document.querySelector('a[data-nav="listen"]')
-    || document.querySelector('a[href*="listen"]');
-  return listenLink?.getAttribute("href") || "/pages/listen.html";
-}
-
 function getTranscriptContext(trigger) {
   if (!trigger) return {};
   const card = trigger.closest(".film-card");
@@ -4125,7 +4115,7 @@ function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
 
   if (transcriptHeroMeta && transcriptHeroDate) {
     if (resolvedDate) {
-      transcriptHeroDate.textContent = `PUBLISHED ${formatTranscriptHeroDate(resolvedDate)}`;
+      transcriptHeroDate.textContent = `Podcasted date ${formatTranscriptHeroDate(resolvedDate)}`;
       transcriptHeroMeta.hidden = false;
     } else {
       transcriptHeroDate.textContent = "";
@@ -4165,9 +4155,6 @@ function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
     transcriptPlayLink.tabIndex = hasPlay ? 0 : -1;
   }
 
-  if (transcriptBrowseLink) {
-    transcriptBrowseLink.setAttribute("href", getBrowseEpisodesHref());
-  }
 }
 
 function renderTranscriptFromTemplate(templateEl) {
@@ -4190,10 +4177,9 @@ function getTranscriptFocusableElements() {
 }
 
 function openTranscriptModal({ transcriptId, title, dateValue, trigger }) {
-  if (!transcriptModal || !transcriptBody || !transcriptTitle) return;
+  if (!transcriptModal || !transcriptBody) return;
   const templateEl = getTranscriptTemplate(transcriptId);
   transcriptTrigger = trigger;
-  transcriptTitle.textContent = title ? `Transcript: ${title}` : "Transcript";
   setTranscriptHero({ transcriptId, title, dateValue: dateValue || templateEl?.dataset?.date, trigger });
   renderTranscriptFromTemplate(templateEl);
   transcriptModal.hidden = false;
