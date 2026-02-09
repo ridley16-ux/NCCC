@@ -5375,6 +5375,59 @@ function applyScoreCardHighlight(scoreRow) {
   }
 }
 
+const transcriptExistsCache = new Map();
+
+function getTranscriptUrl(film) {
+  if (!film) return null;
+  const directPath = film.transcriptTxt || film.transcript_txt;
+  if (directPath) return directPath;
+  const transcriptId = film.transcriptId || film.transcript_id;
+  if (!transcriptId) return null;
+  return `/assets/data/transcripts/${transcriptId}.txt`;
+}
+
+async function checkTranscriptExists(url) {
+  if (!url) return false;
+  try {
+    const response = await fetch(url, { method: "HEAD", cache: "no-store" });
+    if (response.ok) return true;
+    if (response.status !== 405 && response.status !== 501) return false;
+  } catch (error) {
+    // Intentionally ignore errors and fall back to range request.
+  }
+
+  try {
+    const response = await fetch(url, {
+      headers: { Range: "bytes=0-0" },
+      cache: "no-store"
+    });
+    return response.ok;
+  } catch (error) {
+    return false;
+  }
+}
+
+async function getTranscriptAvailability(films = []) {
+  const entries = await Promise.all(
+    films.map(async (film) => {
+      if (!film?.id) return [null, false];
+      if (transcriptExistsCache.has(film.id)) {
+        return [film.id, transcriptExistsCache.get(film.id)];
+      }
+      const transcriptUrl = getTranscriptUrl(film);
+      if (!transcriptUrl || !(film.transcriptId || film.transcript_id)) {
+        transcriptExistsCache.set(film.id, false);
+        return [film.id, false];
+      }
+      const exists = await checkTranscriptExists(transcriptUrl);
+      transcriptExistsCache.set(film.id, exists);
+      return [film.id, exists];
+    })
+  );
+
+  return new Map(entries.filter(([filmId]) => filmId));
+}
+
 async function refreshAudienceScoreForFilm(filmId) {
   if (!supabaseClient) return null;
   const { data, error } = await supabaseClient
@@ -5429,6 +5482,7 @@ async function render(options = {}) {
   const isPodcastSort = currentSort === "podcast-desc" || currentSort === "podcast-asc";
   const isDescendingRank = currentSort === "rating-desc" || currentSort === "listener-desc";
   const isAscendingRank = currentSort === "rating-asc" || currentSort === "listener-asc";
+  const transcriptAvailability = await getTranscriptAvailability(visibleFilms);
 
   visibleFilms.forEach((film, index) => {
     const globalIndex = index + renderOffset;
@@ -5457,7 +5511,7 @@ async function render(options = {}) {
     const kevScoreDisplay = formatPercentLabel(film.score);
     const audienceScoreDisplay = formatPercentLabel(audienceRaw);
     const storedRating = localRatings[film.id] ?? null;
-    const transcriptButton = film.transcriptId
+    const transcriptButton = transcriptAvailability.get(film.id)
       ? `<button class="transcript-link" type="button" data-transcript-id="${film.transcriptId}" data-transcript-title="${escapeHtml(film.title)}" data-transcript-date="${film.podcastDate ?? ""}">View transcript</button>`
       : "";
     const card = document.createElement("div");
