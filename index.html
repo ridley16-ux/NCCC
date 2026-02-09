@@ -972,28 +972,32 @@ label {
   position: absolute;
   top: 12px;
   right: 12px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
   appearance: none;
-  border: 1px solid rgba(255, 255, 255, 0.2);
-  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid rgba(255, 255, 255, 0.22);
+  background: rgba(0, 0, 0, 0.38);
   color: #fff;
-  border-radius: 10px;
-  width: 38px;
-  height: 38px;
-  font-size: 20px;
+  border-radius: 12px;
+  width: 34px;
+  height: 34px;
+  font-size: 19px;
   cursor: pointer;
-  opacity: 0;
-  pointer-events: none;
-  transform: translateY(-2px);
-  transition: opacity 0.2s ease, transform 0.2s ease;
+  opacity: 1;
+  pointer-events: auto;
+  box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  transition: background 0.2s ease, border-color 0.2s ease, box-shadow 0.2s ease, transform 0.2s ease;
   z-index: 5;
 }
 
-.transcript-panel:hover .transcript-close,
-.transcript-panel:focus-within .transcript-close,
-.transcript-panel.show-close .transcript-close {
-  opacity: 1;
-  pointer-events: auto;
-  transform: translateY(0);
+.transcript-close:hover,
+.transcript-close:focus-visible {
+  background: rgba(0, 0, 0, 0.55);
+  border-color: rgba(255, 255, 255, 0.36);
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.45);
+  transform: translateY(-1px);
 }
 
 .transcript-close:focus-visible {
@@ -3679,7 +3683,7 @@ body.modal-open {
   <div class="transcript-backdrop" data-transcript-close></div>
   <div class="transcript-panel" role="document">
     <div class="transcript-close-hotspot" aria-hidden="true"></div>
-    <button class="transcript-close" type="button" aria-label="Close transcript" data-transcript-close>×</button>
+    <button class="transcript-close" type="button" aria-label="Close transcript" title="Close transcript" data-transcript-close>×</button>
 
     <section class="transcript-hero" aria-label="Episode transcript header">
       <div class="transcript-hero-grid">
