@@ -1031,21 +1031,20 @@ body.modal-open {
   gap: 8px;
   font-size: 12px;
   text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
-.rating-label,
-.rating-output {
-  font-weight: 700;
-  font-size: 12px;
   letter-spacing: 0.06em;
+  color: rgba(255, 255, 255, 0.7);
+  font-weight: 700;
+  padding-right: 26px;
 }
 
 .rating-output {
   color: #f5c56b;
+  font-weight: 800;
+  font-size: 13px;
   margin-left: auto;
   text-align: right;
 }
+
 .rating-panel:not(.is-voted) .rating-output {
   opacity: 0.85;
   letter-spacing: 0.04em;
@@ -1118,20 +1117,6 @@ body.modal-open {
     transform: scale(1.08);
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.45);
   }
-}
-
-.rating-scale {
-  display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  opacity: 0.55;
-  margin-top: 6px;
-  padding: 0 2px;
-  pointer-events: none;
-}
-
-.rating-scale span {
-  user-select: none;
 }
 
 .rating-tick {
@@ -3916,11 +3901,6 @@ async function render(options = {}) {
                   </div>
                 </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
-                <div class="rating-scale" aria-hidden="true">
-                  <span>1</span>
-                  <span>5</span>
-                  <span>10</span>
-                </div>
                 <span class="rating-tick" aria-hidden="true">✓</span>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
