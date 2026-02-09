@@ -1024,31 +1024,23 @@ body.modal-open {
   padding-right: 26px;
 }
 
-.rating-meta {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 8px;
-  font-size: 12px;
-  text-transform: uppercase;
-  color: rgba(255, 255, 255, 0.7);
-}
-
 .rating-label,
 .rating-output {
   font-weight: 700;
   font-size: 12px;
   letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.7);
 }
 
 .rating-output {
   color: #f5c56b;
   margin-left: auto;
   text-align: right;
+  min-width: 64px;
 }
 .rating-panel:not(.is-voted) .rating-output {
   opacity: 0.85;
-  letter-spacing: 0.04em;
 }
 
 .rating-panel.is-voted .rating-output {
@@ -1122,15 +1114,52 @@ body.modal-open {
 
 .rating-scale {
   display: flex;
-  justify-content: space-between;
-  font-size: 11px;
-  opacity: 0.55;
+  flex-direction: column;
+  gap: 4px;
   margin-top: 6px;
-  padding: 0 2px;
   pointer-events: none;
 }
 
-.rating-scale span {
+.rating-scale__ticks {
+  position: relative;
+  height: 5px;
+  margin: 0 2px;
+  background-image: linear-gradient(to right, rgba(245, 197, 107, 0.3) 0, rgba(245, 197, 107, 0.3) 1px, transparent 1px);
+  background-size: calc(100% / 9) 100%;
+  background-repeat: repeat;
+}
+
+.rating-scale__ticks::after {
+  content: "";
+  position: absolute;
+  top: -1px;
+  left: 0;
+  right: 0;
+  height: 7px;
+  background-image: linear-gradient(
+    to right,
+    rgba(245, 197, 107, 0.55) 0,
+    rgba(245, 197, 107, 0.55) 1px,
+    transparent 1px,
+    transparent calc(50% - 0.5px),
+    rgba(245, 197, 107, 0.55) calc(50% - 0.5px),
+    rgba(245, 197, 107, 0.55) calc(50% + 0.5px),
+    transparent calc(50% + 0.5px),
+    transparent calc(100% - 1px),
+    rgba(245, 197, 107, 0.55) calc(100% - 1px),
+    rgba(245, 197, 107, 0.55) 100%
+  );
+}
+
+.rating-scale__labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  opacity: 0.55;
+  padding: 0 2px;
+}
+
+.rating-scale__label {
   user-select: none;
 }
 
@@ -1657,13 +1686,6 @@ body.modal-open {
   .rating-shell {
     width: 100%;
     min-width: 0;
-  }
-  .rating-meta {
-    font-size: 12px;
-  }
-  .rating-output {
-    font-size: 24px;
-    line-height: 1;
   }
   .rosette-stack {
     top: calc(var(--poster-side-offset) - (var(--badge-height) * 0.2) + 2px);
@@ -3910,16 +3932,17 @@ async function render(options = {}) {
             <div class="rating-panel ${storedRating ? "is-voted" : ""}" data-rating-panel data-film-id="${film.id}">
               <div class="rating-shell">
                 <div class="rating-header">
-                  <div class="rating-meta">
-                    <span class="rating-label">YOUR RATING</span>
-                    <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "Vote now"}</span>
-                  </div>
+                  <span class="rating-label">YOUR RATING</span>
+                  <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "VOTE NOW"}</span>
                 </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
                 <div class="rating-scale" aria-hidden="true">
-                  <span>1</span>
-                  <span>5</span>
-                  <span>10</span>
+                  <div class="rating-scale__ticks"></div>
+                  <div class="rating-scale__labels">
+                    <span class="rating-scale__label rating-scale__label--min">1</span>
+                    <span class="rating-scale__label rating-scale__label--mid">5</span>
+                    <span class="rating-scale__label rating-scale__label--max">10</span>
+                  </div>
                 </div>
                 <span class="rating-tick" aria-hidden="true">✓</span>
               </div>
@@ -4201,7 +4224,7 @@ container.addEventListener("input", (event) => {
   const panel = slider.closest(".rating-panel");
   if (!panel) return;
   const value = Number(slider.value);
-  updateRatingOutput(panel, value);
+  updateRatingOutput(panel, panel.classList.contains("is-voted") ? value : null);
 });
 
 container.addEventListener("change", async (event) => {
@@ -4385,7 +4408,8 @@ function updateRatingOutput(panel, value) {
   if (!panel) return;
   const output = panel.querySelector("[data-rating-output]");
   if (!output) return;
-  output.textContent = value ? `${value}/10` : "Vote now";
+  const isVoted = panel.classList.contains("is-voted");
+  output.textContent = isVoted && value ? `${value}/10` : "VOTE NOW";
 }
 
 function closeOpenTooltip() {
