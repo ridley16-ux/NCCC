@@ -1021,6 +1021,15 @@ label {
   color: rgba(255, 255, 255, 0.75);
 }
 
+.transcript-plain {
+  margin: 0;
+  white-space: pre-wrap;
+  font-size: 16px;
+  line-height: 1.7;
+  font-family: "Inter", "Helvetica Neue", Arial, sans-serif;
+  color: rgba(255, 255, 255, 0.9);
+}
+
 .t-turn {
   display: grid;
   grid-template-columns: 100px minmax(0, 1fr);
@@ -4180,6 +4189,30 @@ function renderTranscriptFromTemplate(templateEl) {
   transcriptBody.appendChild(templateEl.content.cloneNode(true));
 }
 
+async function renderTranscriptFromTextFile(url) {
+  if (!transcriptBody) return;
+  if (!url) {
+    transcriptBody.innerHTML = `<p class="transcript-status">Transcript is not available yet.</p>`;
+    return;
+  }
+  transcriptBody.innerHTML = `<p class="transcript-status">Loading transcript...</p>`;
+  try {
+    const response = await fetch(url, { cache: "no-store" });
+    if (!response.ok) {
+      transcriptBody.innerHTML = `<p class="transcript-status">Transcript is not available yet.</p>`;
+      return;
+    }
+    const transcriptText = await response.text();
+    const block = document.createElement("pre");
+    block.className = "transcript-plain";
+    block.textContent = transcriptText.trim();
+    transcriptBody.innerHTML = "";
+    transcriptBody.appendChild(block);
+  } catch (error) {
+    transcriptBody.innerHTML = `<p class="transcript-status">Transcript is not available yet.</p>`;
+  }
+}
+
 function getTranscriptFocusableElements() {
   if (!transcriptModal) return [];
   return Array.from(
@@ -4205,7 +4238,12 @@ function openTranscriptModal({ transcriptId, title, dateValue, trigger }) {
   const templateEl = getTranscriptTemplate(transcriptId);
   transcriptTrigger = trigger;
   setTranscriptHero({ transcriptId, title, dateValue: dateValue || templateEl?.dataset?.date, trigger });
-  renderTranscriptFromTemplate(templateEl);
+  if (templateEl) {
+    renderTranscriptFromTemplate(templateEl);
+  } else {
+    const transcriptUrl = getTranscriptUrlFromSlug(transcriptId);
+    renderTranscriptFromTextFile(transcriptUrl);
+  }
   transcriptModal.hidden = false;
   document.body.classList.add("modal-open");
   transcriptBody.scrollTop = 0;
@@ -5376,25 +5414,42 @@ function applyScoreCardHighlight(scoreRow) {
 }
 
 const transcriptExistsCache = new Map();
+const transcriptExistsRequests = new Map();
 
-function getTranscriptUrl(film) {
+function normalizeTranscriptSlug(rawId) {
+  if (!rawId) return null;
+  if (rawId.startsWith("rob-")) return rawId.slice(4);
+  if (rawId.startsWith("real-")) return rawId.slice(5);
+  return rawId;
+}
+
+function getTranscriptSlug(film) {
   if (!film) return null;
-  const directPath = film.transcriptTxt || film.transcript_txt;
-  if (directPath) return directPath;
-  const transcriptId = film.transcriptId || film.transcript_id;
-  if (!transcriptId) return null;
-  return `/assets/data/transcripts/${transcriptId}.txt`;
+  const baseId = film.transcriptId || film.transcript_id || film.id;
+  return normalizeTranscriptSlug(baseId);
+}
+
+function getTranscriptUrlFromSlug(slug) {
+  if (!slug) return null;
+  return `/assets/data/transcripts/${slug}.txt`;
 }
 
 async function checkTranscriptExists(url) {
   if (!url) return false;
+  let shouldFallback = false;
   try {
     const response = await fetch(url, { method: "HEAD", cache: "no-store" });
     if (response.ok) return true;
-    if (response.status !== 405 && response.status !== 501) return false;
+    if (response.status === 403 || response.status === 405) {
+      shouldFallback = true;
+    } else {
+      shouldFallback = true;
+    }
   } catch (error) {
-    // Intentionally ignore errors and fall back to range request.
+    shouldFallback = true;
   }
+
+  if (!shouldFallback) return false;
 
   try {
     const response = await fetch(url, {
@@ -5407,25 +5462,63 @@ async function checkTranscriptExists(url) {
   }
 }
 
-async function getTranscriptAvailability(films = []) {
-  const entries = await Promise.all(
-    films.map(async (film) => {
-      if (!film?.id) return [null, false];
-      if (transcriptExistsCache.has(film.id)) {
-        return [film.id, transcriptExistsCache.get(film.id)];
-      }
-      const transcriptUrl = getTranscriptUrl(film);
-      if (!transcriptUrl || !(film.transcriptId || film.transcript_id)) {
-        transcriptExistsCache.set(film.id, false);
-        return [film.id, false];
-      }
-      const exists = await checkTranscriptExists(transcriptUrl);
-      transcriptExistsCache.set(film.id, exists);
-      return [film.id, exists];
-    })
-  );
+function buildTranscriptButton({ slug, title, dateValue }) {
+  const button = document.createElement("button");
+  button.className = "transcript-link";
+  button.type = "button";
+  button.textContent = "View transcript";
+  button.dataset.transcriptId = slug || "";
+  button.dataset.transcriptTitle = title || "";
+  button.dataset.transcriptDate = dateValue || "";
+  return button;
+}
 
-  return new Map(entries.filter(([filmId]) => filmId));
+function updateTranscriptSlots(slug, { exists }) {
+  if (!slug) return;
+  const slots = document.querySelectorAll(`[data-transcript-slot][data-transcript-slug="${slug}"]`);
+  slots.forEach((slot) => {
+    if (!slot) return;
+    if (!exists) {
+      slot.innerHTML = "";
+      return;
+    }
+    if (slot.querySelector(".transcript-link")) return;
+    const filmId = slot.closest(".film-card")?.dataset?.filmId;
+    const film = filmId ? allFilms.find((entry) => entry.id === filmId) : null;
+    if (!film) return;
+    const button = buildTranscriptButton({
+      slug,
+      title: film.title,
+      dateValue: film.podcastDate || film.podcasted_at || ""
+    });
+    slot.appendChild(button);
+  });
+}
+
+function ensureTranscriptAvailability(film, card) {
+  const slug = getTranscriptSlug(film);
+  if (!slug) return;
+  const slot = card?.querySelector("[data-transcript-slot]");
+  if (slot) {
+    slot.dataset.transcriptSlug = slug;
+  }
+  if (transcriptExistsCache.has(slug)) {
+    updateTranscriptSlots(slug, { exists: transcriptExistsCache.get(slug) });
+    return;
+  }
+  if (transcriptExistsRequests.has(slug)) return;
+  const transcriptUrl = getTranscriptUrlFromSlug(slug);
+  if (!transcriptUrl) {
+    transcriptExistsCache.set(slug, false);
+    return;
+  }
+  const request = checkTranscriptExists(transcriptUrl).then((exists) => {
+    transcriptExistsCache.set(slug, exists);
+    transcriptExistsRequests.delete(slug);
+    updateTranscriptSlots(slug, { exists });
+    return exists;
+  });
+  transcriptExistsRequests.set(slug, request);
 }
 
 async function refreshAudienceScoreForFilm(filmId) {
@@ -5482,8 +5575,6 @@ async function render(options = {}) {
   const isPodcastSort = currentSort === "podcast-desc" || currentSort === "podcast-asc";
   const isDescendingRank = currentSort === "rating-desc" || currentSort === "listener-desc";
   const isAscendingRank = currentSort === "rating-asc" || currentSort === "listener-asc";
-  const transcriptAvailability = await getTranscriptAvailability(visibleFilms);
-
   visibleFilms.forEach((film, index) => {
     const globalIndex = index + renderOffset;
     let rankText = "—";
@@ -5511,9 +5602,6 @@ async function render(options = {}) {
     const kevScoreDisplay = formatPercentLabel(film.score);
     const audienceScoreDisplay = formatPercentLabel(audienceRaw);
     const storedRating = localRatings[film.id] ?? null;
-    const transcriptButton = transcriptAvailability.get(film.id)
-      ? `<button class="transcript-link" type="button" data-transcript-id="${film.transcriptId}" data-transcript-title="${escapeHtml(film.title)}" data-transcript-date="${film.podcastDate ?? ""}">View transcript</button>`
-      : "";
     const card = document.createElement("div");
     card.className = `film-card ${film.rob ? "rob-film" : ""}`;
     card.dataset.filmId = film.id;
@@ -5628,7 +5716,7 @@ async function render(options = {}) {
           <div class="cta">
             <div class="cta-actions">
               <a class="button" href="${film.link}" target="_blank" aria-label="Play episode">▶️ Play now</a>
-              ${transcriptButton}
+              <span class="transcript-slot" data-transcript-slot></span>
             </div>
             <div class="rating-panel ${storedRating ? "is-voted" : ""}" data-rating-panel data-film-id="${film.id}">
               <div class="rating-shell">
@@ -5671,7 +5759,7 @@ async function render(options = {}) {
 
           <div class="cta">
             <a class="btn rt" href="${film.link}" target="_blank">Rotten Tomatoes</a>
-            ${transcriptButton}
+            <span class="transcript-slot" data-transcript-slot></span>
           </div>
         </div>
       `}
@@ -5679,6 +5767,7 @@ async function render(options = {}) {
     `;
 
     container.appendChild(card);
+    ensureTranscriptAvailability(film, card);
     applyScoreCardHighlight(card.querySelector("[data-score-row]"));
   });
 
