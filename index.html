@@ -1134,6 +1134,62 @@ body.modal-open {
   user-select: none;
 }
 
+/* Full tick marks (1–10) under the slider (avoid relying on datalist for cross-browser consistency). */
+.rating-ticks {
+  margin-top: 6px;
+  height: 8px;
+  width: 100%;
+  border-radius: 999px;
+  pointer-events: none;
+  user-select: none;
+  background-image:
+    linear-gradient(rgba(255, 255, 255, 0.35), rgba(255, 255, 255, 0.35));
+  background-repeat: repeat-x;
+  background-size: calc(100% / 9) 8px;
+  background-position: left bottom;
+  -webkit-mask-image:
+    repeating-linear-gradient(
+      to right,
+      #000 0 2px,
+      transparent 2px calc(100% / 9)
+    );
+  mask-image:
+    repeating-linear-gradient(
+      to right,
+      #000 0 2px,
+      transparent 2px calc(100% / 9)
+    );
+  opacity: 0.55;
+}
+
+/* Full 1–10 labels aligned with ticks */
+.rating-scale--full {
+  display: grid;
+  grid-template-columns: repeat(10, 1fr);
+  margin-top: 4px;
+  font-size: 11px;
+  opacity: 0.55;
+  pointer-events: none;
+  user-select: none;
+}
+
+.rating-scale--full span {
+  text-align: center;
+}
+
+.rating-scale--full span:first-child {
+  text-align: left;
+}
+
+.rating-scale--full span:last-child {
+  text-align: right;
+}
+
+.rating-panel.is-voted .rating-ticks,
+.rating-panel.is-voted .rating-scale--full {
+  opacity: 0.55;
+}
+
 .rating-tick {
   position: absolute;
   top: 10px;
@@ -3916,10 +3972,10 @@ async function render(options = {}) {
                   </div>
                 </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
-                <div class="rating-scale" aria-hidden="true">
-                  <span>1</span>
-                  <span>5</span>
-                  <span>10</span>
+                <div class="rating-ticks" aria-hidden="true"></div>
+                <div class="rating-scale rating-scale--full" aria-hidden="true">
+                  <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span>
+                  <span>6</span><span>7</span><span>8</span><span>9</span><span>10</span>
                 </div>
                 <span class="rating-tick" aria-hidden="true">✓</span>
               </div>
