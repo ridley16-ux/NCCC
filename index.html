@@ -987,6 +987,7 @@ body.modal-open {
   flex-direction: column;
   align-items: flex-end;
   gap: 6px;
+  position: relative;
 }
 
 .rating-shell {
@@ -1003,9 +1004,22 @@ body.modal-open {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 
+.rating-panel.is-voted .rating-shell {
+  border-color: rgba(90, 200, 130, 0.65);
+  background: rgba(20, 45, 30, 0.82);
+  box-shadow: inset 0 0 0 1px rgba(90, 200, 130, 0.2);
+}
+
 .rating-shell:focus-within {
   border-color: rgba(245, 197, 107, 0.55);
   box-shadow: 0 0 0 2px rgba(245, 197, 107, 0.2), inset 0 0 0 1px rgba(255, 255, 255, 0.04);
+}
+
+.rating-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
 }
 
 .rating-meta {
@@ -1024,6 +1038,37 @@ body.modal-open {
   color: #f5c56b;
   font-weight: 800;
   font-size: 13px;
+}
+
+.rating-undo {
+  width: 30px;
+  height: 30px;
+  border-radius: 10px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.08);
+  color: #f5c56b;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  cursor: pointer;
+  padding: 0;
+  flex-shrink: 0;
+}
+
+.rating-undo:disabled {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.rating-undo:not(:disabled):hover {
+  border-color: rgba(245, 197, 107, 0.55);
+  background: rgba(245, 197, 107, 0.12);
+}
+
+.rating-undo:focus-visible {
+  outline: 2px solid rgba(245, 197, 107, 0.6);
+  outline-offset: 2px;
 }
 
 .rating-slider {
@@ -1091,23 +1136,29 @@ body.modal-open {
   }
 }
 
-.rating-clear {
-  align-self: flex-end;
-  appearance: none;
-  border: none;
-  background: none;
-  color: #f5c56b;
+.rating-tick {
+  position: absolute;
+  left: 10px;
+  bottom: 10px;
+  width: 20px;
+  height: 20px;
+  border-radius: 999px;
+  background: rgba(88, 190, 126, 0.9);
+  color: #ffffff;
   font-size: 12px;
-  font-weight: 600;
-  text-decoration: underline;
-  cursor: pointer;
-  padding: 0;
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  opacity: 0;
+  transform: scale(0.9);
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  pointer-events: none;
 }
 
-.rating-clear:focus-visible {
-  outline: 2px solid rgba(245, 197, 107, 0.5);
-  outline-offset: 2px;
-  border-radius: 6px;
+.rating-panel.is-voted .rating-tick {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .rating-status {
@@ -1627,6 +1678,16 @@ body.modal-open {
 }
 
 @media (min-width: 768px) {
+  .cta-actions .button {
+    padding-block: 0.65rem;
+    padding-inline: 1.6rem;
+    font-size: 16px;
+  }
+
+  .rating-shell {
+    min-width: 280px;
+  }
+
   .controls {
     max-width: 900px;
     margin: 0 auto;
@@ -1790,6 +1851,18 @@ body.modal-open {
   .rosette {
     font-size: 12px;
     padding: 6px 12px;
+  }
+}
+
+@media (min-width: 1024px) {
+  .cta-actions .button {
+    padding-block: 0.75rem;
+    padding-inline: 1.85rem;
+    font-size: 17px;
+  }
+
+  .rating-shell {
+    min-width: 320px;
   }
 }
 
@@ -3836,15 +3909,18 @@ async function render(options = {}) {
               <a class="button" href="${film.link}" target="_blank" aria-label="Play episode">▶️ Play now</a>
               ${transcriptButton}
             </div>
-            <div class="rating-panel ${storedRating ? "rated" : ""}" data-rating-panel data-film-id="${film.id}">
+            <div class="rating-panel ${storedRating ? "is-voted" : ""}" data-rating-panel data-film-id="${film.id}">
               <div class="rating-shell">
-                <div class="rating-meta">
-                  <span class="rating-label">Your rating</span>
-                  <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "-/10"}</span>
+                <div class="rating-header">
+                  <div class="rating-meta">
+                    <span class="rating-label">Your rating</span>
+                    <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "-/10"}</span>
+                  </div>
+                  <button class="rating-undo" type="button" aria-label="Undo vote" title="Undo vote" ${storedRating ? "" : "disabled"}>↶</button>
                 </div>
                 <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
-                <button class="rating-clear" type="button" ${storedRating ? "" : "disabled"}>Reset</button>
               </div>
+              <span class="rating-tick" aria-hidden="true">✓</span>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
           </div>
@@ -4118,9 +4194,9 @@ document.addEventListener("DOMContentLoaded", () => {
   });
 
 container.addEventListener("click", (event) => {
-  const clearButton = event.target.closest(".rating-clear");
-  if (!clearButton) return;
-  const panel = clearButton.closest(".rating-panel");
+  const undoButton = event.target.closest(".rating-undo");
+  if (!undoButton) return;
+  const panel = undoButton.closest(".rating-panel");
   if (!panel) return;
   setRatingError(panel, "");
   const filmId = panel.dataset.filmId;
@@ -4298,15 +4374,15 @@ window.addEventListener("resize", () => {
 
 function updateRatingUI(filmId, listenerRating, yourRating) {
   document.querySelectorAll(`.rating-panel[data-film-id="${filmId}"]`).forEach(panel => {
-    const clearButton = panel.querySelector(".rating-clear");
+    const undoButton = panel.querySelector(".rating-undo");
     const slider = panel.querySelector(".rating-slider");
     const hasRating = Boolean(yourRating);
 
-    panel.classList.toggle("rated", hasRating);
+    panel.classList.toggle("is-voted", hasRating);
     setRatingError(panel, "");
 
-    if (clearButton) {
-      clearButton.disabled = !hasRating;
+    if (undoButton) {
+      undoButton.disabled = !hasRating;
     }
     if (slider) {
       slider.value = hasRating ? String(yourRating) : "5";
