@@ -838,28 +838,146 @@ label {
   z-index: 1;
 }
 
-.transcript-hero {
+.transcript-modal-top {
   display: flex;
-  align-items: flex-start;
+  align-items: center;
   justify-content: space-between;
   gap: 16px;
   padding-bottom: 16px;
-  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
 }
 
-.transcript-hero-left h2 {
-  margin: 0 0 8px;
-  font-size: 24px;
-}
-
-.transcript-meta {
+.transcript-modal-titlewrap {
   display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-  font-size: 12px;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  width: 100%;
+}
+
+.transcript-modal-titlewrap h2 {
+  margin: 0;
+  font-size: 22px;
+}
+
+.transcript-hero {
+  padding: 18px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(36, 36, 36, 0.9), rgba(20, 20, 20, 0.9));
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.02);
+}
+
+.transcript-hero-grid {
+  display: grid;
+  grid-template-columns: 170px minmax(0, 1fr);
+  gap: 20px;
+  align-items: center;
+}
+
+.transcript-hero-poster {
+  position: relative;
+  width: 100%;
+  border-radius: 16px;
+  overflow: hidden;
+  aspect-ratio: 2 / 3;
+  background: rgba(255, 255, 255, 0.06);
+  box-shadow: 0 16px 28px rgba(0, 0, 0, 0.5);
+}
+
+.transcript-poster-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.transcript-poster-fallback {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: linear-gradient(145deg, rgba(212, 106, 42, 0.25), rgba(16, 16, 16, 0.9));
+  color: rgba(255, 255, 255, 0.86);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: 0.12em;
   text-transform: uppercase;
-  letter-spacing: 0.1em;
+}
+
+.transcript-hero-content {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  min-width: 0;
+}
+
+.transcript-kicker {
+  font-size: 11px;
+  letter-spacing: 0.22em;
+  text-transform: uppercase;
   color: rgba(255, 255, 255, 0.6);
+  font-weight: 700;
+}
+
+.transcript-hero-title {
+  margin: 0;
+  font-size: 28px;
+  line-height: 1.1;
+}
+
+.transcript-hero-desc {
+  margin: 0;
+  font-size: 15px;
+  line-height: 1.6;
+  color: rgba(255, 255, 255, 0.82);
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.transcript-hero-meta {
+  font-size: 12px;
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.55);
+}
+
+.transcript-hero-ctas {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  margin-top: 6px;
+}
+
+.transcript-hero-ctas .btn {
+  min-width: 190px;
+}
+
+.btn.btn-primary {
+  background: var(--brand-orange);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 24px rgba(212, 106, 42, 0.25);
+}
+
+.btn.btn-secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.transcript-play.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.transcript-divider {
+  height: 1px;
+  background: rgba(255, 255, 255, 0.08);
+  margin: 20px 0 8px;
 }
 
 .transcript-close {
@@ -880,11 +998,13 @@ label {
 }
 
 .transcript-body {
-  margin-top: 18px;
+  margin-top: 10px;
   overflow-y: auto;
   padding-right: 8px;
   display: grid;
   gap: 12px;
+  flex: 1;
+  min-height: 0;
 }
 
 .transcript-status {
@@ -962,6 +1082,28 @@ body.modal-open {
 @media (max-width: 720px) {
   .transcript-panel {
     padding: 20px;
+  }
+
+  .transcript-modal-top {
+    padding-bottom: 12px;
+  }
+
+  .transcript-hero-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .transcript-hero-poster {
+    width: min(60%, 220px);
+    justify-self: center;
+  }
+
+  .transcript-hero-ctas {
+    justify-content: stretch;
+    flex-direction: column;
+  }
+
+  .transcript-hero-ctas .btn {
+    width: 100%;
   }
 
   .t-turn {
@@ -3527,13 +3669,38 @@ body.modal-open {
 <div class="transcript-modal" id="transcript-modal" role="dialog" aria-modal="true" aria-labelledby="transcript-title" hidden>
   <div class="transcript-backdrop" data-transcript-close></div>
   <div class="transcript-panel" role="document">
-    <header class="transcript-hero">
-      <div class="transcript-hero-left">
+    <header class="transcript-modal-top">
+      <div class="transcript-modal-titlewrap">
         <h2 id="transcript-title">Transcript</h2>
-        <div class="transcript-meta" id="transcript-meta"></div>
+        <button class="transcript-close" type="button" aria-label="Close transcript" data-transcript-close>×</button>
       </div>
-      <button class="transcript-close" type="button" aria-label="Close transcript" data-transcript-close>×</button>
     </header>
+
+    <section class="transcript-hero" aria-label="Episode transcript header">
+      <div class="transcript-hero-grid">
+        <div class="transcript-hero-poster">
+          <img class="transcript-poster-img" src="" alt="" loading="lazy">
+          <div class="transcript-poster-fallback" aria-hidden="true" hidden>
+            <span class="transcript-poster-initials"></span>
+          </div>
+        </div>
+
+        <div class="transcript-hero-content">
+          <div class="transcript-kicker">EPISODE TRANSCRIPT</div>
+          <h3 class="transcript-hero-title">Transcript</h3>
+          <p class="transcript-hero-desc" hidden></p>
+          <div class="transcript-hero-meta" hidden>
+            <span class="transcript-hero-date"></span>
+          </div>
+          <div class="transcript-hero-ctas">
+            <a class="btn btn-primary transcript-play" href="#" target="_self" rel="nofollow">▶ Play Episode</a>
+            <a class="btn btn-secondary transcript-browse" href="#">Browse all episodes</a>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <div class="transcript-divider"></div>
     <section class="transcript-body" id="transcript-body" aria-label="Episode transcript"></section>
   </div>
 </div>
@@ -3784,7 +3951,15 @@ const awardsSection = document.getElementById("film-awards");
 const transcriptModal = document.getElementById("transcript-modal");
 const transcriptBody = document.getElementById("transcript-body");
 const transcriptTitle = document.getElementById("transcript-title");
-const transcriptMeta = document.getElementById("transcript-meta");
+const transcriptHeroTitle = document.querySelector(".transcript-hero-title");
+const transcriptHeroDesc = document.querySelector(".transcript-hero-desc");
+const transcriptHeroMeta = document.querySelector(".transcript-hero-meta");
+const transcriptHeroDate = document.querySelector(".transcript-hero-date");
+const transcriptPosterImg = document.querySelector(".transcript-poster-img");
+const transcriptPosterFallback = document.querySelector(".transcript-poster-fallback");
+const transcriptPosterInitials = document.querySelector(".transcript-poster-initials");
+const transcriptPlayLink = document.querySelector(".transcript-play");
+const transcriptBrowseLink = document.querySelector(".transcript-browse");
 let transcriptTrigger = null;
 
 function parseLocalDate(d) {
@@ -3893,13 +4068,106 @@ function getTranscriptTemplate(transcriptId) {
   return transcriptId ? document.getElementById(`transcript-${transcriptId}`) : null;
 }
 
-function setTranscriptMeta(dateValue) {
-  if (!transcriptMeta) return;
-  const metaItems = [];
-  if (dateValue) {
-    metaItems.push(`Published ${formatUkDate(dateValue)}`);
+function formatTranscriptHeroDate(dateValue) {
+  const parsed = parseTimestamp(dateValue);
+  if (!parsed) return dateValue || "";
+  return parsed
+    .toLocaleDateString("en-GB", { day: "2-digit", month: "short", year: "numeric" })
+    .toUpperCase();
+}
+
+function getBrowseEpisodesHref() {
+  const listenLink = document.querySelector('a[data-nav="listen"]')
+    || document.querySelector('a[href*="listen"]');
+  return listenLink?.getAttribute("href") || "/pages/listen.html";
+}
+
+function getTranscriptContext(trigger) {
+  if (!trigger) return {};
+  const card = trigger.closest(".film-card");
+  if (!card) return {};
+  const cardTitle = card.querySelector(".detail-title")?.textContent?.replace(/\s+/g, " ").trim();
+  const cardPoster = card.querySelector(".poster")?.getAttribute("src");
+  const cardSummary = card.querySelector(".synopsis")?.textContent?.trim();
+  const cardPlay = card.querySelector(".cta-actions a.button")?.getAttribute("href");
+  return { card, cardTitle, cardPoster, cardSummary, cardPlay };
+}
+
+function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
+  if (!transcriptHeroTitle) return;
+  const { card, cardTitle, cardPoster, cardSummary, cardPlay } = getTranscriptContext(trigger);
+  const filmId = card?.dataset?.filmId;
+  const filmFromId = filmId ? allFilms.find((film) => film.id === filmId) : null;
+  const filmFromTranscript = transcriptId
+    ? allFilms.find((film) => film.transcriptId === transcriptId || film.transcript_id === transcriptId)
+    : null;
+  const film = filmFromTranscript || filmFromId || null;
+
+  const resolvedTitle = film?.title || title || cardTitle || "Transcript";
+  const resolvedPoster = film?.poster || cardPoster || "";
+  const resolvedSummary = film?.summary || cardSummary || "";
+  const resolvedDate = dateValue || film?.podcastDate || film?.podcasted_at || film?.podcastedAt || film?.published_at || film?.publishedAt || "";
+  const resolvedPlay = film?.link || cardPlay || "";
+
+  transcriptHeroTitle.textContent = resolvedTitle === "Transcript"
+    ? "Transcript"
+    : `${resolvedTitle} — Transcript`;
+
+  if (transcriptHeroDesc) {
+    if (resolvedSummary) {
+      transcriptHeroDesc.textContent = resolvedSummary;
+      transcriptHeroDesc.hidden = false;
+    } else {
+      transcriptHeroDesc.textContent = "";
+      transcriptHeroDesc.hidden = true;
+    }
   }
-  transcriptMeta.innerHTML = metaItems.map((item) => `<span>${escapeHtml(item)}</span>`).join("");
+
+  if (transcriptHeroMeta && transcriptHeroDate) {
+    if (resolvedDate) {
+      transcriptHeroDate.textContent = `PUBLISHED ${formatTranscriptHeroDate(resolvedDate)}`;
+      transcriptHeroMeta.hidden = false;
+    } else {
+      transcriptHeroDate.textContent = "";
+      transcriptHeroMeta.hidden = true;
+    }
+  }
+
+  if (transcriptPosterImg && transcriptPosterFallback && transcriptPosterInitials) {
+    const initials = resolvedTitle
+      .replace(/[^a-zA-Z0-9 ]/g, " ")
+      .trim()
+      .split(/\s+/)
+      .slice(0, 2)
+      .map((word) => word[0])
+      .join("")
+      .toUpperCase();
+
+    if (resolvedPoster) {
+      transcriptPosterImg.src = resolvedPoster;
+      transcriptPosterImg.alt = `Poster for ${resolvedTitle}`;
+      transcriptPosterImg.hidden = false;
+      transcriptPosterFallback.hidden = true;
+    } else {
+      transcriptPosterImg.src = "";
+      transcriptPosterImg.alt = "";
+      transcriptPosterImg.hidden = true;
+      transcriptPosterFallback.hidden = false;
+      transcriptPosterInitials.textContent = initials || "NCC";
+    }
+  }
+
+  if (transcriptPlayLink) {
+    const hasPlay = resolvedPlay && resolvedPlay !== "#";
+    transcriptPlayLink.setAttribute("href", hasPlay ? resolvedPlay : "#");
+    transcriptPlayLink.classList.toggle("is-disabled", !hasPlay);
+    transcriptPlayLink.setAttribute("aria-disabled", String(!hasPlay));
+    transcriptPlayLink.tabIndex = hasPlay ? 0 : -1;
+  }
+
+  if (transcriptBrowseLink) {
+    transcriptBrowseLink.setAttribute("href", getBrowseEpisodesHref());
+  }
 }
 
 function renderTranscriptFromTemplate(templateEl) {
@@ -3918,7 +4186,7 @@ function getTranscriptFocusableElements() {
     transcriptModal.querySelectorAll(
       "button, [href], input, select, textarea, [tabindex]:not([tabindex=\"-1\"])"
     )
-  ).filter((el) => !el.hasAttribute("disabled"));
+  ).filter((el) => !el.hasAttribute("disabled") && el.getAttribute("aria-disabled") !== "true");
 }
 
 function openTranscriptModal({ transcriptId, title, dateValue, trigger }) {
@@ -3926,7 +4194,7 @@ function openTranscriptModal({ transcriptId, title, dateValue, trigger }) {
   const templateEl = getTranscriptTemplate(transcriptId);
   transcriptTrigger = trigger;
   transcriptTitle.textContent = title ? `Transcript: ${title}` : "Transcript";
-  setTranscriptMeta(dateValue || templateEl?.dataset?.date);
+  setTranscriptHero({ transcriptId, title, dateValue: dateValue || templateEl?.dataset?.date, trigger });
   renderTranscriptFromTemplate(templateEl);
   transcriptModal.hidden = false;
   document.body.classList.add("modal-open");
