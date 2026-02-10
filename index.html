@@ -1084,6 +1084,11 @@ label {
   color: #d1632e;
 }
 
+.speaker-unknown {
+  border-color: rgba(148, 163, 184, 0.6);
+  color: #94a3b8;
+}
+
 .t-text {
   margin: 10px 0 0;
   color: rgba(255, 255, 255, 0.92);
@@ -4189,6 +4194,147 @@ function renderTranscriptFromTemplate(templateEl) {
   transcriptBody.appendChild(templateEl.content.cloneNode(true));
 }
 
+const transcriptSpeakerConfig = {
+  kev: {
+    key: "KEV",
+    label: "Kev",
+    className: "speaker-kev",
+    iconSrc: "/assets/img/icons/kev-icon.png",
+  },
+  rob: {
+    key: "ROB",
+    label: "Rob",
+    className: "speaker-rob",
+    iconSrc: "/assets/img/icons/rob-icon.png",
+  },
+  unknown: {
+    key: "UNKNOWN",
+    label: "Unknown",
+    className: "speaker-unknown",
+  },
+};
+
+function normalizeTranscriptSpeaker(rawSpeaker) {
+  const cleaned = (rawSpeaker || "").trim().toLowerCase();
+  if (transcriptSpeakerConfig[cleaned]) {
+    return transcriptSpeakerConfig[cleaned];
+  }
+  if (!cleaned) {
+    return transcriptSpeakerConfig.unknown;
+  }
+  return {
+    key: cleaned.toUpperCase(),
+    label: cleaned.charAt(0).toUpperCase() + cleaned.slice(1),
+    className: "speaker-unknown",
+  };
+}
+
+function parseTranscriptTextToTurns(text) {
+  const headerRegex = /^([A-Za-z]+)\s*:\s*(\d{1,2}:\d{2})\s*$/;
+  const lines = (text || "").split(/\r?\n/);
+  const turns = [];
+  let current = null;
+
+  const finalizeTurn = () => {
+    if (!current) return;
+    const message = current.textLines.join(" ").trim();
+    if (!message) return;
+    turns.push({
+      speaker: current.speaker,
+      timestamp: current.timestamp,
+      text: message,
+    });
+  };
+
+  lines.forEach((line) => {
+    const trimmed = line.trim();
+    const match = headerRegex.exec(trimmed);
+    if (match) {
+      finalizeTurn();
+      current = {
+        speaker: match[1],
+        timestamp: match[2],
+        textLines: [],
+      };
+      return;
+    }
+    if (!trimmed) return;
+    if (!current) return;
+    current.textLines.push(trimmed);
+  });
+
+  finalizeTurn();
+
+  if (!turns.length) {
+    const fallbackText = (text || "").replace(/\s+/g, " ").trim();
+    if (fallbackText) {
+      turns.push({
+        speaker: "Unknown",
+        timestamp: "00:00",
+        text: fallbackText,
+      });
+    }
+  }
+
+  return turns;
+}
+
+function createTranscriptTurnElement({ timestamp, speaker, text }) {
+  const normalizedSpeaker = normalizeTranscriptSpeaker(speaker);
+  const turn = document.createElement("article");
+  turn.className = "t-turn";
+
+  const timeEl = document.createElement("div");
+  timeEl.className = "t-time";
+  timeEl.textContent = timestamp;
+
+  const contentEl = document.createElement("div");
+  contentEl.className = "t-content";
+
+  const speakerEl = document.createElement("div");
+  speakerEl.className = `t-speaker ${normalizedSpeaker.className}`;
+
+  if (normalizedSpeaker.iconSrc) {
+    const icon = document.createElement("img");
+    icon.className = "t-icon";
+    icon.src = normalizedSpeaker.iconSrc;
+    icon.alt = "";
+    icon.setAttribute("aria-hidden", "true");
+    speakerEl.appendChild(icon);
+  }
+
+  const name = document.createElement("span");
+  name.className = "t-name";
+  name.textContent = normalizedSpeaker.label;
+  speakerEl.appendChild(name);
+
+  const textEl = document.createElement("p");
+  textEl.className = "t-text";
+  textEl.textContent = text;
+
+  contentEl.appendChild(speakerEl);
+  contentEl.appendChild(textEl);
+
+  turn.appendChild(timeEl);
+  turn.appendChild(contentEl);
+
+  return turn;
+}
+
+function renderTranscriptTurns(turns) {
+  if (!transcriptBody) return;
+  transcriptBody.innerHTML = "";
+  if (!turns.length) {
+    transcriptBody.innerHTML = `<p class="transcript-status">Transcript is not available yet.</p>`;
+    return;
+  }
+  const fragment = document.createDocumentFragment();
+  turns.forEach((turn) => {
+    fragment.appendChild(createTranscriptTurnElement(turn));
+  });
+  transcriptBody.appendChild(fragment);
+}
+
 async function renderTranscriptFromTextFile(url) {
   if (!transcriptBody) return;
   if (!url) {
@@ -4203,11 +4349,8 @@ async function renderTranscriptFromTextFile(url) {
       return;
     }
     const transcriptText = await response.text();
-    const block = document.createElement("pre");
-    block.className = "transcript-plain";
-    block.textContent = transcriptText.trim();
-    transcriptBody.innerHTML = "";
-    transcriptBody.appendChild(block);
+    const transcriptTurns = parseTranscriptTextToTurns(transcriptText);
+    renderTranscriptTurns(transcriptTurns);
   } catch (error) {
     transcriptBody.innerHTML = `<p class="transcript-status">Transcript is not available yet.</p>`;
   }
