@@ -1450,6 +1450,28 @@ body.modal-open {
   font-size: 14px;
 }
 
+.homepage-intro {
+  margin: 0 auto 36px;
+  max-width: 900px;
+  padding: 0 16px;
+}
+
+.homepage-intro .status {
+  margin: 0;
+}
+
+.homepage-intro::after {
+  content: "";
+  display: block;
+  height: 1px;
+  margin-top: 24px;
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.controls.mobile-controls {
+  margin-top: 10px;
+}
+
 .loading {
   color: #f5c56b;
   font-weight: 600;
@@ -2186,13 +2208,21 @@ body.modal-open {
     padding: 10px;
   }
 }
+
+@media (max-width: 767px) {
+  .homepage-intro {
+    margin-bottom: 22px;
+  }
+}
 </style>
 </head>
 
 <body>
 
 <div id="site-header"></div>
-<p class="status">No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results.</p>
+<div class="homepage-intro">
+  <p class="status">No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results.</p>
+</div>
 
 <template id="header-extras-template">
   <div class="controls mobile-controls">
