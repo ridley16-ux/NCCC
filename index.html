@@ -17,34 +17,54 @@
 <link rel="manifest" href="/assets/data/site.webmanifest">
 
 <meta charset="UTF-8" />
-<title>No Context Cinema Club – Films</title>
-<meta name="description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
+<title>No Context Cinema Club | Film Podcast</title>
+<meta name="description" content="No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results." />
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="website-version" content="1.16.1" />
-<meta property="og:title" content="No Context Cinema Club – Films" />
-<meta property="og:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites." />
+<meta property="og:site_name" content="No Context Cinema Club" />
+<meta property="og:title" content="No Context Cinema Club | Film Podcast" />
+<meta property="og:description" content="No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results." />
 <meta property="og:url" content="https://nocontextcinemaclub.com/" />
 <meta property="og:type" content="website" />
-<meta property="og:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<meta property="og:image" content="https://nocontextcinemaclub.com/assets/img/ui/main-logo.webp" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="No Context Cinema Club – Films" />
-<meta name="twitter:description" content="Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted s." />
-<meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/branding/podcast-cover.webp" />
+<meta name="twitter:title" content="No Context Cinema Club | Film Podcast" />
+<meta name="twitter:description" content="No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results." />
+<meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/img/ui/main-logo.webp" />
 <link rel="stylesheet" href="/assets/css/site.css" />
-<script type="module">
-  import { buildPodcastSeriesSchema, injectJsonLd } from "/assets/js/seo.js";
-
-  injectJsonLd(
-    "podcast-series-schema",
-    buildPodcastSeriesSchema({
-      pageTitle: "No Context Cinema Club – Films",
-      pageDescription: "Explore No Context Cinema Club episodes: Rob’s alternate plots, real film matchups, and listener-voted favourites.",
-      pageUrl: "https://nocontextcinemaclub.com/"
-    })
-  );
-</script>
+<!-- TODO: Add official social profile URLs to Organization.sameAs once confirmed. -->
+<script type="application/ld+json" id="nccc-home-schema">{
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://nocontextcinemaclub.com/#org",
+      "name": "No Context Cinema Club",
+      "url": "https://nocontextcinemaclub.com/",
+      "logo": "https://nocontextcinemaclub.com/assets/img/ui/main-logo.webp",
+      "sameAs": []
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://nocontextcinemaclub.com/#website",
+      "name": "No Context Cinema Club",
+      "url": "https://nocontextcinemaclub.com/"
+    },
+    {
+      "@type": "PodcastSeries",
+      "@id": "https://nocontextcinemaclub.com/#podcast",
+      "name": "No Context Cinema Club",
+      "url": "https://nocontextcinemaclub.com/",
+      "inLanguage": "en-GB",
+      "description": "No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results.",
+      "publisher": {
+        "@id": "https://nocontextcinemaclub.com/#org"
+      }
+    }
+  ]
+}</script>
 
 <style>
 :root {
@@ -2172,6 +2192,7 @@ body.modal-open {
 <body>
 
 <div id="site-header"></div>
+<p class="status">No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results.</p>
 
 <template id="header-extras-template">
   <div class="controls mobile-controls">
