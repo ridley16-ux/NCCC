@@ -102,30 +102,30 @@ label {
   margin-bottom: var(--space-4);
 }
 
-.hero-card {
-  display: flex;
-  gap: var(--space-4);
-  padding: var(--space-4);
-  background: #1a1a1a;
-  border-radius: var(--radius-3);
-  border: 1px solid #333333;
-  box-shadow: var(--shadow-1);
-}
-
-.hero-media {
-  flex: 0 0 260px;
-  max-width: 260px;
-}
-
-.hero-image {
+/* About hero – cinematic, responsive */
+.about-hero {
   width: 100%;
-  height: auto;
-  aspect-ratio: 1 / 1;
-  object-fit: cover;
+  margin: 0 auto 24px;
+}
+
+/* Frame controls width + ratio */
+.about-hero__frame {
+  width: 100%;
+  margin: 0 auto;
+  overflow: hidden;
   border-radius: var(--radius-2);
-  display: block;
+  aspect-ratio: 16 / 9;
+  box-shadow: var(--shadow-1);
   background: #0f0f0f;
-  border: 1px solid #2a2a2a;
+}
+
+/* Image fills frame cleanly */
+.about-hero__img {
+  width: 100%;
+  height: 100%;
+  display: block;
+  object-fit: cover;
+  object-position: center;
 }
 
 .hero-content {
@@ -300,17 +300,34 @@ label {
   .content {
     padding: 22px;
   }
+}
 
-  .hero-card {
-    flex-direction: column;
-    padding: var(--space-3);
+/* Tablet: full-width within the content column, but not too tall */
+@media (min-width: 768px) {
+  .about-hero {
+    margin-bottom: 28px;
   }
 
-  .hero-media {
-    width: 100%;
-    max-width: none;
+  .about-hero__frame {
+    aspect-ratio: 21 / 9;
+    max-height: 420px;
   }
+}
 
+/* Desktop: near full width and premium */
+@media (min-width: 1024px) {
+  .about-hero__frame {
+    max-width: 1100px;
+    max-height: 480px;
+  }
+}
+
+/* Large desktop: allow a bit more width without going silly */
+@media (min-width: 1280px) {
+  .about-hero__frame {
+    max-width: 1200px;
+    max-height: 520px;
+  }
 }
 
 </style>
@@ -320,27 +337,29 @@ label {
 <div id="site-header"></div>
 
 <main class="content">
+  <section class="about-hero">
+    <div class="about-hero__frame">
+      <img
+        class="about-hero__img"
+        src="https://storage.buzzsprout.com/q8mrrpi20y1d4ni87d7r8ofmqz67"
+        alt="No Context Cinema Club hero artwork"
+        loading="eager"
+        decoding="async"
+      />
+    </div>
+  </section>
+
   <section class="hero">
-    <div class="hero-card">
-      <div class="hero-media">
-        <img
-          class="hero-image"
-          src="https://storage.buzzsprout.com/q8mrrpi20y1d4ni87d7r8ofmqz67"
-          alt="No Context Cinema Club hero artwork"
-          loading="lazy"
-        />
-      </div>
-      <div class="hero-content">
-        <h1 class="hero-title">About No Context Cinema Club</h1>
-        <div class="hero-copy">
-          <p>
-            No Context Cinema Club, a show where an almost unbelievably unqualified person (Rob) rewrites
-            film history by creating plots based only on titles and some (usually) unhelpful clues that
-            Kev provides him about the real films. Each week we'll explore Rob's complete ignorance of
-            film history, testing the limits of what is possible to have missed from pop culture during
-            his 30-something years on this planet, and hopefully having some fun along the way.
-          </p>
-        </div>
+    <div class="hero-content">
+      <h1 class="hero-title">About No Context Cinema Club</h1>
+      <div class="hero-copy">
+        <p>
+          No Context Cinema Club, a show where an almost unbelievably unqualified person (Rob) rewrites
+          film history by creating plots based only on titles and some (usually) unhelpful clues that
+          Kev provides him about the real films. Each week we'll explore Rob's complete ignorance of
+          film history, testing the limits of what is possible to have missed from pop culture during
+          his 30-something years on this planet, and hopefully having some fun along the way.
+        </p>
       </div>
     </div>
   </section>
