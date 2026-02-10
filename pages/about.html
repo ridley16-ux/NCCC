@@ -324,16 +324,16 @@ label {
     <div class="hero-card">
       <div class="hero-media">
         <img
-          class="hero-image"
+          class="hero-image about-hero"
           src="https://storage.buzzsprout.com/q8mrrpi20y1d4ni87d7r8ofmqz67"
           alt="No Context Cinema Club hero artwork"
           loading="lazy"
         />
       </div>
       <div class="hero-content">
-        <h1 class="hero-title">About No Context Cinema Club</h1>
+        <h1 class="hero-title about-title">About No Context Cinema Club</h1>
         <div class="hero-copy">
-          <p>
+          <p class="about-intro">
             No Context Cinema Club, a show where an almost unbelievably unqualified person (Rob) rewrites
             film history by creating plots based only on titles and some (usually) unhelpful clues that
             Kev provides him about the real films. Each week we'll explore Rob's complete ignorance of
@@ -348,40 +348,44 @@ label {
   <section>
     <h3 class="section-title">Meet the hosts</h3>
     <div class="profile-grid">
-      <article class="profile-card">
-        <div class="profile-header">
-          <img class="profile-avatar" src="/assets/img/icons/kev-icon.png" alt="Kev icon" />
-          <div>
-            <p class="profile-name">Kev</p>
-            <p class="profile-role">Host</p>
+      <div class="host-card">
+        <article class="profile-card">
+          <div class="profile-header">
+            <img class="profile-avatar host-icon" src="/assets/img/icons/kev-icon.png" alt="Kev icon" />
+            <div>
+              <p class="profile-name host-name">Kev</p>
+              <p class="profile-role host-role">Host</p>
+            </div>
           </div>
-        </div>
-        <ul class="profile-list">
-          <li>Voice of reason (most of the time)</li>
-          <li>Relentless roasting, lovingly delivered</li>
-          <li>Keeper of facts, trivia, and the receipts</li>
-        </ul>
-      </article>
-      <article class="profile-card">
-        <div class="profile-header">
-          <img class="profile-avatar" src="/assets/img/icons/rob-icon.png" alt="Rob icon" />
-          <div>
-            <p class="profile-name">Rob</p>
-            <p class="profile-role">Host</p>
+          <ul class="profile-list host-points">
+            <li>Voice of reason (most of the time)</li>
+            <li>Relentless roasting, lovingly delivered</li>
+            <li>Keeper of facts, trivia, and the receipts</li>
+          </ul>
+        </article>
+      </div>
+      <div class="host-card">
+        <article class="profile-card">
+          <div class="profile-header">
+            <img class="profile-avatar host-icon" src="/assets/img/icons/rob-icon.png" alt="Rob icon" />
+            <div>
+              <p class="profile-name host-name">Rob</p>
+              <p class="profile-role host-role">Host</p>
+            </div>
           </div>
-        </div>
-        <ul class="profile-list">
-          <li>Rewrites the movies with maximum confidence</li>
-          <li>Delivers chaotic vibes and wild plot turns</li>
-          <li>Beautifully, proudly wrong about the real film</li>
-        </ul>
-      </article>
+          <ul class="profile-list host-points">
+            <li>Rewrites the movies with maximum confidence</li>
+            <li>Delivers chaotic vibes and wild plot turns</li>
+            <li>Beautifully, proudly wrong about the real film</li>
+          </ul>
+        </article>
+      </div>
     </div>
   </section>
 
   <section>
     <h3 class="section-title">What to expect</h3>
-    <ul class="expect-list">
+    <ul class="expect-list about-what-to-expect">
       <li>Weekly episodes packed with ridiculous rewrites</li>
       <li>Rob’s alternate plot vs. the real film breakdown</li>
       <li>Listener chaos, hot takes, and surprise trivia</li>
@@ -391,14 +395,19 @@ label {
   </section>
 
   <section class="cta">
-    <h3>Subscribe so you don’t miss an episode</h3>
-    <p>Hit subscribe wherever you listen for fresh chaos every week.</p>
-    <a href="REPLACE_WITH_SPOTIFY_LINK" class="button" target="_blank" rel="noreferrer">Subscribe</a>
+    <div class="subscribe-cta">
+      <h3>Subscribe so you don’t miss an episode</h3>
+      <p>Hit subscribe wherever you listen for fresh chaos every week.</p>
+      <a href="REPLACE_WITH_SPOTIFY_LINK" class="button" target="_blank" rel="noreferrer">Subscribe</a>
+    </div>
   </section>
 </main>
 
 <div id="site-footer"></div>
 <script src="/assets/js/shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/gsap.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/gsap@3.12.5/dist/ScrollTrigger.min.js"></script>
+<script src="/assets/js/about-gsap.js"></script>
 <script>
   const headerContainer = document.getElementById("site-header");
   fetch("/assets/header.html")
