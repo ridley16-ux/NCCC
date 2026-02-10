@@ -347,7 +347,8 @@ label {
 .films-list {
   max-width: 900px;
   margin: 0 auto;
-  padding-top: 10px;
+  /* Prevent sticky header / top overlay shadow from bleeding onto the first film tile */
+  padding-top: 12px;
   display: flex;
   flex-direction: column;
   gap: 20px;
