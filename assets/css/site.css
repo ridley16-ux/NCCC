@@ -71,6 +71,20 @@ body {
   margin: 0 auto;
 }
 
+@media (min-width: 768px) {
+  .site-title img {
+    max-width: 400px;
+    max-width: min(400px, 100%);
+  }
+}
+
+@media (min-width: 1024px) {
+  .site-title img {
+    max-width: 430px;
+    max-width: min(430px, 100%);
+  }
+}
+
 .nav-links {
   display: flex;
   justify-content: center;
