@@ -41,6 +41,10 @@
 </script>
 
 <style>
+:root {
+  --brand-orange-light: #FBE1B3;
+}
+
 * {
   font-family: inherit;
 }
@@ -167,6 +171,11 @@ label {
   color: #f1f1f1;
 }
 
+.bullet-highlight {
+  font-weight: 700;
+  color: var(--brand-orange-light);
+}
+
 .contact-email-row {
   display: flex;
   align-items: center;
@@ -268,8 +277,8 @@ label {
 <div class="content">
   <h2>Contact Us</h2>
   <p>
-    Send us your strangest plot pitches or let us know which episode made you yell
-    at your headphones.
+    Got a wild plot pitch? Think we&rsquo;ve completely lost the plot? Want to challenge a score?<br />
+    Pick your person below.
   </p>
 
   <div class="contact-stack">
@@ -277,7 +286,7 @@ label {
       <img class="contact-avatar" src="/assets/img/icons/kev-icon.png" alt="Kev icon" />
       <div class="contact-body">
         <h3 class="contact-name"><u>Kev</u></h3>
-        <p class="contact-copy">Got a <strong>film</strong> we absolutely have to cover?<br />Think we&rsquo;ve missed a <strong>cult classic</strong>?<br />Want to <strong>challenge a score</strong>?<br />Kev&rsquo;s your man.</p>
+        <p class="contact-copy">Film suggestions &amp; score challenges<br />Got a <span class="bullet-highlight">film we have to cover</span>?<br />Think we&rsquo;ve <span class="bullet-highlight">missed a cult classic</span>?<br />Want to <span class="bullet-highlight">challenge a score</span>?</p>
         <div class="contact-email-row">
           <a class="contact-email" href="mailto:kev@nocontextcinemaclub.com">📩 kev@nocontextcinemaclub.com</a>
           <button class="copy-btn" type="button" aria-label="Copy Kev email">
@@ -293,7 +302,7 @@ label {
       <img class="contact-avatar" src="/assets/img/icons/rob-icon.png" alt="Rob icon" />
       <div class="contact-body">
         <h3 class="contact-name"><u>Rob</u></h3>
-        <p class="contact-copy">Fancy <strong>writing a quiz</strong>, <strong>commissioning a feature</strong>, or <strong>buying the rights</strong> to one of these completely made-up masterpieces?<br />Speak to Rob.</p>
+        <p class="contact-copy">Quizzes, features &amp; made-up movie rights<br />Fancy <span class="bullet-highlight">writing a quiz</span>?<br /><span class="bullet-highlight">Commissioning a feature</span>?<br /><span class="bullet-highlight">Buying the rights</span> to one of our completely fabricated masterpieces?</p>
         <div class="contact-email-row">
           <a class="contact-email" href="mailto:rob@nocontextcinemaclub.com">📩 rob@nocontextcinemaclub.com</a>
           <button class="copy-btn" type="button" aria-label="Copy Rob email">
@@ -309,7 +318,7 @@ label {
       <img class="contact-avatar" src="/assets/img/icons/name-icon.png" alt="Show icon" />
       <div class="contact-body">
         <h3 class="contact-name"><u>The Show</u></h3>
-        <p class="contact-copy"><strong>Not sure who to ping? Start here.</strong><br /><strong>Feedback</strong>, <strong>complaints</strong>, wild plot twists, <strong>casting suggestions</strong>, or a passionate defence of a 3/10&hellip; we want it all.<br />This is the <strong>main inbox</strong> for everything No Context Cinema Club.</p>
+        <p class="contact-copy">General feedback &amp; episode questions<br /><span class="bullet-highlight">Not sure who to contact</span>?<br />Got some <span class="bullet-highlight">general feedback</span>?<br />Have an <span class="bullet-highlight">episode question</span>?</p>
         <div class="contact-email-row">
           <a class="contact-email" href="mailto:show@nocontextcinemaclub.com">📩 show@nocontextcinemaclub.com</a>
           <button class="copy-btn" type="button" aria-label="Copy Show email">
