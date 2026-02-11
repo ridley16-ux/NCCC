@@ -3811,14 +3811,6 @@ body.modal-open {
     .then((response) => response.text())
     .then((html) => {
       footerContainer.innerHTML = html;
-      footerContainer.querySelectorAll("script").forEach((oldScript) => {
-        const nextScript = document.createElement("script");
-        Array.from(oldScript.attributes).forEach((attribute) => {
-          nextScript.setAttribute(attribute.name, attribute.value);
-        });
-        nextScript.textContent = oldScript.textContent;
-        oldScript.replaceWith(nextScript);
-      });
     })
     .catch((error) => {
       console.error("Failed to load footer:", error);
