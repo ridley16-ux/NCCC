@@ -1,97 +1,4 @@
 <style>
-  .newsletter-signup {
-    width: 100%;
-    max-width: 760px;
-    margin: 0 auto 8px;
-    padding: 28px 24px;
-    border: 1px solid rgba(255, 255, 255, 0.14);
-    border-radius: 14px;
-    background: #171717;
-    text-align: center;
-  }
-
-  .newsletter-signup h3 {
-    margin: 0;
-    font-size: 1.55rem;
-    line-height: 1.2;
-    color: #ffffff;
-  }
-
-  .newsletter-signup-copy {
-    margin: 10px 0 0;
-    font-size: 1rem;
-    color: rgba(255, 255, 255, 0.9);
-  }
-
-  .newsletter-form {
-    margin: 18px auto 0;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    max-width: 560px;
-  }
-
-  .newsletter-form input[type="email"] {
-    flex: 1;
-    min-width: 0;
-    border: 1px solid rgba(255, 255, 255, 0.28);
-    border-radius: 10px;
-    background: #101010;
-    color: #ffffff;
-    padding: 12px 14px;
-    font-size: 1rem;
-  }
-
-  .newsletter-form input[type="email"]::placeholder {
-    color: rgba(255, 255, 255, 0.65);
-  }
-
-  .newsletter-form button {
-    border: none;
-    border-radius: 10px;
-    background: #D1632E;
-    color: #ffffff;
-    font-weight: 700;
-    padding: 12px 18px;
-    font-size: 1rem;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: filter 0.2s ease;
-  }
-
-  .newsletter-form button:hover {
-    filter: brightness(1.08);
-  }
-
-  .newsletter-form input[type="email"]:focus-visible,
-  .newsletter-form button:focus-visible {
-    outline: 2px solid #ffffff;
-    outline-offset: 2px;
-  }
-
-  .newsletter-signup-smallprint {
-    margin: 12px 0 0;
-    font-size: 0.88rem;
-    color: rgba(255, 255, 255, 0.78);
-  }
-
-  @media (max-width: 640px) {
-    .newsletter-signup {
-      padding: 24px 16px;
-    }
-
-    .newsletter-form {
-      flex-direction: column;
-      align-items: stretch;
-    }
-
-    .newsletter-form input[type="email"],
-    .newsletter-form button {
-      width: 100%;
-    }
-  }
-
   .site-footer {
     background: #0f0f0f;
     color: #fff;
@@ -199,18 +106,6 @@
 <footer class="site-footer">
   <div class="footer-container">
 
-    <section class="newsletter-signup" aria-label="Email sign-up">
-      <h3>Join the Club</h3>
-      <p class="newsletter-signup-copy">Get an email when a new episode drops.</p>
-
-      <form class="newsletter-form" action="https://app.sender.net/forms/subscribe/aOYDpL" method="POST">
-        <input type="email" name="email" autocomplete="email" required placeholder="Enter your email" />
-        <button type="submit">Subscribe</button>
-      </form>
-
-      <p class="newsletter-signup-smallprint">No spam. Just updates. Unsubscribe anytime.</p>
-    </section>
-
     <div class="footer-logo-strip" aria-label="No Context Cinema Club">
       <a class="footer-logo-link" href="/index.html" aria-label="No Context Cinema Club home">
         <img
@@ -238,7 +133,7 @@
     </nav>
 
     <p class="footer-version" id="footer-version" title="Live audience score refresh after rating.">
-      Website version: 2.13.3
+      Website version: 2.13.2
     </p>
 
   </div>
