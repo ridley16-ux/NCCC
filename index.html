@@ -3871,8 +3871,8 @@ const AWARDS = [
       });
       if (tiedFilms.length <= 1) return tiedFilms;
       tiedFilms.sort((a, b) => {
-        const aDate = getPodcastedAtTimestamp(a);
-        const bDate = getPodcastedAtTimestamp(b);
+        const aDate = parseTimestamp(a?.podcastDate)?.getTime() ?? null;
+        const bDate = parseTimestamp(b?.podcastDate)?.getTime() ?? null;
         const aHasDate = Number.isFinite(aDate);
         const bHasDate = Number.isFinite(bDate);
         if (aHasDate && bHasDate && aDate !== bDate) return aDate - bDate;
@@ -5362,7 +5362,17 @@ function sortFilms(films) {
     return stableSortFilms(films, (a, b) => getCompositeScore(a) - getCompositeScore(b));
   }
   if (currentSort === "rating-desc") {
-    return stableSortFilms(films, (a, b) => getCompositeScore(b) - getCompositeScore(a));
+    return stableSortFilms(films, (a, b) => {
+      const scoreDiff = getCompositeScore(b) - getCompositeScore(a);
+      if (scoreDiff !== 0) return scoreDiff;
+      const aDate = parseTimestamp(a?.podcastDate)?.getTime() ?? null;
+      const bDate = parseTimestamp(b?.podcastDate)?.getTime() ?? null;
+      const aHasDate = Number.isFinite(aDate);
+      const bHasDate = Number.isFinite(bDate);
+      if (aHasDate && bHasDate && aDate !== bDate) return aDate - bDate;
+      if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+      return String(a?.id ?? "").localeCompare(String(b?.id ?? ""));
+    });
   }
   if (currentSort === "listener-asc") {
     return stableSortFilms(films, (a, b) => {
@@ -5820,7 +5830,7 @@ async function render(options = {}) {
     } else if (isAscendingRank) {
       rankText = String(totalFilms - globalIndex);
     } else if (isPodcastSort) {
-      rankText = timeSinceLabel(getPodcastedDateValue(film));
+      rankText = timeSinceLabel(film.podcastDate);
     } else {
       rankText = String(globalIndex + 1);
     }
