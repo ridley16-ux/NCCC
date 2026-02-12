@@ -3852,10 +3852,35 @@ const AWARDS = [
     emoji: "🏆",
     rosetteClass: "rosette--kev-pick",
     description: "Awarded to the film that Kev loves the most.",
-    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
-      const kevRating = getKevRating10(film, aggregates);
-      return Number.isFinite(kevRating) ? kevRating : null;
-    })
+    getWinners: (films, aggregates) => {
+      let topKevRating = null;
+      const tiedFilms = [];
+      films.forEach((film) => {
+        const kevRating = getKevRating10(film, aggregates);
+        const normalisedKevRating = normaliseScoreToPercent(kevRating);
+        if (!Number.isFinite(normalisedKevRating)) return;
+        if (topKevRating === null || normalisedKevRating > topKevRating) {
+          topKevRating = normalisedKevRating;
+          tiedFilms.length = 0;
+          tiedFilms.push(film);
+          return;
+        }
+        if (normalisedKevRating === topKevRating) {
+          tiedFilms.push(film);
+        }
+      });
+      if (tiedFilms.length <= 1) return tiedFilms;
+      tiedFilms.sort((a, b) => {
+        const aDate = getPodcastedAtTimestamp(a);
+        const bDate = getPodcastedAtTimestamp(b);
+        const aHasDate = Number.isFinite(aDate);
+        const bHasDate = Number.isFinite(bDate);
+        if (aHasDate && bHasDate && aDate !== bDate) return aDate - bDate;
+        if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+        return String(a?.id ?? "").localeCompare(String(b?.id ?? ""));
+      });
+      return [tiedFilms[0]];
+    }
   },
   {
     key: "listener-pick",
