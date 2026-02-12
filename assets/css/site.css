@@ -190,3 +190,47 @@ body {
     margin-top: 8px;
   }
 }
+
+.listen-highlight {
+  background: linear-gradient(rgba(191, 93, 46, 0.08), rgba(191, 93, 46, 0.03));
+  border: 1px solid rgba(191, 93, 46, 0.25);
+  border-radius: 16px;
+  padding: 28px;
+  margin-top: 28px;
+  background-clip: padding-box;
+}
+
+.listen-highlight .listen-intro {
+  margin: 0 0 20px;
+  font-size: 20px;
+  font-weight: 700;
+  line-height: 1.35;
+  position: relative;
+  padding-bottom: 12px;
+}
+
+.listen-highlight .listen-intro::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  width: 64px;
+  height: 2px;
+  border-radius: 999px;
+  background: rgba(191, 93, 46, 0.8);
+}
+
+.listen-highlight .listen-logo {
+  width: 34px;
+  height: 34px;
+}
+
+@media (max-width: 600px) {
+  .listen-highlight {
+    padding: 22px;
+  }
+
+  .listen-highlight .listen-intro {
+    font-size: 18px;
+  }
+}
