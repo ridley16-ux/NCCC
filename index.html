@@ -5830,7 +5830,19 @@ async function render(options = {}) {
     } else if (isAscendingRank) {
       rankText = String(totalFilms - globalIndex);
     } else if (isPodcastSort) {
-      rankText = timeSinceLabel(film.podcastDate);
+      const podcastDate = parseTimestamp(film.podcastDate);
+      if (!podcastDate) {
+        rankText = "—";
+      } else {
+        const now = new Date();
+        const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+        const podcastDateStart = new Date(podcastDate.getFullYear(), podcastDate.getMonth(), podcastDate.getDate());
+        if (podcastDateStart.getTime() > todayStart.getTime()) {
+          rankText = "Coming soon";
+        } else {
+          rankText = timeSinceLabel(film.podcastDate);
+        }
+      }
     } else {
       rankText = String(globalIndex + 1);
     }
