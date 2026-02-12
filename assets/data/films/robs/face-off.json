@@ -7,10 +7,8 @@
   "coherence": 7,
   "entertainment": 5,
   "originality": 5,
-
-
   "podcastDate": "2026-02-14",
-  "podcasted_at": "2026-02-14",
+  "podcasted_at": "2026-02-14T08:00:00+00:00",
   "summary": "A disgraced coach starts a new life in Phoenix as the trainer of a middle-school hockey team. But as he begins to lay down roots in the Arizona desert, he finds his past and present on collision course, as he struggles to fully escape the consequences of his past misdemeanours.",
   "transcriptTxt": "/assets/data/transcripts/face-off.txt",
   "transcriptId": "face-off",
