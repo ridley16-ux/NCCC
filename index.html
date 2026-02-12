@@ -5613,10 +5613,13 @@ function applyScoreCardHighlight(scoreRow) {
 
   if (!Number.isFinite(kevValue) || !Number.isFinite(audienceValue)) return;
 
-  if (audienceValue > kevValue) {
+  const roundedKevValue = roundPercent(kevValue);
+  const roundedAudienceValue = roundPercent(audienceValue);
+
+  if (roundedAudienceValue > roundedKevValue) {
     audienceTrend.textContent = "▲";
     audienceTrend.classList.add("score-trend--up");
-  } else if (audienceValue < kevValue) {
+  } else if (roundedAudienceValue < roundedKevValue) {
     audienceTrend.textContent = "▼";
     audienceTrend.classList.add("score-trend--down");
   }
