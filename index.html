@@ -5157,9 +5157,9 @@ function setAwardsLastUpdated(timestamp) {
 }
 
 function shouldShowFilmAwards() {
-  // Visibility gating: Rob’s films only, no search query, and default sort state.
-  const hasDefaultSort = currentSort === "rating-desc";
-  return currentFilter === "rob" && filmSearchQuery.trim() === "" && hasDefaultSort;
+  // Visibility gating: show for Rob or All filters when no search query is active.
+  const allowedFilter = currentFilter === "rob" || currentFilter === "all";
+  return allowedFilter && filmSearchQuery.trim() === "";
 }
 
 function formatAwardWinnersLine(
