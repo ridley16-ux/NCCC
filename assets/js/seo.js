@@ -1,14 +1,13 @@
 /*
   SEO helpers for No Context Cinema Club.
   - Add the podcast cover at /assets/branding/podcast-cover.webp (update this when the artwork is ready).
-  - Replace the placeholder platform links below with real URLs when the show goes live.
 */
 
 const DEFAULT_BASE_URL = "https://nocontextcinemaclub.com/";
 const PODCAST_IMAGE = `${DEFAULT_BASE_URL}assets/branding/podcast-cover.webp`;
 const PLATFORM_LINKS = [
-  "REPLACE_WITH_SPOTIFY_LINK",
-  "REPLACE_WITH_APPLE_LINK"
+  "https://open.spotify.com/show/6SE2QpCj42C46AlHfTPd59",
+  "https://podcasts.apple.com/us/podcast/no-context-cinema-club/id1875096501"
 ];
 
 const PLATFORM_HOSTS = [
