@@ -216,96 +216,70 @@ label {
   color: #d9d9d9;
 }
 
-.cta {
+.listen {
   margin-top: var(--space-5);
-  background: #1f1f1f;
-  border-radius: var(--radius-1);
-  padding: var(--space-4);
-  text-align: center;
-  border: 1px solid #333333;
 }
 
-.cta h3 {
-  margin: 0 0 var(--space-2);
+.listen-intro {
+  margin: 12px 0 16px;
 }
 
-.cta p {
-  margin: 0 0 var(--space-3);
-  color: #cfcfcf;
+.listen-grid {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: 12px;
 }
 
-.cta a {
-  color: inherit;
-}
-
-.subscribe-options {
-  margin-top: var(--space-2);
-  display: inline-flex;
-  flex-wrap: wrap;
-  justify-content: center;
-  gap: var(--space-2);
-}
-
-.subscribe-options[hidden] {
-  display: none;
-}
-
-.button {
-  position: relative;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-  padding-block: 0.5rem;
-  padding-inline: 1.25rem;
-  background-color: var(--brand-orange);
-  border-radius: 9999px;
-  display: inline-flex;
+.listen-btn {
+  display: flex;
   align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #ffffff;
-  gap: 10px;
-  font-weight: bold;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  outline: none;
-  overflow: hidden;
-  font-size: 15px;
+  gap: 14px;
+  width: 100%;
+  padding: 16px;
+  border-radius: 14px;
+  background: var(--card, #1b1b1b);
+  color: var(--text, #fff);
   text-decoration: none;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  min-height: 64px;
+  box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+  transition: transform 0.2s ease, box-shadow 0.2s ease, background 0.2s ease;
 }
 
-.button:hover {
-  transform: scale(1.05);
-  border-color: rgba(255, 255, 255, 0.6);
+.listen-btn:hover {
+  background: rgba(255, 255, 255, 0.06);
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(0, 0, 0, 0.35);
 }
 
-.button:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, 0.7);
-  outline-offset: 3px;
+.listen-btn:focus-visible {
+  outline: 3px solid rgba(245, 154, 79, 0.6);
+  outline-offset: 2px;
 }
 
-.button::before {
-  content: "";
-  position: absolute;
-  width: 100px;
-  height: 100%;
-  background-image: linear-gradient(
-    120deg,
-    rgba(255, 255, 255, 0) 30%,
-    rgba(255, 255, 255, 0.8),
-    rgba(255, 255, 255, 0) 70%
-  );
-  top: 0;
-  left: -100px;
-  opacity: 0.6;
+.listen-logo {
+  height: 28px;
+  width: 28px;
+  flex: 0 0 auto;
+  object-fit: contain;
 }
 
-.button:hover::before {
-  animation: shine 1.5s ease-out infinite;
+.listen-text {
+  display: flex;
+  flex-direction: column;
+  line-height: 1.1;
+  text-align: left;
 }
 
-@keyframes shine {
-  0% { left: -100px; }
-  60% { left: 100%; }
-  100% { left: 100%; }
+.listen-title {
+  font-weight: 800;
+  font-size: 16px;
+}
+
+.listen-subtitle {
+  font-size: 12px;
+  opacity: 0.75;
+  margin-top: 4px;
 }
 
 @media (max-width: 520px) {
@@ -323,6 +297,12 @@ label {
     max-width: none;
   }
 
+}
+
+@media (min-width: 600px) {
+  .listen-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 </style>
@@ -345,13 +325,10 @@ label {
       <div class="hero-content">
         <h1 class="hero-title">About No Context Cinema Club</h1>
         <div class="hero-copy">
-          <p>
-            No Context Cinema Club, a show where an almost unbelievably unqualified person (Rob) rewrites
-            film history by creating plots based only on titles and some (usually) unhelpful clues that
-            Kev provides him about the real films. Each week we'll explore Rob's complete ignorance of
-            film history, testing the limits of what is possible to have missed from pop culture during
-            his 30-something years on this planet, and hopefully having some fun along the way.
-          </p>
+          <p>No Context Cinema Club is the podcast where classic films are boldly rewritten by someone who hasn’t seen them.</p>
+          <p>Each week, Rob builds an entirely new plot from the title alone, while Kev drip-feeds clues designed to help — but usually don’t. No research. No Googling. No takebacks.</p>
+          <p>What follows: confident chaos, accidental parallels, unnecessary montages, and a final score for coherence, originality and entertainment.</p>
+          <p>Film discussion. Social experiment. Ongoing concern.</p>
         </div>
       </div>
     </div>
@@ -369,9 +346,10 @@ label {
           </div>
         </div>
         <ul class="profile-list">
-          <li>Voice of reason (most of the time)</li>
-          <li>Relentless roasting, lovingly delivered</li>
-          <li>Keeper of facts, trivia, and the receipts</li>
+          <li>The calm in the chaos (allegedly)</li>
+          <li>Delivers clues with surgical precision</li>
+          <li>Fact-checker, scorekeeper, and chief instigator</li>
+          <li>Roasts Rob — politely, but thoroughly</li>
         </ul>
       </article>
       <article class="profile-card">
@@ -383,9 +361,10 @@ label {
           </div>
         </div>
         <ul class="profile-list">
-          <li>Rewrites the movies with maximum confidence</li>
-          <li>Delivers chaotic vibes and wild plot turns</li>
-          <li>Beautifully, proudly wrong about the real film</li>
+          <li>Rewrites cinema history with unstoppable confidence</li>
+          <li>Commits fully to every bad decision</li>
+          <li>Turns minor details into full-blown subplots</li>
+          <li>Proudly, spectacularly wrong about the real film</li>
         </ul>
       </article>
     </div>
@@ -394,27 +373,50 @@ label {
   <section>
     <h3 class="section-title">What to expect</h3>
     <ul class="expect-list">
-      <li>Weekly episodes packed with ridiculous rewrites</li>
-      <li>Rob’s alternate plot vs. the real film breakdown</li>
-      <li>Listener chaos, hot takes, and surprise trivia</li>
-      <li>Zero spoilers for the real movie (mostly)</li>
-      <li>Plenty of laughs and the odd cinematic confession</li>
+      <li>Weekly episodes built on one simple rule: no research, no takebacks</li>
+      <li>Rob rewriting iconic films from the title alone</li>
+      <li>Strategic clues from Kev that somehow make things worse</li>
+      <li>Ridiculous plot twists, accidental parallels, and unnecessary montages</li>
+      <li>A final score for coherence, originality, and entertainment</li>
+      <li>Very few spoilers for the real film (usually)</li>
     </ul>
   </section>
 
-  <section class="cta">
-    <h3>Subscribe so you don’t miss an episode</h3>
-    <p>Hit subscribe wherever you listen for fresh chaos every week.</p>
-    <button
-      type="button"
-      class="button"
-      id="subscribe-toggle"
-      aria-expanded="false"
-      aria-controls="subscribe-options"
-    >Subscribe</button>
-    <div class="subscribe-options" id="subscribe-options" hidden>
-      <a class="button" href="https://podcasts.apple.com/us/podcast/no-context-cinema-club/id1875096501?utm_source=nocontextcinemaclub.com&utm_medium=subscribe_cta&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">Apple Podcasts</a>
-      <a class="button" href="https://open.spotify.com/show/6SE2QpCj42C46AlHfTPd59?utm_source=nocontextcinemaclub.com&utm_medium=subscribe_cta&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">Spotify</a>
+  <section class="listen">
+    <p class="listen-intro">Pick your preferred player to start listening.</p>
+
+    <div class="listen-grid">
+      <a class="listen-btn" href="https://podcasts.apple.com/us/podcast/no-context-cinema-club/id1875096501?utm_source=nocontextcinemaclub.com&utm_medium=listen_now&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">
+        <img class="listen-logo" src="https://badges.podlink.com/icons/apple.svg" alt="Apple Podcasts">
+        <span class="listen-text">
+          <span class="listen-title">Apple Podcasts</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="https://open.spotify.com/show/6SE2QpCj42C46AlHfTPd59?utm_source=nocontextcinemaclub.com&utm_medium=listen_now&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">
+        <img class="listen-logo" src="https://badges.podlink.com/icons/spotify.svg" alt="Spotify">
+        <span class="listen-text">
+          <span class="listen-title">Spotify Podcasts</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="https://feeds.buzzsprout.com/2591128.rss?utm_source=nocontextcinemaclub.com&utm_medium=listen_now&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">
+        <img class="listen-logo" src="https://badges.podlink.com/icons/rss.svg" alt="RSS">
+        <span class="listen-text">
+          <span class="listen-title">RSS</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
+
+      <a class="listen-btn" href="https://pod.link/aHR0cHM6Ly9mZWVkcy5idXp6c3Byb3V0LmNvbS8yNTkxMTI4LnJzcw?utm_source=nocontextcinemaclub.com&utm_medium=listen_now_other&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">
+        <img class="listen-logo" src="https://d33v4339jhl8k0.cloudfront.net/docs/assets/688690e64bb5de1a7282390f/images/6886a2452becc041225ba1cb/podlink.png" alt="Other">
+        <span class="listen-text">
+          <span class="listen-title">Other</span>
+          <span class="listen-subtitle">Listen</span>
+        </span>
+      </a>
     </div>
   </section>
 </main>
@@ -438,17 +440,6 @@ label {
     .catch((error) => {
       console.error("Failed to load header:", error);
     });
-
-
-  const subscribeToggle = document.getElementById("subscribe-toggle");
-  const subscribeOptions = document.getElementById("subscribe-options");
-  if (subscribeToggle && subscribeOptions) {
-    subscribeToggle.addEventListener("click", () => {
-      const isExpanded = subscribeToggle.getAttribute("aria-expanded") === "true";
-      subscribeToggle.setAttribute("aria-expanded", String(!isExpanded));
-      subscribeOptions.hidden = isExpanded;
-    });
-  }
 
   const footerContainer = document.getElementById("site-footer");
   fetch("/assets/footer.html")
