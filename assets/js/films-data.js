@@ -11,20 +11,42 @@ function getPodcastedAtValue(film) {
     ?? null;
 }
 
-function parseLocalDate(dateString) {
-  if (!dateString) return null;
-  const [year, month, day] = dateString.split("-").map(Number);
-  if (!year || !month || !day) return null;
-  const date = new Date(year, month - 1, day);
-  return Number.isNaN(date.getTime()) ? null : date;
+function parsePodcastDateTime(value) {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === "number") {
+    const numericDate = new Date(value);
+    return Number.isNaN(numericDate.getTime()) ? null : numericDate;
+  }
+  if (typeof value !== "string") return null;
+
+  const trimmed = value.trim();
+  if (!trimmed) return null;
+
+  const ukShortDateMatch = trimmed.match(/^(\d{2})\/(\d{2})\/(\d{2})$/);
+  if (ukShortDateMatch) {
+    const [, day, month, shortYear] = ukShortDateMatch;
+    const fullYear = 2000 + Number(shortYear);
+    const date = new Date(fullYear, Number(month) - 1, Number(day));
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const isoDateOnlyMatch = trimmed.match(/^(\d{4})-(\d{2})-(\d{2})$/);
+  if (isoDateOnlyMatch) {
+    const [, year, month, day] = isoDateOnlyMatch;
+    const date = new Date(Number(year), Number(month) - 1, Number(day));
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  if (!/^\d{4}-\d{2}-\d{2}T/.test(trimmed)) return null;
+  const isoDateTime = new Date(trimmed);
+  return Number.isNaN(isoDateTime.getTime()) ? null : isoDateTime;
 }
 
 export function isFilmLive(podcastDate) {
-  const date = parseLocalDate(podcastDate);
+  const date = parsePodcastDateTime(podcastDate);
   if (!date) return true;
-  const today = new Date();
-  const todayStart = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  return date.getTime() <= todayStart.getTime();
+  return date.getTime() <= Date.now();
 }
 
 export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL } = {}) {
