@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BHEJTM2PGH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BHEJTM2PGH');
+</script>
+<meta charset="UTF-8" />
+<title>No Context Cinema Club – Subscribe</title>
+<meta name="description" content="Subscribe to No Context Cinema Club on your preferred podcast player." />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://nocontextcinemaclub.com/subscribe.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<style>
+:root {
+  --brand-orange: #d1632e;
+}
+
+* { box-sizing: border-box; }
+
+html {
+  overflow-x: visible;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  background: #0f0f0f;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+.content {
+  max-width: 700px;
+  margin: 0 auto 32px;
+  background: #232323;
+  border-radius: 12px;
+  padding: 28px;
+  line-height: 1.6;
+  text-align: center;
+}
+
+h1 {
+  margin: 0 0 8px;
+}
+
+p {
+  color: #d9d9d9;
+}
+
+.button-row {
+  margin-top: 20px;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 12px;
+}
+
+.button {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0 10px 20px rgba(0, 0, 0, 0.2);
+  padding: 0.5rem 1.25rem;
+  background-color: var(--brand-orange);
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  font-weight: bold;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  overflow: hidden;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
+}
+
+.helper {
+  margin-top: 18px;
+  font-size: 14px;
+}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="content">
+  <h1>Subscribe</h1>
+  <p>If you’re not redirected in 2 seconds, choose your player:</p>
+  <div class="button-row">
+    <a id="apple-link" class="button" href="https://podcasts.apple.com/us/podcast/no-context-cinema-club/id1875096501" target="_blank" rel="noopener noreferrer" role="button" aria-label="Open No Context Cinema Club on Apple Podcasts">Apple Podcasts</a>
+    <a id="spotify-link" class="button" href="https://open.spotify.com/show/6SE2QpCj42C46AlHfTPd59" target="_blank" rel="noopener noreferrer" role="button" aria-label="Open No Context Cinema Club on Spotify">Spotify</a>
+  </div>
+  <p class="helper">If you are not redirected automatically, use one of the buttons above.</p>
+</main>
+
+<div id="site-footer"></div>
+<script src="/assets/js/shared.js"></script>
+<script>
+  const APPLE_BASE = "https://podcasts.apple.com/us/podcast/no-context-cinema-club/id1875096501";
+  const SPOTIFY_BASE = "https://open.spotify.com/show/6SE2QpCj42C46AlHfTPd59";
+
+  function withUtm(url) {
+    const destination = new URL(url);
+    destination.searchParams.set("utm_source", "nocontextcinemaclub.com");
+    destination.searchParams.set("utm_medium", "subscribe_cta");
+    destination.searchParams.set("utm_campaign", "podcast_subscribe");
+    return destination.toString();
+  }
+
+  const appleUrl = withUtm(APPLE_BASE);
+  const spotifyUrl = withUtm(SPOTIFY_BASE);
+
+  const appleLink = document.getElementById("apple-link");
+  const spotifyLink = document.getElementById("spotify-link");
+  appleLink.href = appleUrl;
+  spotifyLink.href = spotifyUrl;
+
+  const ua = navigator.userAgent || "";
+  const isIOS = /iPhone|iPad|iPod/i.test(ua);
+  const isAndroid = /Android/i.test(ua);
+  const isMacSafari = /Macintosh/i.test(ua) && /Safari/i.test(ua) && !/Chrome|Chromium|Edg/i.test(ua);
+
+  let redirectTarget = "";
+  if (isIOS || isMacSafari) {
+    redirectTarget = appleUrl;
+  } else if (isAndroid) {
+    redirectTarget = spotifyUrl;
+  }
+
+  if (redirectTarget) {
+    window.location.replace(redirectTarget);
+  }
+
+  const headerContainer = document.getElementById("site-header");
+  fetch("/assets/header.html")
+    .then((response) => response.text())
+    .then((html) => {
+      headerContainer.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Failed to load header:", error);
+    });
+
+  const footerContainer = document.getElementById("site-footer");
+  fetch("/assets/footer.html")
+    .then((response) => response.text())
+    .then((html) => {
+      footerContainer.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Failed to load footer:", error);
+    });
+</script>
+</body>
+</html>
