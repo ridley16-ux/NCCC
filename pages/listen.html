@@ -358,12 +358,46 @@ import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.
 const BASE_URL = "https://nocontextcinemaclub.com/";
 const MANIFEST_URL = "/assets/data/films/manifest.json";
 
-function parseLocalDate(dateString) {
-  if (!dateString) return null;
-  const [year, month, day] = dateString.split("-").map(Number);
-  if (!year || !month || !day) return null;
-  const date = new Date(year, month - 1, day);
-  return Number.isNaN(date.getTime()) ? null : date;
+function parseLocalDateTime(dateString) {
+  if (!dateString || typeof dateString !== "string") return null;
+  const trimmed = dateString.trim();
+  if (!trimmed) return null;
+
+  const isoMatch = trimmed.match(/^(\d{4})-(\d{1,2})-(\d{1,2})(?:\s+(\d{1,2}):(\d{2}))?$/);
+  if (isoMatch) {
+    const [, yearValue, monthValue, dayValue, hourValue, minuteValue] = isoMatch;
+    const year = Number(yearValue);
+    const month = Number(monthValue);
+    const day = Number(dayValue);
+    const hour = hourValue == null ? 8 : Number(hourValue);
+    const minute = minuteValue == null ? 0 : Number(minuteValue);
+    const date = new Date(year, month - 1, day, hour, minute);
+    return Number.isNaN(date.getTime()) ? null : date;
+  }
+
+  const match = trimmed.match(/^(\d{1,2})\/(\d{1,2})\/(\d{2}|\d{4})(?:\s+(\d{1,2}):(\d{2}))?$/);
+  if (!match) return null;
+
+  const [, dayValue, monthValue, yearValue, hourValue, minuteValue] = match;
+  const day = Number(dayValue);
+  const month = Number(monthValue);
+  const year = yearValue.length === 2 ? 2000 + Number(yearValue) : Number(yearValue);
+  const hour = hourValue == null ? 8 : Number(hourValue);
+  const minute = minuteValue == null ? 0 : Number(minuteValue);
+
+  const date = new Date(year, month - 1, day, hour, minute);
+  if (Number.isNaN(date.getTime())) return null;
+  if (
+    date.getFullYear() !== year
+    || date.getMonth() !== month - 1
+    || date.getDate() !== day
+    || date.getHours() !== hour
+    || date.getMinutes() !== minute
+  ) {
+    return null;
+  }
+
+  return date;
 }
 
 function getTodayStart() {
@@ -376,7 +410,7 @@ function formatUpper(value) {
 }
 
 function buildBanner(episode) {
-  const date = parseLocalDate(episode.podcastDate);
+  const date = parseLocalDateTime(episode.podcastDate);
   if (!date) return "";
   const month = formatUpper(date.toLocaleDateString("en-GB", { month: "short" }));
   const weekday = formatUpper(date.toLocaleDateString("en-GB", { weekday: "long" }));
@@ -413,9 +447,9 @@ async function loadUpcomingEpisodeBanner() {
     const todayStart = getTodayStart();
     const upcoming = filmData
       .filter((film) => film && film.podcastDate)
-      .map((film) => ({ ...film, parsedDate: parseLocalDate(film.podcastDate) }))
+      .map((film) => ({ ...film, parsedDate: parseLocalDateTime(film.podcastDate) }))
       .filter((film) => film.parsedDate && film.parsedDate.getTime() > todayStart.getTime())
-      .sort((a, b) => a.parsedDate - b.parsedDate)[0];
+      .sort((a, b) => (a.parsedDate - b.parsedDate) || (a.slug || a.title || "").localeCompare(b.slug || b.title || ""))[0];
     if (!upcoming) {
       banner.innerHTML = "";
       return;
