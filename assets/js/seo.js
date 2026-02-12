@@ -12,8 +12,7 @@ const PLATFORM_LINKS = [
 
 const PLATFORM_HOSTS = [
   "spotify.com",
-  "apple.com",
-  "pod.link"
+  "apple.com"
 ];
 
 function normalizeBaseUrl(baseUrl = DEFAULT_BASE_URL) {

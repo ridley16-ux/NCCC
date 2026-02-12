@@ -238,6 +238,18 @@ label {
   color: inherit;
 }
 
+.subscribe-options {
+  margin-top: var(--space-2);
+  display: inline-flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: var(--space-2);
+}
+
+.subscribe-options[hidden] {
+  display: none;
+}
+
 .button {
   position: relative;
   transition: all 0.3s ease-in-out;
@@ -393,7 +405,17 @@ label {
   <section class="cta">
     <h3>Subscribe so you don’t miss an episode</h3>
     <p>Hit subscribe wherever you listen for fresh chaos every week.</p>
-    <a href="/subscribe.html" class="button">Subscribe</a>
+    <button
+      type="button"
+      class="button"
+      id="subscribe-toggle"
+      aria-expanded="false"
+      aria-controls="subscribe-options"
+    >Subscribe</button>
+    <div class="subscribe-options" id="subscribe-options" hidden>
+      <a class="button" href="https://podcasts.apple.com/us/podcast/no-context-cinema-club/id1875096501?utm_source=nocontextcinemaclub.com&utm_medium=subscribe_cta&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">Apple Podcasts</a>
+      <a class="button" href="https://open.spotify.com/show/6SE2QpCj42C46AlHfTPd59?utm_source=nocontextcinemaclub.com&utm_medium=subscribe_cta&utm_campaign=podcast_subscribe" target="_blank" rel="noopener noreferrer">Spotify</a>
+    </div>
   </section>
 </main>
 
@@ -416,6 +438,17 @@ label {
     .catch((error) => {
       console.error("Failed to load header:", error);
     });
+
+
+  const subscribeToggle = document.getElementById("subscribe-toggle");
+  const subscribeOptions = document.getElementById("subscribe-options");
+  if (subscribeToggle && subscribeOptions) {
+    subscribeToggle.addEventListener("click", () => {
+      const isExpanded = subscribeToggle.getAttribute("aria-expanded") === "true";
+      subscribeToggle.setAttribute("aria-expanded", String(!isExpanded));
+      subscribeOptions.hidden = isExpanded;
+    });
+  }
 
   const footerContainer = document.getElementById("site-footer");
   fetch("/assets/footer.html")
