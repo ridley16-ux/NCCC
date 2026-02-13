@@ -2220,9 +2220,26 @@ body.modal-open {
 <body>
 
 <div id="site-header"></div>
-<div class="homepage-intro">
-  <p class="status">No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results.</p>
-</div>
+<section id="rewrite-rankings" class="homepage-intro film-awards" aria-labelledby="rewrite-rankings-title">
+  <div class="film-awards__inner">
+    <button class="film-awards__toggle" type="button" aria-expanded="false" aria-controls="rewrite-rankings-content">
+      <span class="film-awards__heading">
+        <span id="rewrite-rankings-title" class="film-awards__title">🏆 Re-Write Rankings</span>
+      </span>
+      <span class="film-awards__chevron" aria-hidden="true">
+        <svg viewBox="0 0 24 24" width="20" height="20" focusable="false" aria-hidden="true">
+          <path fill="currentColor" d="M12 15.5a.75.75 0 0 1-.53-.22l-5.5-5.5a.75.75 0 0 1 1.06-1.06L12 13.69l4.97-4.97a.75.75 0 0 1 1.06 1.06l-5.5 5.5a.75.75 0 0 1-.53.22Z"/>
+        </svg>
+      </span>
+    </button>
+    <div id="rewrite-rankings-content" class="film-awards__content" role="region" aria-labelledby="rewrite-rankings-title" aria-hidden="true">
+      <div class="film-awards__list">
+        <p class="status">No Context Cinema Club is a film podcast where Rob rewrites real movies, Kev scores them, and listeners rate the results.</p>
+        <p class="status">The Re-Write Rankings combine Kev’s score with audience votes to create one live, evolving leaderboard of every rewritten film.</p>
+      </div>
+    </div>
+  </div>
+</section>
 
 <template id="header-extras-template">
   <div class="controls mobile-controls">
@@ -3841,6 +3858,7 @@ const INSIGHT_MIN_VOTES = 1;
 const INSIGHT_GAP_MIN = 1;
 const INSIGHT_DIV_MIN = 1;
 const AWARDS_CONTENT_ID = "film-awards-content";
+const REWRITE_RANKINGS_SECTION_ID = "rewrite-rankings";
 let awardsExpanded = false;
 let awardsLastUpdatedAt = null;
 
@@ -4046,6 +4064,7 @@ const statusEl = document.getElementById("status");
 const loadingEl = document.getElementById("loading");
 const sentinelEl = document.getElementById("scroll-sentinel");
 const awardsSection = document.getElementById("film-awards");
+const rewriteRankingsSection = document.getElementById(REWRITE_RANKINGS_SECTION_ID);
 const transcriptModal = document.getElementById("transcript-modal");
 const transcriptBody = document.getElementById("transcript-body");
 const transcriptHeroTitle = document.querySelector(".transcript-hero-title");
@@ -5199,11 +5218,10 @@ function getVisibleAwards(films, aggregates = {}) {
   ));
 }
 
-function setAwardsExpanded(isExpanded, { immediate = false } = {}) {
-  awardsExpanded = isExpanded;
-  if (!awardsSection) return;
-  const toggleButton = awardsSection.querySelector(".film-awards__toggle");
-  const content = awardsSection.querySelector(".film-awards__content");
+function setFilmAwardsSectionExpanded(section, isExpanded, { immediate = false } = {}) {
+  if (!section) return;
+  const toggleButton = section.querySelector(".film-awards__toggle");
+  const content = section.querySelector(".film-awards__content");
   if (!toggleButton || !content) return;
   toggleButton.setAttribute("aria-expanded", String(isExpanded));
   content.setAttribute("aria-hidden", String(!isExpanded));
@@ -5219,10 +5237,26 @@ function setAwardsExpanded(isExpanded, { immediate = false } = {}) {
   if (isExpanded) {
     content.classList.add("is-open");
     requestAnimationFrame(updateHeights);
-  } else {
-    requestAnimationFrame(updateHeights);
-    content.addEventListener("transitionend", () => content.classList.remove("is-open"), { once: true });
+    return;
   }
+  requestAnimationFrame(updateHeights);
+  content.addEventListener("transitionend", () => content.classList.remove("is-open"), { once: true });
+}
+
+function setAwardsExpanded(isExpanded, { immediate = false } = {}) {
+  awardsExpanded = isExpanded;
+  setFilmAwardsSectionExpanded(awardsSection, isExpanded, { immediate });
+}
+
+function initRewriteRankingsAccordion() {
+  if (!rewriteRankingsSection) return;
+  const toggleButton = rewriteRankingsSection.querySelector(".film-awards__toggle");
+  if (!toggleButton) return;
+  toggleButton.addEventListener("click", () => {
+    const isExpanded = toggleButton.getAttribute("aria-expanded") === "true";
+    setFilmAwardsSectionExpanded(rewriteRankingsSection, !isExpanded);
+  });
+  setFilmAwardsSectionExpanded(rewriteRankingsSection, false, { immediate: true });
 }
 
 function renderFilmAwards() {
@@ -6452,6 +6486,7 @@ window.addEventListener("resize", () => {
   }
 });
 
+  initRewriteRankingsAccordion();
   initInfiniteScroll();
   loadFilms();
 });
