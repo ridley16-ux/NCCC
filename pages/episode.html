@@ -117,7 +117,7 @@ body {
 .rosette--fixed-it { background: var(--rosette-fixed-it-bg); }
 .rosette--consensus { background: var(--rosette-consensus-bg); }
 
-.episode-player-panel h2 {
+.episode-right-column h2 {
   margin: 0 0 8px;
   font-size: 18px;
 }
@@ -129,7 +129,7 @@ body {
   background: #121212;
   border: 1px solid #353535;
   min-height: 110px;
-  padding: 10px;
+  padding: 0;
 }
 
 .episode-player > div,
@@ -186,24 +186,24 @@ body {
   line-height: 1;
 }
 
-.hero-layout {
+.episode-grid {
   display: grid;
-  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
-  gap: 18px;
+  grid-template-columns: 260px 1fr;
+  gap: 16px;
   align-items: start;
 }
 
 .poster {
   width: 100%;
-  max-width: 260px;
   height: auto;
-  border-radius: 8px;
+  border-radius: 10px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
 }
 
-.episode-summary-wrap {
+.episode-right-column {
   display: grid;
   gap: 12px;
+  min-width: 0;
 }
 
 .synopsis {
@@ -230,13 +230,9 @@ body {
   text-decoration: underline;
 }
 
-@media (max-width: 760px) {
-  .hero-layout {
+@media (max-width: 768px) {
+  .episode-grid {
     grid-template-columns: 1fr;
-  }
-
-  .poster {
-    max-width: 100%;
   }
 
   .score-row { grid-template-columns: 1fr; }
@@ -256,16 +252,13 @@ body {
       <div class="rosette-stack" aria-label="Episode rosettes" id="episode-rosettes"></div>
     </div>
 
-    <section class="episode-player-panel" aria-label="Player panel">
-      <h2 id="episode-listen-heading">Listen to this episode</h2>
-      <div class="episode-player" id="episode-player-container">
-        <p class="episode-status" id="episode-player-status">Loading player…</p>
-      </div>
-    </section>
-
-    <div class="hero-layout">
+    <div class="episode-grid">
       <img class="poster" id="episode-poster" src="" alt="" hidden />
-      <div class="episode-summary-wrap">
+      <section class="episode-right-column" aria-label="Player panel">
+        <h2 id="episode-listen-heading">Listen to this episode</h2>
+        <div class="episode-player" id="episode-player-container">
+          <p class="episode-status" id="episode-player-status">Loading player…</p>
+        </div>
         <div class="score-row" data-score-row id="episode-score-row" data-kev-score="" data-audience-score="">
           <div class="score-card score-card--stat" data-score-card="kev">
             <div class="score-stat" data-score-half="kev">
@@ -281,7 +274,7 @@ body {
           </div>
         </div>
         <p class="synopsis" id="episode-summary"></p>
-      </div>
+      </section>
     </div>
 
     <div class="episode-footer-row">
