@@ -585,6 +585,12 @@ function formatPercentLabel(value) {
   return rounded === null ? "—" : `${rounded}%`;
 }
 
+function formatAudienceScore(value) {
+  const score = getPercentRaw(value);
+  if (score === null) return null;
+  return roundPercent(score);
+}
+
 function normaliseScoreToPercent(value) {
   const score = Number(value);
   if (!Number.isFinite(score)) return null;
@@ -613,10 +619,20 @@ function getListenerAverage10(film, aggregates = {}) {
   return normalized !== null ? normalized / 10 : null;
 }
 
-function getKevRating10(film) {
+function getKevRating10(film, _aggregates = {}) {
   const kevValue = film.kev_rating_10 ?? film.kevRating10 ?? film.kevScore ?? film.score;
   const normalized = normaliseScoreToPercent(kevValue);
   return normalized !== null ? normalized / 10 : null;
+}
+
+function getRobComponentAverage10(film) {
+  const coherence = Number(film.coherence ?? film.coherenceScore ?? film.coherence_rating);
+  const entertainment = Number(film.entertainment ?? film.entertainmentScore ?? film.entertainment_rating);
+  const originality = Number(film.originality ?? film.originalityScore ?? film.originality_rating);
+  if (![coherence, entertainment, originality].every((value) => Number.isFinite(value) && value >= 0 && value <= 10)) {
+    return null;
+  }
+  return (coherence + entertainment + originality) / 3;
 }
 
 function normalizeFilmTitle(value) {
@@ -886,6 +902,11 @@ async function fetchAudienceScores() {
     return;
   }
 
+  if (!Array.isArray(data)) {
+    console.warn("Audience score payload was empty or invalid on episode page.");
+    return;
+  }
+
   data.forEach((row) => {
     audienceScores[row.film_id] = {
       weighted_percent: row.weighted_percent,
@@ -913,14 +934,16 @@ function renderEpisode(film) {
   renderPlayer(film);
   getRosettesForFilm(film);
 
-  const kevPercentRaw = normaliseScoreToPercent(getKevRating10(film));
-  const listenerCount = getListenerCount(film, audienceScores);
-  const audiencePercentRaw = listenerCount > 0
-    ? getPercentRaw(audienceScores[film.id]?.weighted_percent)
-    : null;
+  if (!film?.id) {
+    console.warn("Episode page film is missing an id, listener score lookup may fail.");
+  }
+
+  const kevRating10 = getKevRating10(film, { audienceScores }) ?? getRobComponentAverage10(film);
+  const kevPercentRaw = kevRating10 !== null ? roundPercent(kevRating10 * 10) : null;
+  const audiencePercentRaw = formatAudienceScore(audienceScores[film.id]?.weighted_percent);
 
   kevScoreEl.textContent = formatPercentLabel(kevPercentRaw);
-  listenerScoreEl.textContent = formatPercentLabel(audiencePercentRaw);
+  listenerScoreEl.textContent = audiencePercentRaw === null ? "—" : formatPercentLabel(audiencePercentRaw);
 }
 
 async function initEpisodePage() {
