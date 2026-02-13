@@ -601,6 +601,16 @@ function formatUkDate(d) {
   return dt ? dt.toLocaleDateString("en-GB").replaceAll("/", "-") : (d || "—");
 }
 
+function formatPodcastDateDisplay(podcastDate) {
+  const parsed = parseLocalDate(podcastDate);
+  if (!parsed) return podcastDate || "—";
+  return new Intl.DateTimeFormat("en-GB", {
+    day: "2-digit",
+    month: "short",
+    year: "numeric"
+  }).format(parsed);
+}
+
 function escapeHtml(value) {
   return String(value)
     .replaceAll("&", "&amp;")
@@ -991,7 +1001,7 @@ async function fetchListenerVotesForFilms(films = []) {
 function renderEpisode(film) {
   document.title = `${film.title} – No Context Cinema Club`;
   titleEl.textContent = film.title || "Episode";
-  podcastedEl.textContent = `Podcasted: ${formatUkDate(film.podcasted_at ?? film.podcastDate ?? film.podcastedAt)}`;
+  podcastedEl.textContent = `Podcasted: ${formatPodcastDateDisplay(film.podcastDate)}`;
   summaryEl.textContent = film.summary || "";
 
   if (film.poster) {
