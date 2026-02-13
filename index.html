@@ -4247,7 +4247,7 @@ function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
 
   if (transcriptHeroMeta && transcriptHeroDate) {
     if (resolvedDate) {
-      transcriptHeroDate.textContent = `Podcasted date ${formatPodcastDateDisplay(resolvedDate)}`;
+      transcriptHeroDate.textContent = `Podcasted: ${formatPodcastDateDisplay(resolvedDate)}`;
       transcriptHeroMeta.hidden = false;
     } else {
       transcriptHeroDate.textContent = "";
