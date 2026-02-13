@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BHEJTM2PGH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BHEJTM2PGH');
+</script>
+<meta charset="UTF-8" />
+<title>No Context Cinema Club – Episode</title>
+<meta name="description" content="Listen to No Context Cinema Club episodes directly on-site." />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://nocontextcinemaclub.com/pages/episode.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="website-version" content="1.16.1" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<style>
+* { box-sizing: border-box; }
+
+html {
+  overflow-x: visible;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+body {
+  font-family: inherit;
+  background: #0f0f0f;
+  color: #ffffff;
+  margin: 0;
+  padding: 0;
+  overflow-x: clip;
+  overflow-y: scroll;
+  scrollbar-gutter: stable;
+}
+
+.content {
+  max-width: 960px;
+  margin: 0 auto 32px;
+  background: #232323;
+  border-radius: 12px;
+  padding: 24px;
+  line-height: 1.6;
+}
+
+.episode-layout {
+  display: grid;
+  gap: 20px;
+}
+
+.episode-title {
+  margin: 0;
+  font-size: clamp(28px, 4vw, 40px);
+}
+
+.episode-player {
+  width: 100%;
+  border-radius: 12px;
+  overflow: hidden;
+  background: #121212;
+  border: 1px solid #353535;
+  min-height: 160px;
+}
+
+.episode-player iframe {
+  display: block;
+  width: 100%;
+  min-height: 220px;
+  border: 0;
+}
+
+.episode-meta {
+  display: grid;
+  grid-template-columns: minmax(180px, 280px) 1fr;
+  gap: 20px;
+  align-items: start;
+}
+
+.episode-poster {
+  width: 100%;
+  height: auto;
+  border-radius: 12px;
+  border: 1px solid #383838;
+  background: #101010;
+}
+
+.episode-summary {
+  margin: 0;
+  color: #f2f2f2;
+}
+
+.episode-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.button.is-disabled {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.episode-status {
+  margin: 0;
+  color: #d8d8d8;
+}
+
+.back-link {
+  color: #d1632e;
+  text-decoration: none;
+  font-weight: 600;
+}
+
+.back-link:hover,
+.back-link:focus-visible {
+  text-decoration: underline;
+}
+
+@media (max-width: 760px) {
+  .episode-meta {
+    grid-template-columns: 1fr;
+  }
+}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+
+<main class="content" aria-live="polite">
+  <section class="episode-layout" id="episode-root">
+    <h1 class="episode-title" id="episode-title">Loading episode…</h1>
+
+    <div class="episode-player" id="episode-player-container">
+      <p class="episode-status" id="episode-player-status" style="padding: 16px;">Loading player…</p>
+    </div>
+
+    <div class="episode-meta">
+      <img class="episode-poster" id="episode-poster" src="" alt="" hidden />
+      <div>
+        <p class="episode-summary" id="episode-summary"></p>
+        <div class="episode-actions" style="margin-top: 16px;">
+          <a class="button" id="episode-transcript-link" href="#">View transcript</a>
+          <a class="button" id="episode-vote-link" href="#">Vote on this rewrite</a>
+        </div>
+        <p style="margin-top: 16px;"><a class="back-link" href="/index.html">← Back to films</a></p>
+      </div>
+    </div>
+  </section>
+</main>
+
+<div id="site-footer"></div>
+
+<script>
+  const headerContainer = document.getElementById("site-header");
+  fetch("/assets/header.html")
+    .then((response) => response.text())
+    .then((html) => {
+      headerContainer.innerHTML = html;
+      const activePath = window.location.pathname === "/" ? "/index.html" : window.location.pathname;
+      const navLinks = headerContainer.querySelectorAll(".nav-links a");
+      navLinks.forEach((link) => {
+        if (link.getAttribute("href") === activePath) {
+          link.classList.add("active");
+        }
+      });
+    })
+    .catch((error) => {
+      console.error("Failed to load header:", error);
+    });
+
+  const footerContainer = document.getElementById("site-footer");
+  fetch("/assets/footer.html")
+    .then((response) => response.text())
+    .then((html) => {
+      footerContainer.innerHTML = html;
+    })
+    .catch((error) => {
+      console.error("Failed to load footer:", error);
+    });
+</script>
+
+<script type="module">
+import { loadFilmsData } from "/assets/js/films-data.js";
+
+const BUZZSPROUT_HOST = "www.buzzsprout.com";
+
+const titleEl = document.getElementById("episode-title");
+const posterEl = document.getElementById("episode-poster");
+const summaryEl = document.getElementById("episode-summary");
+const playerContainerEl = document.getElementById("episode-player-container");
+const playerStatusEl = document.getElementById("episode-player-status");
+const transcriptLinkEl = document.getElementById("episode-transcript-link");
+const voteLinkEl = document.getElementById("episode-vote-link");
+
+function createEpisodeUrl(id) {
+  return `/pages/episode.html?id=${encodeURIComponent(id)}`;
+}
+
+function isValidBuzzsproutEmbedUrl(value) {
+  if (!value || typeof value !== "string") return false;
+  try {
+    const url = new URL(value);
+    return url.protocol === "https:" && url.hostname === BUZZSPROUT_HOST && /^\/\d+\/episodes\//.test(url.pathname);
+  } catch {
+    return false;
+  }
+}
+
+function showNotFoundState() {
+  titleEl.textContent = "Episode not found";
+  summaryEl.textContent = "We couldn't find that episode. Please return to the films list and choose another episode.";
+  playerContainerEl.hidden = true;
+  posterEl.hidden = true;
+  transcriptLinkEl.hidden = true;
+  voteLinkEl.hidden = true;
+}
+
+function setTranscriptLink(film) {
+  const transcriptPath = typeof film?.transcriptTxt === "string" ? film.transcriptTxt.trim() : "";
+  if (transcriptPath) {
+    transcriptLinkEl.href = transcriptPath;
+    transcriptLinkEl.target = "_blank";
+    transcriptLinkEl.rel = "noopener noreferrer";
+    transcriptLinkEl.classList.remove("is-disabled");
+    transcriptLinkEl.setAttribute("aria-disabled", "false");
+    return;
+  }
+
+  transcriptLinkEl.href = "#";
+  transcriptLinkEl.classList.add("is-disabled");
+  transcriptLinkEl.setAttribute("aria-disabled", "true");
+}
+
+function renderEpisode(film) {
+  document.title = `${film.title} – No Context Cinema Club`;
+  titleEl.textContent = film.title || "Episode";
+  summaryEl.textContent = film.summary || "";
+
+  if (film.poster) {
+    posterEl.src = film.poster;
+    posterEl.alt = `Poster for ${film.title || "episode"}`;
+    posterEl.hidden = false;
+  } else {
+    posterEl.hidden = true;
+  }
+
+  setTranscriptLink(film);
+
+  voteLinkEl.href = `/index.html#film-${encodeURIComponent(film.id)}`;
+
+  if (isValidBuzzsproutEmbedUrl(film.buzzsproutEmbedUrl)) {
+    const iframe = document.createElement("iframe");
+    iframe.title = `${film.title || "Episode"} audio player`;
+    iframe.loading = "lazy";
+    iframe.src = film.buzzsproutEmbedUrl;
+    iframe.allow = "autoplay";
+
+    playerContainerEl.replaceChildren(iframe);
+  } else {
+    if (playerStatusEl) {
+      playerStatusEl.textContent = "Audio coming soon.";
+      playerContainerEl.replaceChildren(playerStatusEl);
+    }
+  }
+}
+
+async function initEpisodePage() {
+  const params = new URLSearchParams(window.location.search);
+  const id = params.get("id");
+
+  if (!id) {
+    showNotFoundState();
+    return;
+  }
+
+  try {
+    const films = await loadFilmsData();
+    const film = films.find((entry) => entry?.id === id);
+
+    if (!film) {
+      showNotFoundState();
+      return;
+    }
+
+    renderEpisode(film);
+
+    if (window.location.pathname === "/pages/episode.html") {
+      const nextUrl = createEpisodeUrl(film.id);
+      if (`${window.location.pathname}${window.location.search}` !== nextUrl.replace(window.location.origin, "")) {
+        window.history.replaceState({}, "", nextUrl);
+      }
+    }
+  } catch (error) {
+    console.error("Failed to load episode", error);
+    showNotFoundState();
+  }
+}
+
+initEpisodePage();
+</script>
+</body>
+</html>

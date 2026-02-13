@@ -4201,6 +4201,18 @@ function getTranscriptContext(trigger) {
   return { card, cardTitle, cardPoster, cardSummary, cardPlay };
 }
 
+function getEpisodePageUrl(filmId) {
+  if (!filmId) return "#";
+  return `/pages/episode.html?id=${encodeURIComponent(filmId)}`;
+}
+
+function getPlayNowUrl(film, fallback = "") {
+  if (film?.linkType === "podcast") {
+    return getEpisodePageUrl(film.id);
+  }
+  return film?.link || fallback || "#";
+}
+
 function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
   if (!transcriptHeroTitle) return;
   const { card, cardTitle, cardPoster, cardSummary, cardPlay } = getTranscriptContext(trigger);
@@ -4215,7 +4227,7 @@ function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
   const resolvedPoster = film?.poster || cardPoster || "";
   const resolvedSummary = film?.summary || cardSummary || "";
   const resolvedDate = dateValue || film?.podcastDate || film?.podcasted_at || film?.podcastedAt || film?.published_at || film?.publishedAt || "";
-  const resolvedPlay = film?.link || cardPlay || "";
+  const resolvedPlay = getPlayNowUrl(film, cardPlay);
 
   transcriptHeroTitle.textContent = resolvedTitle === "Transcript"
     ? "Transcript"
@@ -5974,7 +5986,7 @@ async function render(options = {}) {
 
           <div class="cta">
             <div class="cta-actions">
-              <a class="button" href="${film.link}" target="_blank" aria-label="Play episode">▶️ Play now</a>
+              <a class="button" href="${getPlayNowUrl(film)}" target="_self" aria-label="Play episode">▶ Play Now</a>
               <span class="transcript-slot" data-transcript-slot></span>
             </div>
             <div class="rating-panel ${storedRating ? "is-voted" : ""}" data-rating-panel data-film-id="${film.id}">

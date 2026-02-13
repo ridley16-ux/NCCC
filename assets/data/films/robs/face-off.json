@@ -13,5 +13,6 @@
   "transcriptTxt": "/assets/data/transcripts/face-off.txt",
   "transcriptId": "face-off",
   "link": "#",
-  "linkType": "podcast"
+  "linkType": "podcast",
+  "buzzsproutEmbedUrl": "https://www.buzzsprout.com/2591128/episodes/18586740-face-off?client_source=small_player"
 }

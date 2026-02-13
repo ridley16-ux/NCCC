@@ -6,10 +6,11 @@
   "starring": "Hilary Swank, Clint Eastwood",
   "poster": "https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p35226_p_v8_ar.jpg",
   "score": 91,
-  "scoreLabel": "\ud83c\udf45 Rotten Tomatoes",
+  "scoreLabel": "🍅 Rotten Tomatoes",
   "podcastDate": "2026-02-28",
   "podcasted_at": "2026-02-28T08:00:00+00:00",
   "summary": "When a cantankerous trainer mentors a persistent amateur boxer determined to go pro, deep-seated emotions become their strongest opponents.",
   "link": "https://www.rottentomatoes.com/m/million_dollar_baby",
-  "linkType": "rt"
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": ""
 }
