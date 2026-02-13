@@ -71,6 +71,37 @@ body {
   color: var(--muted);
 }
 
+.episode-title-meta-row {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.episode-title-meta-row .meta-line {
+  margin: 0;
+}
+
+.episode-title-meta-row .meta-line::before {
+  content: "·";
+  margin-right: 8px;
+}
+
+
+@media (max-width: 767px) {
+  .episode-title-meta-row {
+    display: block;
+  }
+
+  .episode-title-meta-row .meta-line {
+    margin-top: 8px;
+  }
+
+  .episode-title-meta-row .meta-line::before {
+    content: "";
+    margin-right: 0;
+  }
+}
+
 .episode-header-row {
   display: flex;
   justify-content: space-between;
@@ -253,9 +284,11 @@ body {
 <main class="content" aria-live="polite">
   <section class="film-card" id="episode-root">
     <div class="episode-header-row">
-      <div>
-        <h1 class="detail-title" id="episode-title">Loading episode…</h1>
-        <p class="meta-line" id="episode-podcasted">Podcasted: —</p>
+      <div class="episode-title-block">
+        <div class="episode-title-meta-row">
+          <h1 class="detail-title" id="episode-title">Loading episode…</h1>
+          <p class="meta-line" id="episode-podcasted">Podcasted: —</p>
+        </div>
       </div>
       <div class="rosette-stack" aria-label="Episode rosettes" id="episode-rosettes"></div>
     </div>
@@ -891,27 +924,61 @@ function showNotFoundState() {
   posterEl.hidden = true;
 }
 
-async function refreshAudienceScoreForFilm(filmId) {
-  if (!supabaseClient || !filmId) return null;
+async function fetchAudienceScoresForFilms(films = []) {
+  if (!supabaseClient) return;
+  const filmIds = films.map((film) => film?.id).filter(Boolean);
+  if (!filmIds.length) return;
+
   const { data, error } = await supabaseClient
     .from("film_scores_v1")
     .select("film_id, weighted_percent, listener_count")
-    .eq("film_id", filmId)
-    .maybeSingle();
+    .in("film_id", filmIds);
 
   if (error) {
-    console.error("Failed to refresh audience score.", error);
-    return null;
+    console.error("Failed to fetch audience scores.", error);
+    return;
   }
 
-  if (!data) return null;
+  data.forEach((row) => {
+    audienceScores[row.film_id] = {
+      weighted_percent: row.weighted_percent,
+      listener_count: row.listener_count
+    };
+  });
+}
 
-  audienceScores[filmId] = {
-    weighted_percent: data.weighted_percent,
-    listener_count: data.listener_count
-  };
+async function fetchListenerVotesForFilms(films = []) {
+  if (!supabaseClient) return;
+  const robIds = films.filter((film) => film?.rob).map((film) => film.id).filter(Boolean);
+  if (!robIds.length) return;
 
-  return data;
+  const pageSize = 1000;
+  let fromIndex = 0;
+  while (true) {
+    const toIndex = fromIndex + pageSize - 1;
+    const { data, error } = await supabaseClient
+      .from("film_votes")
+      .select("film_id, rating")
+      .in("film_id", robIds)
+      .range(fromIndex, toIndex);
+
+    if (error) {
+      console.error("Failed to fetch listener votes.", error);
+      return;
+    }
+
+    if (!data?.length) break;
+
+    data.forEach((row) => {
+      const existing = audienceScores[row.film_id] ?? {};
+      const ratings = Array.isArray(existing.listener_ratings) ? existing.listener_ratings : [];
+      ratings.push(row.rating);
+      audienceScores[row.film_id] = { ...existing, listener_ratings: ratings };
+    });
+
+    if (data.length < pageSize) break;
+    fromIndex += pageSize;
+  }
 }
 
 function renderEpisode(film) {
@@ -961,7 +1028,8 @@ async function initEpisodePage() {
       return;
     }
 
-    await refreshAudienceScoreForFilm(film.id);
+    await fetchAudienceScoresForFilms(allFilms);
+    await fetchListenerVotesForFilms(allFilms);
     renderEpisode(film);
   } catch (error) {
     console.error("Failed to load episode", error);
