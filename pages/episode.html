@@ -19,41 +19,103 @@
 <meta name="website-version" content="1.16.1" />
 <link rel="stylesheet" href="/assets/css/site.css" />
 <style>
-* { box-sizing: border-box; }
-
-html {
-  overflow-x: visible;
-  font-family: Arial, Helvetica, sans-serif;
+:root {
+  --bg: #0f0f0f;
+  --card: #1b1b1b;
+  --text: #ffffff;
+  --muted: #aaaaaa;
+  --line: rgba(255, 255, 255, 0.1);
+  --accent-rob: #d46a2a;
+  --brand-orange: var(--accent-rob);
 }
 
+* { box-sizing: border-box; }
+
 body {
-  font-family: inherit;
-  background: #0f0f0f;
-  color: #ffffff;
+  background: var(--bg);
+  color: var(--text);
   margin: 0;
-  padding: 0;
   overflow-x: clip;
-  overflow-y: scroll;
-  scrollbar-gutter: stable;
 }
 
 .content {
-  max-width: 960px;
+  max-width: 900px;
   margin: 0 auto 32px;
-  background: #232323;
-  border-radius: 12px;
-  padding: 24px;
-  line-height: 1.6;
+  padding: 12px 16px 0;
 }
 
-.episode-layout {
-  display: grid;
-  gap: 20px;
+.film-card {
+  display: block;
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), var(--card);
+  border-radius: 18px;
+  border: 1px solid var(--line);
+  padding: 18px;
+  position: relative;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
 }
 
-.episode-title {
+.detail-title {
   margin: 0;
-  font-size: clamp(28px, 4vw, 40px);
+  font-size: 28px;
+  letter-spacing: -0.02em;
+  line-height: 1.15;
+}
+
+.meta-line {
+  margin: 8px 0 0;
+  font-size: 14px;
+  color: var(--muted);
+}
+
+.episode-header-row {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+  align-items: flex-start;
+  flex-wrap: wrap;
+}
+
+.rosette-stack {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  justify-content: flex-end;
+}
+
+.rosette {
+  font-size: 11px;
+  font-weight: 700;
+  padding: 6px 12px;
+  border-radius: 999px;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  line-height: 1;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.18), 0 2px 8px rgba(0, 0, 0, 0.45);
+  color: #fff;
+}
+
+.badge-icon { font-size: 0.9em; line-height: 1; }
+.rosette.rob { background: #3e5f3e; color: #d8f0d8; }
+.rosette.real { background: #444; }
+.rosette--kev-pick { background: var(--rosette-kev-pick); }
+.rosette--listener-pick { background: var(--rosette-listener-pick); }
+.rosette--new { background: var(--rosette-new); }
+.rosette.other { background: #565656; }
+.rosette--most-underrated { background: var(--rosette-most-underrated); }
+.rosette--most-overrated { background: var(--rosette-most-overrated); }
+.rosette--most-divisive { background: var(--rosette-most-divisive); }
+.rosette--lost-plot { background: var(--rosette-lost-plot-bg); }
+.rosette--fixed-it { background: var(--rosette-fixed-it-bg); }
+.rosette--consensus { background: var(--rosette-consensus-bg); }
+
+.episode-player-panel { margin-top: 16px; }
+.episode-player-panel h2 {
+  margin: 0 0 12px;
+  font-size: 18px;
 }
 
 .episode-player {
@@ -65,47 +127,217 @@ body {
   min-height: 160px;
 }
 
-.episode-player iframe {
+.episode-player iframe,
+.episode-player .buzzsprout-player {
   display: block;
   width: 100%;
   min-height: 220px;
   border: 0;
 }
 
-.episode-meta {
-  display: grid;
-  grid-template-columns: minmax(180px, 280px) 1fr;
-  gap: 20px;
-  align-items: start;
-}
-
-.episode-poster {
-  width: 100%;
-  height: auto;
-  border-radius: 12px;
-  border: 1px solid #383838;
-  background: #101010;
-}
-
-.episode-summary {
-  margin: 0;
-  color: #f2f2f2;
-}
-
-.episode-actions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 10px;
-}
-
-.button.is-disabled {
-  opacity: 0.6;
-  pointer-events: none;
-}
-
 .episode-status {
   margin: 0;
   color: #d8d8d8;
+  padding: 16px;
+}
+
+.score-row {
+  margin-top: 16px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  align-items: stretch;
+  gap: 12px;
+}
+
+.score-card {
+  border-radius: 18px;
+  padding: 14px;
+}
+
+.score-card--stat {
+  border: 1px solid rgba(124, 74, 45, 0.88);
+  background: rgba(92, 54, 31, 0.8);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.06);
+}
+
+.score-stat {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  align-items: center;
+  text-align: center;
+}
+
+.score-label {
+  font-size: 12px;
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: rgba(255, 255, 255, 0.86);
+}
+
+.score-value {
+  font-size: 30px;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.score-trend { margin-left: 0.32em; font-size: 0.9em; }
+.score-trend--up { color: #8ddf9f; }
+.score-trend--down { color: #ff8e86; }
+
+.bars { display: grid; gap: 10px; margin-top: 16px; }
+.bar-row {
+  display: grid;
+  grid-template-columns: 130px 1fr 46px;
+  gap: 10px;
+  align-items: center;
+}
+.bar-row label { color: var(--muted); font-size: 13px; }
+.track {
+  height: 10px;
+  border-radius: 999px;
+  background: rgba(255, 255, 255, 0.08);
+  border: 1px solid var(--line);
+  overflow: hidden;
+}
+.fill {
+  height: 100%;
+  background: linear-gradient(90deg, var(--accent-rob), #ffb37a);
+}
+.bar-row strong {
+  font-size: 13px;
+  color: var(--muted);
+  font-weight: 650;
+  text-align: right;
+}
+
+.divider {
+  height: 1px;
+  background: var(--line);
+  margin: 16px 0;
+}
+
+.hero-layout {
+  display: grid;
+  grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
+  gap: 18px;
+  align-items: start;
+}
+
+.poster {
+  width: 100%;
+  max-width: 260px;
+  border-radius: 8px;
+  box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.synopsis {
+  line-height: 1.63;
+  font-size: 16px;
+  color: rgba(255, 255, 255, 0.92);
+  margin: 0;
+}
+
+.cta {
+  margin-top: 16px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
+
+.cta-actions {
+  display: flex;
+  gap: 10px;
+  flex-wrap: wrap;
+}
+
+.btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 16px;
+  border-radius: 14px;
+  border: 1px solid rgba(0, 0, 0, 0.2);
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.btn.btn-primary {
+  background: var(--brand-orange);
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 12px 24px rgba(212, 106, 42, 0.25);
+}
+
+.btn.btn-secondary {
+  background: transparent;
+  color: rgba(255, 255, 255, 0.86);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.btn:hover { opacity: 0.92; }
+.btn:focus-visible { outline: 3px solid rgba(255, 255, 255, 0.65); outline-offset: 2px; }
+
+.button {
+  position: relative;
+  transition: all 0.3s ease-in-out;
+  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
+  padding-block: 0.5rem;
+  padding-inline: 1.25rem;
+  background-color: var(--brand-orange);
+  border-radius: 9999px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  color: #ffffff;
+  gap: 10px;
+  font-weight: bold;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  outline: none;
+  overflow: hidden;
+  font-size: 15px;
+  text-decoration: none;
+}
+
+.button:hover {
+  transform: scale(1.05);
+  border-color: rgba(255, 255, 255, 0.6);
+}
+
+.button:focus-visible {
+  outline: 3px solid rgba(255, 255, 255, 0.7);
+  outline-offset: 3px;
+}
+
+.button::before {
+  content: "";
+  position: absolute;
+  width: 100px;
+  height: 100%;
+  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70%);
+  top: 0;
+  left: -100px;
+  opacity: 0.6;
+}
+
+.button:hover::before {
+  animation: shine 1.5s ease-out infinite;
+}
+
+@keyframes shine {
+  0% { left: -100px; }
+  60% { left: 100%; }
+  100% { left: 100%; }
+}
+
+
+.btn.is-disabled {
+  opacity: 0.6;
+  pointer-events: none;
 }
 
 .back-link {
@@ -120,9 +352,12 @@ body {
 }
 
 @media (max-width: 760px) {
-  .episode-meta {
+  .hero-layout,
+  .bar-row {
     grid-template-columns: 1fr;
   }
+
+  .score-row { grid-template-columns: 1fr; }
 }
 </style>
 </head>
@@ -130,20 +365,52 @@ body {
 <div id="site-header"></div>
 
 <main class="content" aria-live="polite">
-  <section class="episode-layout" id="episode-root">
-    <h1 class="episode-title" id="episode-title">Loading episode…</h1>
-
-    <div class="episode-player" id="episode-player-container">
-      <p class="episode-status" id="episode-player-status" style="padding: 16px;">Loading player…</p>
+  <section class="film-card" id="episode-root">
+    <div class="episode-header-row">
+      <div>
+        <h1 class="detail-title" id="episode-title">Loading episode…</h1>
+        <p class="meta-line" id="episode-podcasted">Podcasted: —</p>
+      </div>
+      <div class="rosette-stack" aria-label="Episode rosettes" id="episode-rosettes"></div>
     </div>
 
-    <div class="episode-meta">
-      <img class="episode-poster" id="episode-poster" src="" alt="" hidden />
+    <section class="episode-player-panel film-card" aria-label="Player panel">
+      <h2>Listen to this episode</h2>
+      <div class="episode-player" id="episode-player-container">
+        <p class="episode-status" id="episode-player-status">Loading player…</p>
+      </div>
+    </section>
+
+    <div class="score-row" data-score-row id="episode-score-row" data-kev-score="" data-audience-score="">
+      <div class="score-card score-card--stat" data-score-card="kev">
+        <div class="score-stat" data-score-half="kev">
+          <div class="score-label">Kev’s Score</div>
+          <div class="score-value" data-score-value id="episode-kev-score">—</div>
+        </div>
+      </div>
+      <div class="score-card score-card--stat" data-score-card="audience">
+        <div class="score-stat" data-score-half="audience">
+          <div class="score-label">Listener Score</div>
+          <div class="score-value" data-score-value>
+            <span data-score-number id="episode-listener-score">—</span><span class="score-trend" data-score-trend aria-hidden="true"></span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <section class="bars" aria-label="Ratings" id="episode-bars"></section>
+
+    <div class="divider"></div>
+
+    <div class="hero-layout">
+      <img class="poster" id="episode-poster" src="" alt="" hidden />
       <div>
-        <p class="episode-summary" id="episode-summary"></p>
-        <div class="episode-actions" style="margin-top: 16px;">
-          <a class="button" id="episode-transcript-link" href="#">View transcript</a>
-          <a class="button" id="episode-vote-link" href="#">Vote on this rewrite</a>
+        <p class="synopsis" id="episode-summary"></p>
+        <div class="cta">
+          <div class="cta-actions">
+            <a class="button" id="episode-vote-link" href="#">⭐ Vote on this rewrite</a>
+            <a class="btn btn-secondary" id="episode-transcript-link" href="#">View transcript</a>
+          </div>
         </div>
         <p style="margin-top: 16px;"><a class="back-link" href="/index.html">← Back to films</a></p>
       </div>
@@ -153,6 +420,8 @@ body {
 
 <div id="site-footer"></div>
 
+<script src="/assets/js/shared.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
   const headerContainer = document.getElementById("site-header");
   fetch("/assets/header.html")
@@ -186,17 +455,468 @@ body {
 import { loadFilmsData } from "/assets/js/films-data.js";
 
 const BUZZSPROUT_HOST = "www.buzzsprout.com";
+const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
+const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
+const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+
+const INSIGHT_MIN_VOTES = 1;
+const INSIGHT_GAP_MIN = 1;
+const INSIGHT_DIV_MIN = 1;
+const audienceScores = {};
+let allFilms = [];
 
 const titleEl = document.getElementById("episode-title");
+const podcastedEl = document.getElementById("episode-podcasted");
+const rosettesEl = document.getElementById("episode-rosettes");
 const posterEl = document.getElementById("episode-poster");
 const summaryEl = document.getElementById("episode-summary");
 const playerContainerEl = document.getElementById("episode-player-container");
 const playerStatusEl = document.getElementById("episode-player-status");
 const transcriptLinkEl = document.getElementById("episode-transcript-link");
 const voteLinkEl = document.getElementById("episode-vote-link");
+const kevScoreEl = document.getElementById("episode-kev-score");
+const listenerScoreEl = document.getElementById("episode-listener-score");
+const scoreRowEl = document.getElementById("episode-score-row");
+const barsEl = document.getElementById("episode-bars");
 
-function createEpisodeUrl(id) {
-  return `/pages/episode.html?id=${encodeURIComponent(id)}`;
+const AWARDS = [
+  {
+    key: "kev-pick",
+    label: "Kev’s Pick",
+    emoji: "🏆",
+    rosetteClass: "rosette--kev-pick",
+    description: "Awarded to the film that Kev loves the most.",
+    getWinners: (films, aggregates) => {
+      let topKevRating = null;
+      const tiedFilms = [];
+      films.forEach((film) => {
+        const kevRating = getKevRating10(film, aggregates);
+        const normalisedKevRating = normaliseScoreToPercent(kevRating);
+        if (!Number.isFinite(normalisedKevRating)) return;
+        if (topKevRating === null || normalisedKevRating > topKevRating) {
+          topKevRating = normalisedKevRating;
+          tiedFilms.length = 0;
+          tiedFilms.push(film);
+          return;
+        }
+        if (normalisedKevRating === topKevRating) tiedFilms.push(film);
+      });
+      if (tiedFilms.length <= 1) return tiedFilms;
+      tiedFilms.sort((a, b) => {
+        const aDate = parseTimestamp(a?.podcastDate)?.getTime() ?? null;
+        const bDate = parseTimestamp(b?.podcastDate)?.getTime() ?? null;
+        const aHasDate = Number.isFinite(aDate);
+        const bHasDate = Number.isFinite(bDate);
+        if (aHasDate && bHasDate && aDate !== bDate) return aDate - bDate;
+        if (aHasDate !== bHasDate) return aHasDate ? -1 : 1;
+        return String(a?.id ?? "").localeCompare(String(b?.id ?? ""));
+      });
+      return [tiedFilms[0]];
+    }
+  },
+  {
+    key: "listener-pick",
+    label: "Listener Pick",
+    emoji: "❤️",
+    rosetteClass: "rosette--listener-pick",
+    description: "Awarded to the film that listeners can't live without.",
+    getWinners: (films, aggregates) => getTopAwardWinners(films, (film) => {
+      const listenerAvg = getListenerAverage10(film, aggregates);
+      const listenerCount = getListenerCount(film, aggregates);
+      if (!Number.isFinite(listenerAvg) || listenerCount <= 0) return null;
+      return listenerAvg;
+    })
+  },
+  {
+    key: "new",
+    label: "New",
+    emoji: "🆕",
+    rosetteClass: "rosette--new",
+    description: "The most recently podcasted film.",
+    getWinners: (films) => getTopAwardWinners(films, (film) => {
+      const newest = getNewestFilmTimestamp(film);
+      return Number.isFinite(newest) ? newest : null;
+    })
+  },
+  {
+    key: "most-underrated",
+    label: "Most Underrated",
+    emoji: "⬆️",
+    rosetteClass: "rosette--most-underrated",
+    description: "Largest positive listener gap over Kev.",
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+        const gap = listenerAvg - kevRating;
+        return gap >= INSIGHT_GAP_MIN / 10 ? gap : null;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
+  },
+  {
+    key: "most-overrated",
+    label: "Most Overrated",
+    emoji: "⬇️",
+    rosetteClass: "rosette--most-overrated",
+    description: "Largest positive Kev gap over listeners.",
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES || !Number.isFinite(listenerAvg) || !Number.isFinite(kevRating)) return null;
+        const gap = kevRating - listenerAvg;
+        return gap >= INSIGHT_GAP_MIN / 10 ? gap : null;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
+  },
+  {
+    key: "most-divisive",
+    label: "Most Divisive",
+    emoji: "⚡",
+    rosetteClass: "rosette--most-divisive",
+    description: "Awarded to the film with biggest rating variance.",
+    getWinners: (films, aggregates) => getBestSingleWinnerWithTiebreak(
+      films,
+      (film) => {
+        const listenerCount = getListenerCount(film, aggregates);
+        if (listenerCount < INSIGHT_MIN_VOTES) return null;
+        const metric = getDivisiveAwardMetric(film, aggregates);
+        return Number.isFinite(metric) && metric >= INSIGHT_DIV_MIN ? metric : null;
+      },
+      (film) => getListenerCount(film, aggregates),
+      (film) => {
+        const listenerAvg10 = getListenerAverage10(film, aggregates);
+        const kevAvg10 = getKevRating10(film, aggregates);
+        const gapVsKev = Number.isFinite(listenerAvg10) && Number.isFinite(kevAvg10)
+          ? Math.abs(listenerAvg10 - kevAvg10)
+          : -1;
+        return { gapVsKev, title: String(film.title || "") };
+      }
+    )
+  },
+  {
+    key: "lost-plot",
+    label: "Lost the Plot",
+    emoji: "🌀",
+    rosetteClass: "rosette--lost-plot",
+    description: "Furthest from the real film.",
+    shouldDisplay: (films, aggregates) => films.some((film) => Number.isFinite(getRottenTomatoesScore10(film, aggregates))),
+    getWinners: (films, aggregates) => getBestSingleWinner(
+      films,
+      (film) => {
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        const rottenScore = getRottenTomatoesScore10(film, aggregates);
+        if (!Number.isFinite(kevRating) || !Number.isFinite(listenerAvg) || !Number.isFinite(rottenScore)) return null;
+        return (Math.abs(kevRating - rottenScore) + Math.abs(listenerAvg - rottenScore)) / 2;
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
+  },
+  {
+    key: "fixed-it",
+    label: "Fixed It",
+    emoji: "✨",
+    rosetteClass: "rosette--fixed-it",
+    description: "Kev’s score beats Rotten Tomatoes for the real film.",
+    getWinners: (films, aggregates) => films.filter((film) => {
+      const kevRating = getKevRating10(film, aggregates);
+      const rottenScore = getRottenTomatoesScore10(film, aggregates);
+      if (!Number.isFinite(kevRating) || !Number.isFinite(rottenScore)) return false;
+      return kevRating > rottenScore;
+    })
+  },
+  {
+    key: "consensus-achieved",
+    label: "Consensus Achieved",
+    emoji: "🤝",
+    rosetteClass: "rosette--consensus",
+    description: "Kev and listeners agreed the most.",
+    getWinners: (films, aggregates) => getBestSingleWinnerLowest(
+      films,
+      (film) => {
+        const kevRating = getKevRating10(film, aggregates);
+        const listenerAvg = getListenerAverage10(film, aggregates);
+        if (!Number.isFinite(kevRating) || !Number.isFinite(listenerAvg)) return null;
+        return Math.abs(kevRating - listenerAvg);
+      },
+      (film) => getListenerCount(film, aggregates)
+    )
+  }
+];
+
+function parseLocalDate(d) {
+  if (!d) return null;
+  const [year, month, day] = String(d).split("-").map(Number);
+  if (!year || !month || !day) return null;
+  const dt = new Date(year, month - 1, day);
+  return Number.isNaN(dt.getTime()) ? null : dt;
+}
+
+function parseTimestamp(value) {
+  if (!value) return null;
+  if (value instanceof Date) return Number.isNaN(value.getTime()) ? null : value;
+  if (typeof value === "number") {
+    const numericDate = new Date(value);
+    return Number.isNaN(numericDate.getTime()) ? null : numericDate;
+  }
+  if (typeof value === "string") {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (/^\d{2}\/\d{2}\/\d{2}$/.test(trimmed)) {
+      const [day, month, shortYear] = trimmed.split("/").map(Number);
+      const fullYear = 2000 + shortYear;
+      const ukShortDate = new Date(fullYear, month - 1, day);
+      return Number.isNaN(ukShortDate.getTime()) ? null : ukShortDate;
+    }
+    const localDate = parseLocalDate(trimmed);
+    if (localDate) return localDate;
+    const isoLike = /^\d{4}-\d{2}-\d{2}T/.test(trimmed) || /^\d{4}-\d{2}-\d{2}$/.test(trimmed);
+    if (!isoLike) return null;
+    const parsed = new Date(trimmed);
+    return Number.isNaN(parsed.getTime()) ? null : parsed;
+  }
+  return null;
+}
+
+function formatUkDate(d) {
+  const dt = parseLocalDate(d) || parseTimestamp(d);
+  return dt ? dt.toLocaleDateString("en-GB").replaceAll("/", "-") : (d || "—");
+}
+
+function escapeHtml(value) {
+  return String(value)
+    .replaceAll("&", "&amp;")
+    .replaceAll("<", "&lt;")
+    .replaceAll(">", "&gt;")
+    .replaceAll('"', "&quot;")
+    .replaceAll("'", "&#39;");
+}
+
+function getPercentRaw(value) {
+  const score = Number(value);
+  return Number.isFinite(score) ? score : null;
+}
+
+function roundPercent(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed)) return null;
+  return Math.round(parsed);
+}
+
+function formatPercentLabel(value) {
+  const rounded = roundPercent(value);
+  return rounded === null ? "—" : `${rounded}%`;
+}
+
+function normaliseScoreToPercent(value) {
+  const score = Number(value);
+  if (!Number.isFinite(score)) return null;
+  if (score >= 0 && score <= 10) return score * 10;
+  if (score >= 0 && score <= 100) return score;
+  return null;
+}
+
+function getListenerCount(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id];
+  const listenerVotesRaw = audienceData?.listener_count
+    ?? film.listenerVotes
+    ?? (Array.isArray(film.listenerRatings) ? film.listenerRatings.length : null);
+  const listenerVotes = Number(listenerVotesRaw);
+  return Number.isFinite(listenerVotes) ? listenerVotes : 0;
+}
+
+function getListenerAverage10(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id];
+  const weightedPercent = audienceData?.weighted_percent
+    ?? film.listenerScore
+    ?? film.listenerRating
+    ?? film.listenerPercent
+    ?? film.listener_score;
+  const normalized = normaliseScoreToPercent(weightedPercent);
+  return normalized !== null ? normalized / 10 : null;
+}
+
+function getKevRating10(film) {
+  const kevValue = film.kev_rating_10 ?? film.kevRating10 ?? film.kevScore ?? film.score;
+  const normalized = normaliseScoreToPercent(kevValue);
+  return normalized !== null ? normalized / 10 : null;
+}
+
+function normalizeFilmTitle(value) {
+  return String(value || "").trim().toLowerCase();
+}
+
+function findMatchingRealFilm(film, films = []) {
+  if (!film?.title) return null;
+  const targetTitle = normalizeFilmTitle(film.title);
+  return films.find((candidate) => !candidate.rob && normalizeFilmTitle(candidate.title) === targetTitle) ?? null;
+}
+
+function getRottenTomatoesScore10FromFilm(film) {
+  if (!film) return null;
+  const directValue = film.rottenTomatoesScore ?? film.rtScore ?? film.rt_score ?? film.rotten_score;
+  const directNormalized = normaliseScoreToPercent(directValue);
+  if (directNormalized !== null) return directNormalized / 10;
+  const scoreLabel = String(film.scoreLabel || "");
+  if (!film.rob && scoreLabel.toLowerCase().includes("rotten")) {
+    const normalized = normaliseScoreToPercent(film.score);
+    return normalized !== null ? normalized / 10 : null;
+  }
+  return null;
+}
+
+function getRottenTomatoesScore10(film, aggregates = {}) {
+  const direct = getRottenTomatoesScore10FromFilm(film);
+  if (direct !== null) return direct;
+  const allFilmsList = aggregates.allFilms ?? allFilms;
+  if (!Array.isArray(allFilmsList)) return null;
+  const matched = findMatchingRealFilm(film, allFilmsList);
+  return matched ? getRottenTomatoesScore10FromFilm(matched) : null;
+}
+
+function getNewestFilmTimestamp(film) {
+  const dateValue = film.podcasted_at ?? film.podcastedAt ?? film.podcastDate ?? film.created_at ?? film.createdAt ?? film.published_at ?? film.publishedAt ?? film.date;
+  const parsed = parseTimestamp(dateValue);
+  return parsed ? parsed.getTime() : null;
+}
+
+function computeStandardDeviation(values) {
+  const parsed = values.map((value) => Number(value)).filter((value) => Number.isFinite(value));
+  if (parsed.length < 2) return null;
+  const mean = parsed.reduce((sum, value) => sum + value, 0) / parsed.length;
+  const variance = parsed.reduce((sum, value) => sum + ((value - mean) ** 2), 0) / parsed.length;
+  return Math.sqrt(variance);
+}
+
+function getDivisiveMetric(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id] ?? {};
+  const listenerRatings = Array.isArray(film.listenerRatings)
+    ? film.listenerRatings
+    : (Array.isArray(audienceData.listener_ratings) ? audienceData.listener_ratings : null);
+
+  if (listenerRatings?.length >= 2) {
+    const normalisedRatings = listenerRatings.map(normaliseScoreToPercent).filter((value) => Number.isFinite(value));
+    if (normalisedRatings.length >= 2) return computeStandardDeviation(normalisedRatings);
+  }
+
+  const spreadRaw = audienceData.rating_spread ?? film.ratingSpread ?? film.listenerRatingSpread;
+  const spreadNorm = normaliseScoreToPercent(spreadRaw);
+  if (spreadNorm !== null) return spreadNorm;
+
+  const minRating = normaliseScoreToPercent(audienceData.min_rating ?? film.listenerMinRating ?? film.listenerRatingMin);
+  const maxRating = normaliseScoreToPercent(audienceData.max_rating ?? film.listenerMaxRating ?? film.listenerRatingMax);
+  if (minRating !== null && maxRating !== null && maxRating >= minRating) return maxRating - minRating;
+
+  return null;
+}
+
+function getDivisiveAwardMetric(film, aggregates = {}) {
+  const audienceData = aggregates.audienceScores?.[film.id] ?? audienceScores[film.id] ?? {};
+  const hasPerVoteRatings = Array.isArray(film.listenerRatings) || Array.isArray(audienceData.listener_ratings);
+  const baseSpread = getDivisiveMetric(film, aggregates);
+  if (!Number.isFinite(baseSpread)) return null;
+  if (hasPerVoteRatings) return baseSpread;
+  const listenerCount = getListenerCount(film, aggregates);
+  return listenerCount > 0 ? baseSpread * listenerCount : baseSpread;
+}
+
+function getTopAwardWinners(films, getValue) {
+  let bestValue = null;
+  let winners = [];
+  films.forEach((film) => {
+    const value = getValue(film);
+    if (!Number.isFinite(value)) return;
+    if (bestValue === null || value > bestValue) {
+      bestValue = value;
+      winners = [film];
+      return;
+    }
+    if (value === bestValue) winners.push(film);
+  });
+  return winners;
+}
+
+function getBestSingleWinner(films, getMetric, getVotes) {
+  let bestFilm = null;
+  let bestMetric = null;
+  let bestVotes = null;
+  let bestTitle = "";
+  films.forEach((film) => {
+    const metric = getMetric(film);
+    if (!Number.isFinite(metric)) return;
+    const safeVotes = Number(getVotes(film)) || 0;
+    const title = String(film.title || "");
+    if (bestFilm === null || metric > bestMetric || (metric === bestMetric && safeVotes > bestVotes) || (metric === bestMetric && safeVotes === bestVotes && title.localeCompare(bestTitle, "en-GB", { sensitivity: "base" }) < 0)) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestTitle = title;
+    }
+  });
+  return bestFilm ? [bestFilm] : [];
+}
+
+function getBestSingleWinnerWithTiebreak(films, getMetric, getVotes, getTie) {
+  let bestFilm = null;
+  let bestMetric = null;
+  let bestVotes = null;
+  let bestGap = -1;
+  let bestTitle = "";
+  films.forEach((film) => {
+    const metric = getMetric(film);
+    if (!Number.isFinite(metric)) return;
+    const safeVotes = Number(getVotes(film)) || 0;
+    const tieData = getTie ? getTie(film) : {};
+    const gapVsKev = Number.isFinite(tieData?.gapVsKev) ? tieData.gapVsKev : -1;
+    const title = String(tieData?.title ?? film.title ?? "");
+    if (bestFilm === null
+      || metric > bestMetric
+      || (metric === bestMetric && gapVsKev > bestGap)
+      || (metric === bestMetric && gapVsKev === bestGap && safeVotes > bestVotes)
+      || (metric === bestMetric && gapVsKev === bestGap && safeVotes === bestVotes && title.localeCompare(bestTitle, "en-GB", { sensitivity: "base" }) < 0)) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestGap = gapVsKev;
+      bestTitle = title;
+    }
+  });
+  return bestFilm ? [bestFilm] : [];
+}
+
+function getBestSingleWinnerLowest(films, getMetric, getVotes) {
+  let bestFilm = null;
+  let bestMetric = null;
+  let bestVotes = null;
+  let bestTitle = "";
+  films.forEach((film) => {
+    const metric = getMetric(film);
+    if (!Number.isFinite(metric)) return;
+    const safeVotes = Number(getVotes(film)) || 0;
+    const title = String(film.title || "");
+    if (bestFilm === null
+      || metric < bestMetric
+      || (metric === bestMetric && safeVotes > bestVotes)
+      || (metric === bestMetric && safeVotes === bestVotes && title.localeCompare(bestTitle, "en-GB", { sensitivity: "base" }) < 0)) {
+      bestFilm = film;
+      bestMetric = metric;
+      bestVotes = safeVotes;
+      bestTitle = title;
+    }
+  });
+  return bestFilm ? [bestFilm] : [];
+}
+
+function getVisibleAwards(films, aggregates = {}) {
+  return AWARDS.filter((award) => typeof award.shouldDisplay !== "function" || award.shouldDisplay(films, aggregates));
 }
 
 function isValidBuzzsproutEmbedUrl(value) {
@@ -207,15 +927,6 @@ function isValidBuzzsproutEmbedUrl(value) {
   } catch {
     return false;
   }
-}
-
-function showNotFoundState() {
-  titleEl.textContent = "Episode not found";
-  summaryEl.textContent = "We couldn't find that episode. Please return to the films list and choose another episode.";
-  playerContainerEl.hidden = true;
-  posterEl.hidden = true;
-  transcriptLinkEl.hidden = true;
-  voteLinkEl.hidden = true;
 }
 
 function setTranscriptLink(film) {
@@ -234,10 +945,128 @@ function setTranscriptLink(film) {
   transcriptLinkEl.setAttribute("aria-disabled", "true");
 }
 
+function renderBars(film) {
+  const metrics = [
+    { label: "Coherence", value: Number(film.coherence) },
+    { label: "Entertainment", value: Number(film.entertainment) },
+    { label: "Originality", value: Number(film.originality) }
+  ];
+
+  barsEl.innerHTML = metrics.map(({ label, value }) => {
+    const safeValue = Number.isFinite(value) ? Math.max(0, Math.min(10, value)) : 0;
+    return `<div class="bar-row"><label>${label}</label><div class="track"><div class="fill" style="width:${safeValue * 10}%"></div></div><strong>${safeValue}/10</strong></div>`;
+  }).join("");
+}
+
+function applyScoreCardHighlight(scoreRow) {
+  if (!scoreRow) return;
+  const kevValue = Number(scoreRow.dataset.kevScore);
+  const audienceValue = Number(scoreRow.dataset.audienceScore);
+  const audienceTrend = scoreRow.querySelector("[data-score-trend]");
+  if (!audienceTrend) return;
+
+  audienceTrend.textContent = "";
+  audienceTrend.classList.remove("score-trend--up", "score-trend--down");
+  if (!Number.isFinite(kevValue) || !Number.isFinite(audienceValue)) return;
+
+  const roundedKevValue = roundPercent(kevValue);
+  const roundedAudienceValue = roundPercent(audienceValue);
+  if (roundedAudienceValue > roundedKevValue) {
+    audienceTrend.textContent = "▲";
+    audienceTrend.classList.add("score-trend--up");
+  } else if (roundedAudienceValue < roundedKevValue) {
+    audienceTrend.textContent = "▼";
+    audienceTrend.classList.add("score-trend--down");
+  }
+}
+
+function getRosettesForFilm(film) {
+  const rosettes = [{ className: film.rob ? "rob" : "real", label: film.rob ? "Rob’s Film" : "Real Film", icon: "" }];
+
+  if (film.rob) {
+    const robFilmsAll = allFilms.filter((entry) => entry.active && entry.rob);
+    const awardsContext = { audienceScores, allFilms };
+    const visibleAwards = getVisibleAwards(robFilmsAll, awardsContext);
+    const awardWinnersByKey = Object.fromEntries(
+      visibleAwards.map((award) => [award.key, new Set(award.getWinners(robFilmsAll, awardsContext).map((winner) => winner.id))])
+    );
+
+    visibleAwards.forEach((award) => {
+      if (!awardWinnersByKey[award.key]?.has(film.id)) return;
+      rosettes.push({
+        className: award.rosetteClass,
+        label: award.label,
+        icon: `<span class="badge-icon" aria-hidden="true">${award.emoji}</span>`,
+        title: award.description || ""
+      });
+    });
+  }
+
+  if (Array.isArray(film.rosettes)) {
+    film.rosettes.forEach((rosette) => {
+      if (!rosette?.label) return;
+      rosettes.push({ className: rosette.className || "other", label: rosette.label, icon: rosette.icon || "", title: rosette.title || "" });
+    });
+  }
+
+  rosettesEl.innerHTML = rosettes.map(({ className, label, icon, title }) => {
+    const iconMarkup = icon ? ` ${icon.trim()}` : "";
+    return `<span class="rosette ${className}"${title ? ` title="${escapeHtml(title)}"` : ""}>${label}${iconMarkup}</span>`;
+  }).join("");
+}
+
+function renderPlayer(film) {
+  if (isValidBuzzsproutEmbedUrl(film.buzzsproutEmbedUrl)) {
+    const iframe = document.createElement("iframe");
+    iframe.title = `${film.title || "Episode"} audio player`;
+    iframe.loading = "lazy";
+    iframe.src = film.buzzsproutEmbedUrl;
+    iframe.allow = "autoplay";
+    playerContainerEl.replaceChildren(iframe);
+    return;
+  }
+  playerStatusEl.textContent = "Audio coming soon.";
+  playerContainerEl.replaceChildren(playerStatusEl);
+}
+
+function showNotFoundState() {
+  titleEl.textContent = "Episode not found";
+  podcastedEl.textContent = "Podcasted: —";
+  summaryEl.textContent = "We couldn't find that episode. Please return to the films list and choose another episode.";
+  rosettesEl.innerHTML = "";
+  playerStatusEl.textContent = "Audio coming soon.";
+  playerContainerEl.replaceChildren(playerStatusEl);
+  posterEl.hidden = true;
+  transcriptLinkEl.hidden = true;
+  voteLinkEl.hidden = true;
+}
+
+async function fetchAudienceScores() {
+  if (!supabaseClient) return;
+  const { data, error } = await supabaseClient
+    .from("film_scores_v1")
+    .select("film_id, weighted_percent, listener_count, agg_updated_at");
+
+  if (error) {
+    console.error("Failed to fetch audience scores.", error);
+    return;
+  }
+
+  data.forEach((row) => {
+    audienceScores[row.film_id] = {
+      weighted_percent: row.weighted_percent,
+      listener_count: row.listener_count,
+      agg_updated_at: row.agg_updated_at
+    };
+  });
+}
+
 function renderEpisode(film) {
   document.title = `${film.title} – No Context Cinema Club`;
   titleEl.textContent = film.title || "Episode";
+  podcastedEl.textContent = `Podcasted: ${formatUkDate(film.podcasted_at ?? film.podcastDate ?? film.podcastedAt)}`;
   summaryEl.textContent = film.summary || "";
+  voteLinkEl.href = `/index.html#film-${encodeURIComponent(film.id)}`;
 
   if (film.poster) {
     posterEl.src = film.poster;
@@ -248,23 +1077,19 @@ function renderEpisode(film) {
   }
 
   setTranscriptLink(film);
+  renderPlayer(film);
+  renderBars(film);
+  getRosettesForFilm(film);
 
-  voteLinkEl.href = `/index.html#film-${encodeURIComponent(film.id)}`;
+  const kevPercentRaw = normaliseScoreToPercent(getKevRating10(film));
+  const audiencePercentRaw = getPercentRaw(audienceScores[film.id]?.weighted_percent);
 
-  if (isValidBuzzsproutEmbedUrl(film.buzzsproutEmbedUrl)) {
-    const iframe = document.createElement("iframe");
-    iframe.title = `${film.title || "Episode"} audio player`;
-    iframe.loading = "lazy";
-    iframe.src = film.buzzsproutEmbedUrl;
-    iframe.allow = "autoplay";
+  kevScoreEl.textContent = formatPercentLabel(kevPercentRaw);
+  listenerScoreEl.textContent = formatPercentLabel(audiencePercentRaw);
 
-    playerContainerEl.replaceChildren(iframe);
-  } else {
-    if (playerStatusEl) {
-      playerStatusEl.textContent = "Audio coming soon.";
-      playerContainerEl.replaceChildren(playerStatusEl);
-    }
-  }
+  scoreRowEl.dataset.kevScore = kevPercentRaw ?? "";
+  scoreRowEl.dataset.audienceScore = audiencePercentRaw ?? "";
+  applyScoreCardHighlight(scoreRowEl);
 }
 
 async function initEpisodePage() {
@@ -277,8 +1102,9 @@ async function initEpisodePage() {
   }
 
   try {
-    const films = await loadFilmsData();
-    const film = films.find((entry) => entry?.id === id);
+    allFilms = await loadFilmsData();
+    await fetchAudienceScores();
+    const film = allFilms.find((entry) => entry?.id === id);
 
     if (!film) {
       showNotFoundState();
@@ -286,13 +1112,6 @@ async function initEpisodePage() {
     }
 
     renderEpisode(film);
-
-    if (window.location.pathname === "/pages/episode.html") {
-      const nextUrl = createEpisodeUrl(film.id);
-      if (`${window.location.pathname}${window.location.search}` !== nextUrl.replace(window.location.origin, "")) {
-        window.history.replaceState({}, "", nextUrl);
-      }
-    }
   } catch (error) {
     console.error("Failed to load episode", error);
     showNotFoundState();
