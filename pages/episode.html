@@ -673,7 +673,8 @@ function getListenerAverage10(film, aggregates = {}) {
 function getKevRating10(film, _aggregates = {}) {
   const kevValue = film.kev_rating_10 ?? film.kevRating10 ?? film.kevScore ?? film.score;
   const normalized = normaliseScoreToPercent(kevValue);
-  return normalized !== null ? normalized / 10 : null;
+  if (normalized !== null) return normalized / 10;
+  return getRobComponentAverage10(film);
 }
 
 function getRobComponentAverage10(film) {
