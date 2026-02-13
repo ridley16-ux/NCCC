@@ -5744,7 +5744,10 @@ function updateTranscriptSlots(slug, { exists }) {
     if (slot.querySelector(".transcript-link")) return;
     const filmId = slot.closest(".film-card")?.dataset?.filmId;
     const film = filmId ? allFilms.find((entry) => entry.id === filmId) : null;
-    if (!film) return;
+    if (!film || !film.rob) {
+      slot.innerHTML = "";
+      return;
+    }
     const button = buildTranscriptButton({
       slug,
       title: film.title,
@@ -5755,6 +5758,14 @@ function updateTranscriptSlots(slug, { exists }) {
 }
 
 function ensureTranscriptAvailability(film, card) {
+  if (!film?.rob) {
+    const slot = card?.querySelector("[data-transcript-slot]");
+    if (slot) {
+      slot.innerHTML = "";
+      delete slot.dataset.transcriptSlug;
+    }
+    return;
+  }
   const slug = getTranscriptSlug(film);
   if (!slug) return;
   const slot = card?.querySelector("[data-transcript-slot]");
@@ -6030,7 +6041,6 @@ async function render(options = {}) {
 
           <div class="cta">
             <a class="btn rt" href="${film.link}" target="_blank">Rotten Tomatoes</a>
-            <span class="transcript-slot" data-transcript-slot></span>
           </div>
         </div>
       `}
