@@ -16,7 +16,7 @@
 <meta name="robots" content="index,follow" />
 <link rel="canonical" href="https://nocontextcinemaclub.com/pages/episode.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<meta name="website-version" content="1.16.1" />
+<meta name="website-version" content="1.16.2" />
 <link rel="stylesheet" href="/assets/css/site.css" />
 <style>
 :root {
@@ -40,11 +40,11 @@ body {
 
 .content {
   max-width: 900px;
-  margin: 0 auto 32px;
+  margin: 0 auto 24px;
   padding: 12px 16px 0;
 }
 
-.film-card {
+.film-tile-card {
   display: block;
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), var(--card);
   border-radius: 18px;
@@ -52,6 +52,11 @@ body {
   padding: 18px;
   position: relative;
   box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+}
+
+.episode-card {
+  display: grid;
+  gap: 14px;
 }
 
 .detail-title {
@@ -112,9 +117,8 @@ body {
 .rosette--fixed-it { background: var(--rosette-fixed-it-bg); }
 .rosette--consensus { background: var(--rosette-consensus-bg); }
 
-.episode-player-panel { margin-top: 16px; }
 .episode-player-panel h2 {
-  margin: 0 0 12px;
+  margin: 0 0 8px;
   font-size: 18px;
 }
 
@@ -124,25 +128,24 @@ body {
   overflow: hidden;
   background: #121212;
   border: 1px solid #353535;
-  min-height: 160px;
+  min-height: 110px;
+  padding: 10px;
 }
 
+.episode-player > div,
 .episode-player iframe,
 .episode-player .buzzsprout-player {
-  display: block;
-  width: 100%;
-  min-height: 220px;
-  border: 0;
+  width: 100% !important;
+  max-width: 100% !important;
 }
 
 .episode-status {
   margin: 0;
   color: #d8d8d8;
-  padding: 16px;
+  padding: 8px;
 }
 
 .score-row {
-  margin-top: 16px;
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
   align-items: stretch;
@@ -183,42 +186,6 @@ body {
   line-height: 1;
 }
 
-.score-trend { margin-left: 0.32em; font-size: 0.9em; }
-.score-trend--up { color: #8ddf9f; }
-.score-trend--down { color: #ff8e86; }
-
-.bars { display: grid; gap: 10px; margin-top: 16px; }
-.bar-row {
-  display: grid;
-  grid-template-columns: 130px 1fr 46px;
-  gap: 10px;
-  align-items: center;
-}
-.bar-row label { color: var(--muted); font-size: 13px; }
-.track {
-  height: 10px;
-  border-radius: 999px;
-  background: rgba(255, 255, 255, 0.08);
-  border: 1px solid var(--line);
-  overflow: hidden;
-}
-.fill {
-  height: 100%;
-  background: linear-gradient(90deg, var(--accent-rob), #ffb37a);
-}
-.bar-row strong {
-  font-size: 13px;
-  color: var(--muted);
-  font-weight: 650;
-  text-align: right;
-}
-
-.divider {
-  height: 1px;
-  background: var(--line);
-  margin: 16px 0;
-}
-
 .hero-layout {
   display: grid;
   grid-template-columns: minmax(220px, 260px) minmax(0, 1fr);
@@ -229,8 +196,14 @@ body {
 .poster {
   width: 100%;
   max-width: 260px;
+  height: auto;
   border-radius: 8px;
   box-shadow: 0 12px 28px rgba(0, 0, 0, 0.4);
+}
+
+.episode-summary-wrap {
+  display: grid;
+  gap: 12px;
 }
 
 .synopsis {
@@ -240,104 +213,10 @@ body {
   margin: 0;
 }
 
-.cta {
-  margin-top: 16px;
+
+.episode-footer-row {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  flex-wrap: wrap;
-}
-
-.cta-actions {
-  display: flex;
-  gap: 10px;
-  flex-wrap: wrap;
-}
-
-.btn {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 12px 16px;
-  border-radius: 14px;
-  border: 1px solid rgba(0, 0, 0, 0.2);
-  font-weight: 800;
-  text-decoration: none;
-}
-
-.btn.btn-primary {
-  background: var(--brand-orange);
-  color: #fff;
-  border: 1px solid rgba(255, 255, 255, 0.1);
-  box-shadow: 0 12px 24px rgba(212, 106, 42, 0.25);
-}
-
-.btn.btn-secondary {
-  background: transparent;
-  color: rgba(255, 255, 255, 0.86);
-  border: 1px solid rgba(255, 255, 255, 0.2);
-}
-
-.btn:hover { opacity: 0.92; }
-.btn:focus-visible { outline: 3px solid rgba(255, 255, 255, 0.65); outline-offset: 2px; }
-
-.button {
-  position: relative;
-  transition: all 0.3s ease-in-out;
-  box-shadow: 0px 10px 20px rgba(0, 0, 0, 0.2);
-  padding-block: 0.5rem;
-  padding-inline: 1.25rem;
-  background-color: var(--brand-orange);
-  border-radius: 9999px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  cursor: pointer;
-  color: #ffffff;
-  gap: 10px;
-  font-weight: bold;
-  border: 3px solid rgba(255, 255, 255, 0.3);
-  outline: none;
-  overflow: hidden;
-  font-size: 15px;
-  text-decoration: none;
-}
-
-.button:hover {
-  transform: scale(1.05);
-  border-color: rgba(255, 255, 255, 0.6);
-}
-
-.button:focus-visible {
-  outline: 3px solid rgba(255, 255, 255, 0.7);
-  outline-offset: 3px;
-}
-
-.button::before {
-  content: "";
-  position: absolute;
-  width: 100px;
-  height: 100%;
-  background-image: linear-gradient(120deg, rgba(255, 255, 255, 0) 30%, rgba(255, 255, 255, 0.8), rgba(255, 255, 255, 0) 70%);
-  top: 0;
-  left: -100px;
-  opacity: 0.6;
-}
-
-.button:hover::before {
-  animation: shine 1.5s ease-out infinite;
-}
-
-@keyframes shine {
-  0% { left: -100px; }
-  60% { left: 100%; }
-  100% { left: 100%; }
-}
-
-
-.btn.is-disabled {
-  opacity: 0.6;
-  pointer-events: none;
+  justify-content: flex-end;
 }
 
 .back-link {
@@ -352,9 +231,12 @@ body {
 }
 
 @media (max-width: 760px) {
-  .hero-layout,
-  .bar-row {
+  .hero-layout {
     grid-template-columns: 1fr;
+  }
+
+  .poster {
+    max-width: 100%;
   }
 
   .score-row { grid-template-columns: 1fr; }
@@ -365,7 +247,7 @@ body {
 <div id="site-header"></div>
 
 <main class="content" aria-live="polite">
-  <section class="film-card" id="episode-root">
+  <section class="film-tile-card episode-card" id="episode-root">
     <div class="episode-header-row">
       <div>
         <h1 class="detail-title" id="episode-title">Loading episode…</h1>
@@ -374,46 +256,36 @@ body {
       <div class="rosette-stack" aria-label="Episode rosettes" id="episode-rosettes"></div>
     </div>
 
-    <section class="episode-player-panel film-card" aria-label="Player panel">
-      <h2>Listen to this episode</h2>
+    <section class="episode-player-panel" aria-label="Player panel">
+      <h2 id="episode-listen-heading">Listen to this episode</h2>
       <div class="episode-player" id="episode-player-container">
         <p class="episode-status" id="episode-player-status">Loading player…</p>
       </div>
     </section>
 
-    <div class="score-row" data-score-row id="episode-score-row" data-kev-score="" data-audience-score="">
-      <div class="score-card score-card--stat" data-score-card="kev">
-        <div class="score-stat" data-score-half="kev">
-          <div class="score-label">Kev’s Score</div>
-          <div class="score-value" data-score-value id="episode-kev-score">—</div>
-        </div>
-      </div>
-      <div class="score-card score-card--stat" data-score-card="audience">
-        <div class="score-stat" data-score-half="audience">
-          <div class="score-label">Listener Score</div>
-          <div class="score-value" data-score-value>
-            <span data-score-number id="episode-listener-score">—</span><span class="score-trend" data-score-trend aria-hidden="true"></span>
+    <div class="hero-layout">
+      <img class="poster" id="episode-poster" src="" alt="" hidden />
+      <div class="episode-summary-wrap">
+        <div class="score-row" data-score-row id="episode-score-row" data-kev-score="" data-audience-score="">
+          <div class="score-card score-card--stat" data-score-card="kev">
+            <div class="score-stat" data-score-half="kev">
+              <div class="score-label">Kev’s Score</div>
+              <div class="score-value" data-score-value id="episode-kev-score">—</div>
+            </div>
+          </div>
+          <div class="score-card score-card--stat" data-score-card="audience">
+            <div class="score-stat" data-score-half="audience">
+              <div class="score-label">Listener Score</div>
+              <div class="score-value" data-score-value id="episode-listener-score">—</div>
+            </div>
           </div>
         </div>
+        <p class="synopsis" id="episode-summary"></p>
       </div>
     </div>
 
-    <section class="bars" aria-label="Ratings" id="episode-bars"></section>
-
-    <div class="divider"></div>
-
-    <div class="hero-layout">
-      <img class="poster" id="episode-poster" src="" alt="" hidden />
-      <div>
-        <p class="synopsis" id="episode-summary"></p>
-        <div class="cta">
-          <div class="cta-actions">
-            <a class="button" id="episode-vote-link" href="#">⭐ Vote on this rewrite</a>
-            <a class="btn btn-secondary" id="episode-transcript-link" href="#">View transcript</a>
-          </div>
-        </div>
-        <p style="margin-top: 16px;"><a class="back-link" href="/index.html">← Back to films</a></p>
-      </div>
+    <div class="episode-footer-row">
+      <a class="back-link" href="/index.html">← Back to films</a>
     </div>
   </section>
 </main>
@@ -472,12 +344,9 @@ const posterEl = document.getElementById("episode-poster");
 const summaryEl = document.getElementById("episode-summary");
 const playerContainerEl = document.getElementById("episode-player-container");
 const playerStatusEl = document.getElementById("episode-player-status");
-const transcriptLinkEl = document.getElementById("episode-transcript-link");
-const voteLinkEl = document.getElementById("episode-vote-link");
+const listenHeadingEl = document.getElementById("episode-listen-heading");
 const kevScoreEl = document.getElementById("episode-kev-score");
 const listenerScoreEl = document.getElementById("episode-listener-score");
-const scoreRowEl = document.getElementById("episode-score-row");
-const barsEl = document.getElementById("episode-bars");
 
 const AWARDS = [
   {
@@ -919,66 +788,18 @@ function getVisibleAwards(films, aggregates = {}) {
   return AWARDS.filter((award) => typeof award.shouldDisplay !== "function" || award.shouldDisplay(films, aggregates));
 }
 
-function isValidBuzzsproutEmbedUrl(value) {
+function isValidBuzzsproutScriptSrc(value) {
   if (!value || typeof value !== "string") return false;
   try {
     const url = new URL(value);
-    return url.protocol === "https:" && url.hostname === BUZZSPROUT_HOST && /^\/\d+\/episodes\//.test(url.pathname);
+    if (url.protocol !== "https:" || url.hostname !== BUZZSPROUT_HOST) return false;
+    if (!/^\/\d+\/episodes\/\d+-.+\.js$/.test(url.pathname)) return false;
+    return url.searchParams.get("player") === "small";
   } catch {
     return false;
   }
 }
 
-function setTranscriptLink(film) {
-  const transcriptPath = typeof film?.transcriptTxt === "string" ? film.transcriptTxt.trim() : "";
-  if (transcriptPath) {
-    transcriptLinkEl.href = transcriptPath;
-    transcriptLinkEl.target = "_blank";
-    transcriptLinkEl.rel = "noopener noreferrer";
-    transcriptLinkEl.classList.remove("is-disabled");
-    transcriptLinkEl.setAttribute("aria-disabled", "false");
-    return;
-  }
-
-  transcriptLinkEl.href = "#";
-  transcriptLinkEl.classList.add("is-disabled");
-  transcriptLinkEl.setAttribute("aria-disabled", "true");
-}
-
-function renderBars(film) {
-  const metrics = [
-    { label: "Coherence", value: Number(film.coherence) },
-    { label: "Entertainment", value: Number(film.entertainment) },
-    { label: "Originality", value: Number(film.originality) }
-  ];
-
-  barsEl.innerHTML = metrics.map(({ label, value }) => {
-    const safeValue = Number.isFinite(value) ? Math.max(0, Math.min(10, value)) : 0;
-    return `<div class="bar-row"><label>${label}</label><div class="track"><div class="fill" style="width:${safeValue * 10}%"></div></div><strong>${safeValue}/10</strong></div>`;
-  }).join("");
-}
-
-function applyScoreCardHighlight(scoreRow) {
-  if (!scoreRow) return;
-  const kevValue = Number(scoreRow.dataset.kevScore);
-  const audienceValue = Number(scoreRow.dataset.audienceScore);
-  const audienceTrend = scoreRow.querySelector("[data-score-trend]");
-  if (!audienceTrend) return;
-
-  audienceTrend.textContent = "";
-  audienceTrend.classList.remove("score-trend--up", "score-trend--down");
-  if (!Number.isFinite(kevValue) || !Number.isFinite(audienceValue)) return;
-
-  const roundedKevValue = roundPercent(kevValue);
-  const roundedAudienceValue = roundPercent(audienceValue);
-  if (roundedAudienceValue > roundedKevValue) {
-    audienceTrend.textContent = "▲";
-    audienceTrend.classList.add("score-trend--up");
-  } else if (roundedAudienceValue < roundedKevValue) {
-    audienceTrend.textContent = "▼";
-    audienceTrend.classList.add("score-trend--down");
-  }
-}
 
 function getRosettesForFilm(film) {
   const rosettes = [{ className: film.rob ? "rob" : "real", label: film.rob ? "Rob’s Film" : "Real Film", icon: "" }];
@@ -1016,29 +837,42 @@ function getRosettesForFilm(film) {
 }
 
 function renderPlayer(film) {
-  if (isValidBuzzsproutEmbedUrl(film.buzzsproutEmbedUrl)) {
-    const iframe = document.createElement("iframe");
-    iframe.title = `${film.title || "Episode"} audio player`;
-    iframe.loading = "lazy";
-    iframe.src = film.buzzsproutEmbedUrl;
-    iframe.allow = "autoplay";
-    playerContainerEl.replaceChildren(iframe);
+  playerStatusEl.textContent = "Audio coming soon.";
+  const scriptSrc = typeof film?.buzzsproutScriptSrc === "string" ? film.buzzsproutScriptSrc.trim() : "";
+  if (!isValidBuzzsproutScriptSrc(scriptSrc)) {
+    playerContainerEl.replaceChildren(playerStatusEl);
     return;
   }
-  playerStatusEl.textContent = "Audio coming soon.";
-  playerContainerEl.replaceChildren(playerStatusEl);
+
+  const parsedSrc = new URL(scriptSrc);
+  const playerContainerId = `buzzsprout-player-${String(film.id || "episode").replace(/[^a-zA-Z0-9_-]/g, "-")}`;
+  parsedSrc.searchParams.set("container_id", playerContainerId);
+  parsedSrc.searchParams.set("player", "small");
+
+  const mount = document.createElement("div");
+  mount.id = playerContainerId;
+  playerContainerEl.replaceChildren(mount);
+
+  const script = document.createElement("script");
+  script.src = parsedSrc.toString();
+  script.type = "text/javascript";
+  script.async = true;
+  script.charset = "utf-8";
+  script.onerror = () => {
+    playerContainerEl.replaceChildren(playerStatusEl);
+  };
+  playerContainerEl.appendChild(script);
 }
 
 function showNotFoundState() {
   titleEl.textContent = "Episode not found";
   podcastedEl.textContent = "Podcasted: —";
+  listenHeadingEl.textContent = "Listen to this episode";
   summaryEl.textContent = "We couldn't find that episode. Please return to the films list and choose another episode.";
   rosettesEl.innerHTML = "";
   playerStatusEl.textContent = "Audio coming soon.";
   playerContainerEl.replaceChildren(playerStatusEl);
   posterEl.hidden = true;
-  transcriptLinkEl.hidden = true;
-  voteLinkEl.hidden = true;
 }
 
 async function fetchAudienceScores() {
@@ -1066,7 +900,7 @@ function renderEpisode(film) {
   titleEl.textContent = film.title || "Episode";
   podcastedEl.textContent = `Podcasted: ${formatUkDate(film.podcasted_at ?? film.podcastDate ?? film.podcastedAt)}`;
   summaryEl.textContent = film.summary || "";
-  voteLinkEl.href = `/index.html#film-${encodeURIComponent(film.id)}`;
+  listenHeadingEl.textContent = `Listen to ${film.title || "this episode"}`;
 
   if (film.poster) {
     posterEl.src = film.poster;
@@ -1076,20 +910,17 @@ function renderEpisode(film) {
     posterEl.hidden = true;
   }
 
-  setTranscriptLink(film);
   renderPlayer(film);
-  renderBars(film);
   getRosettesForFilm(film);
 
   const kevPercentRaw = normaliseScoreToPercent(getKevRating10(film));
-  const audiencePercentRaw = getPercentRaw(audienceScores[film.id]?.weighted_percent);
+  const listenerCount = getListenerCount(film, audienceScores);
+  const audiencePercentRaw = listenerCount > 0
+    ? getPercentRaw(audienceScores[film.id]?.weighted_percent)
+    : null;
 
   kevScoreEl.textContent = formatPercentLabel(kevPercentRaw);
   listenerScoreEl.textContent = formatPercentLabel(audiencePercentRaw);
-
-  scoreRowEl.dataset.kevScore = kevPercentRaw ?? "";
-  scoreRowEl.dataset.audienceScore = audiencePercentRaw ?? "";
-  applyScoreCardHighlight(scoreRowEl);
 }
 
 async function initEpisodePage() {
