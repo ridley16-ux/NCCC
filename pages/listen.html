@@ -397,11 +397,6 @@ function parseLocalDateTime(dateString) {
   return date;
 }
 
-function getTodayStart() {
-  const now = new Date();
-  return new Date(now.getFullYear(), now.getMonth(), now.getDate());
-}
-
 function formatUpper(value) {
   return value ? value.toUpperCase() : "";
 }
@@ -441,11 +436,11 @@ async function loadUpcomingEpisodeBanner() {
         return response.ok ? response.json() : null;
       })
     );
-    const todayStart = getTodayStart();
+    const cutoff = new Date(Date.now() - 60 * 1000);
     const upcoming = filmData
       .filter((film) => film && film.podcastDate)
       .map((film) => ({ ...film, parsedDate: parseLocalDateTime(film.podcastDate) }))
-      .filter((film) => film.parsedDate && film.parsedDate.getTime() > todayStart.getTime())
+      .filter((film) => film.parsedDate && film.parsedDate.getTime() > cutoff.getTime())
       .sort((a, b) => (a.parsedDate - b.parsedDate) || (a.slug || a.title || "").localeCompare(b.slug || b.title || ""))[0];
     if (!upcoming) {
       banner.innerHTML = "";
