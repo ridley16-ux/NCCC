@@ -76,6 +76,55 @@ body.ops-page {
   padding: 12px;
 }
 
+
+.ops-section-title {
+  margin: 0 0 10px;
+  font-size: 15px;
+  color: #eaeaea;
+}
+
+.ops-kpi-row {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+  gap: 8px;
+  margin: 0 0 10px;
+}
+
+.ops-kpi-card {
+  border: 1px solid #3b3b3b;
+  background: var(--ops-panel-soft);
+  border-radius: 8px;
+  padding: 8px 10px;
+}
+
+.ops-kpi-label {
+  display: block;
+  color: var(--ops-text-muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.02em;
+}
+
+.ops-kpi-value {
+  display: block;
+  margin-top: 2px;
+  font-size: 17px;
+  font-weight: 700;
+}
+
+.ops-table-compact {
+  min-width: 320px;
+}
+
+.ops-table-compact th,
+.ops-table-compact td {
+  font-size: 13px;
+}
+
+.ops-panel + .ops-panel {
+  margin-top: 14px;
+}
+
 .ops-table-scroll {
   overflow-x: auto;
 }

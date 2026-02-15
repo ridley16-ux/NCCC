@@ -9,6 +9,9 @@
   const refreshedAtEl = document.getElementById("ops-refreshed-at");
   const refreshButton = document.getElementById("ops-refresh");
   const copyLinkButton = document.getElementById("ops-copy-link");
+  const voterStateEl = document.getElementById("ops-voter-state");
+  const voterTableBody = document.getElementById("ops-voter-table-body");
+  const voterKpisEl = document.getElementById("ops-voter-kpis");
 
   const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -168,6 +171,95 @@
     });
   }
 
+
+  async function fetchVoterDistribution() {
+    if (!supabaseClient) {
+      throw new Error("Supabase client is unavailable on this page.");
+    }
+
+    const { data, error } = await supabaseClient
+      .from("ops_voter_film_count_distribution")
+      .select("films_voted,voters")
+      .order("films_voted", { ascending: true });
+
+    if (error) {
+      throw new Error(`Could not load voter distribution: ${error.message}`);
+    }
+
+    return Array.isArray(data) ? data : [];
+  }
+
+  function sumVoters(rows, predicate = () => true) {
+    return rows.reduce((total, row) => {
+      const filmsVoted = Number(row.films_voted || 0);
+      const voters = Number(row.voters || 0);
+      if (!Number.isFinite(voters) || !predicate(filmsVoted)) return total;
+      return total + voters;
+    }, 0);
+  }
+
+  function renderVoterKpis(rows) {
+    const uniqueVoters = sumVoters(rows);
+    const votersWith2Plus = sumVoters(rows, (filmsVoted) => filmsVoted >= 2);
+    const votersWith3Plus = sumVoters(rows, (filmsVoted) => filmsVoted >= 3);
+
+    voterKpisEl.innerHTML = `
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Unique voters</span>
+        <span class="ops-kpi-value">${uniqueVoters.toLocaleString()}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Voters with 2+ films</span>
+        <span class="ops-kpi-value">${votersWith2Plus.toLocaleString()}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Voters with 3+ films</span>
+        <span class="ops-kpi-value">${votersWith3Plus.toLocaleString()}</span>
+      </div>
+    `;
+    voterKpisEl.hidden = false;
+  }
+
+  function renderVoterDistribution(rows) {
+    voterTableBody.innerHTML = "";
+
+    rows.forEach((row) => {
+      const tr = document.createElement("tr");
+      tr.innerHTML = `
+        <td>${Number(row.films_voted || 0).toLocaleString()}</td>
+        <td>${Number(row.voters || 0).toLocaleString()}</td>
+      `;
+      voterTableBody.appendChild(tr);
+    });
+  }
+
+  async function renderVoterSection() {
+    if (!voterStateEl || !voterTableBody || !voterKpisEl) return;
+
+    voterStateEl.className = "ops-loading";
+    voterStateEl.textContent = "Loading voter engagement…";
+    voterKpisEl.hidden = true;
+    voterKpisEl.innerHTML = "";
+    voterTableBody.innerHTML = "";
+
+    try {
+      const rows = await fetchVoterDistribution();
+      if (rows.length === 0) {
+        voterStateEl.className = "ops-empty";
+        voterStateEl.textContent = "No voter engagement data found.";
+        return;
+      }
+
+      voterStateEl.className = "";
+      voterStateEl.textContent = "";
+      renderVoterKpis(rows);
+      renderVoterDistribution(rows);
+    } catch (error) {
+      voterStateEl.className = "ops-error";
+      voterStateEl.textContent = error instanceof Error ? error.message : "Unable to load voter engagement data.";
+    }
+  }
+
   async function loadOpsData() {
     if (!supabaseClient) {
       throw new Error("Supabase client is unavailable on this page.");
@@ -210,10 +302,12 @@
       }
 
       refreshedAtEl.textContent = new Date().toLocaleString();
+      await renderVoterSection();
     } catch (error) {
       tableBody.innerHTML = "";
       stateEl.className = "ops-error";
       stateEl.textContent = error instanceof Error ? error.message : "Unable to load ops data.";
+      await renderVoterSection();
     }
   }
 

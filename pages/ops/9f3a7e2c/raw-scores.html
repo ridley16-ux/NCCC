@@ -39,6 +39,23 @@
         </table>
       </div>
     </section>
+
+    <section class="ops-panel" aria-label="Voter engagement by films voted">
+      <h2 class="ops-section-title">Voter engagement (films voted per person)</h2>
+      <div id="ops-voter-state" class="ops-loading">Loading voter engagement…</div>
+      <div id="ops-voter-kpis" class="ops-kpi-row" hidden></div>
+      <div class="ops-table-scroll">
+        <table class="ops-table ops-table-compact" aria-describedby="ops-voter-state">
+          <thead>
+            <tr>
+              <th>Films voted</th>
+              <th>Voters</th>
+            </tr>
+          </thead>
+          <tbody id="ops-voter-table-body"></tbody>
+        </table>
+      </div>
+    </section>
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
