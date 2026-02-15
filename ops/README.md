@@ -6,33 +6,26 @@ This folder contains the SQL and operational notes for the hidden internal vote-
 - Aggregate source: `public.ops_film_vote_summary`
 - Voter engagement source: `public.ops_voter_film_count_distribution`
 - Totals KPI source: `public.ops_vote_totals`
+- Daily trend source: `public.ops_votes_by_day_30`
 
-## Apply SQL in Supabase
 
-1. Open Supabase Studio for your project.
-2. Go to **SQL Editor**.
-3. Paste and run `ops/sql/ops_film_vote_summary.sql`.
-4. Paste and run `ops/sql/ops_voter_film_count_distribution.sql`.
-5. Paste and run `ops/sql/ops_vote_totals.sql`.
-6. Verify with:
-   ```sql
-   select * from public.ops_film_vote_summary order by last_vote_at desc limit 20;
-   select * from public.ops_voter_film_count_distribution order by films_voted asc;
-   select * from public.ops_vote_totals;
-   ```
+## Supabase setup for Ops dashboard
 
-## How to deploy
-
-1. Apply SQL in Supabase SQL Editor.
-2. Grant `select` permissions for the ops views.
-3. Refresh schema cache in Supabase (**Settings → API → Reload schema cache**).
-4. Reminder: this page is obscurity-only (hidden URL + `noindex`), not secure.
+1. Open Supabase Studio for your project and go to **SQL Editor**.
+2. Run all Ops SQL view files, including:
+   - `ops/sql/ops_film_vote_summary.sql`
+   - `ops/sql/ops_voter_film_count_distribution.sql`
+   - `ops/sql/ops_vote_totals.sql`
+   - `ops/sql/ops_votes_by_day_30.sql`
+3. After creating or updating views, refresh schema cache in Supabase Dashboard (**Settings → API → Reload schema cache**).
+4. If the client reports `Could not find ... in schema cache`, reload schema cache and re-run the query.
+5. If it still persists, follow Supabase PostgREST schema cache troubleshooting guidance in your project docs/process.
 
 ## Security notes
 
 - This page is **obscurity-only**, not true access control.
 - Keep `film_votes` raw rows protected by RLS/policies.
-- The page should read only `ops_film_vote_summary`, `ops_voter_film_count_distribution`, and `ops_vote_totals` (aggregate columns only).
+- The page should read only `ops_film_vote_summary`, `ops_voter_film_count_distribution`, `ops_vote_totals`, and `ops_votes_by_day_30` (aggregate columns only).
 - If you need tighter guarantees, replace direct view access with a `SECURITY DEFINER` RPC function that returns the same aggregate shape.
 
 ## Rotating the hidden path

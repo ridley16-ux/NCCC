@@ -2,6 +2,8 @@
   const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
   const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
   const MANIFEST_URL = "/assets/data/films/manifest.json";
+
+  const supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
   const rtf = new Intl.RelativeTimeFormat("en", { numeric: "auto" });
 
   const tableBody = document.getElementById("ops-table-body");
@@ -12,28 +14,14 @@
   const voterStateEl = document.getElementById("ops-voter-state");
   const voterTableBody = document.getElementById("ops-voter-table-body");
   const voterKpisEl = document.getElementById("ops-voter-kpis");
-  const totalsStateEl = document.getElementById("ops-totals-state");
-  const totalsKpisEl = document.getElementById("ops-totals-kpis");
 
-  const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
+  let votesTrendChart30Instance = null;
 
-  function fmtAbsolute(ts) {
-    if (!ts) return "—";
-    const date = new Date(ts);
+  function fmtRelative(timestamp) {
+    if (!timestamp) return "—";
+    const date = new Date(timestamp);
     if (Number.isNaN(date.getTime())) return "—";
-    return date.toLocaleString();
-  }
-
-  function fmtRelative(ts) {
-    if (!ts) return "—";
-    const date = new Date(ts);
-    if (Number.isNaN(date.getTime())) return "—";
-    const seconds = Math.round((date.getTime() - Date.now()) / 1000);
-    const abs = Math.abs(seconds);
-    if (abs < 60) return rtf.format(seconds, "second");
-    if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
-    if (abs < 86400) return rtf.format(Math.round(seconds / 3600), "hour");
-    return rtf.format(Math.round(seconds / 86400), "day");
+    return formatRelativeTime(date.getTime() - Date.now());
   }
 
   function fmtDateOnly(value) {
@@ -47,57 +35,34 @@
     });
   }
 
-  async function loadMetadataFromSupabase() {
-    if (!supabaseClient) return null;
-
-    const candidates = [
-      { table: "film_meta", columns: "film_id,title,podcastDate,podcast_date,rob,version_label" },
-      { table: "film_scores_v1", columns: "film_id,title,podcastDate,podcast_date,rob,version_label" }
-    ];
-
-    for (const candidate of candidates) {
-      const { data, error } = await supabaseClient.from(candidate.table).select(candidate.columns).limit(1000);
-      if (error || !Array.isArray(data) || data.length === 0) continue;
-
-      const byId = new Map();
-      data.forEach((row) => {
-        const filmId = row.film_id || row.id;
-        if (!filmId) return;
-        const versionLabel = row.version_label || (row.rob === true ? "Rob’s Version" : "");
-        byId.set(filmId, {
-          title: row.title || filmId,
-          podcastDate: row.podcastDate || row.podcast_date || null,
-          versionLabel
-        });
-      });
-
-      if (byId.size > 0) return byId;
-    }
-
-    return null;
+  function formatRelativeTime(ms) {
+    const seconds = Math.round(ms / 1000);
+    const abs = Math.abs(seconds);
+    if (abs < 60) return rtf.format(seconds, "second");
+    if (abs < 3600) return rtf.format(Math.round(seconds / 60), "minute");
+    if (abs < 86400) return rtf.format(Math.round(seconds / 3600), "hour");
+    return rtf.format(Math.round(seconds / 86400), "day");
   }
 
   async function loadMetadataFromManifest() {
     const manifestRes = await fetch(MANIFEST_URL, { cache: "no-store" });
-    if (!manifestRes.ok) throw new Error(`Manifest request failed (${manifestRes.status})`);
+    if (!manifestRes.ok) return new Map();
     const manifest = await manifestRes.json();
     const filmEntries = Array.isArray(manifest.films) ? manifest.films : [];
 
-    const jsonEntries = filmEntries.filter((entry) => entry?.path).map((entry) => entry.path);
-    const filePayloads = await Promise.all(
-      jsonEntries.map(async (path) => {
-        try {
-          const res = await fetch(path, { cache: "no-store" });
-          if (!res.ok) return null;
-          return await res.json();
-        } catch (_error) {
-          return null;
-        }
-      })
-    );
+    const paths = filmEntries.filter((entry) => entry?.path).map((entry) => entry.path);
+    const films = await Promise.all(paths.map(async (path) => {
+      try {
+        const res = await fetch(path, { cache: "no-store" });
+        if (!res.ok) return null;
+        return await res.json();
+      } catch (_error) {
+        return null;
+      }
+    }));
 
     const byId = new Map();
-    filePayloads.forEach((film) => {
+    films.forEach((film) => {
       if (!film?.id) return;
       byId.set(film.id, {
         title: film.title || film.id,
@@ -105,114 +70,176 @@
         versionLabel: film.rob ? "Rob’s Version" : ""
       });
     });
-
     return byId;
   }
 
-  function getRatingCount(ratingCounts, score) {
-    if (!ratingCounts || typeof ratingCounts !== "object") return 0;
-    const raw = ratingCounts[String(score)] ?? ratingCounts[score];
-    const value = Number(raw);
-    return Number.isFinite(value) ? value : 0;
+  async function loadOpsTotals() {
+    const grid = document.getElementById("opsKpiGrid");
+    const meta = document.getElementById("opsKpiMeta");
+    if (!grid || !meta || !supabase) return;
+
+    grid.innerHTML = "Loading totals…";
+    meta.textContent = "";
+
+    const { data, error } = await supabase
+      .from("ops_vote_totals")
+      .select("*")
+      .limit(1)
+      .single();
+
+    if (error) {
+      console.error("Could not load ops totals:", error);
+      grid.innerHTML = "Could not load totals.";
+      return;
+    }
+
+    const lastVote = data.last_vote_at ? new Date(data.last_vote_at) : null;
+    const now = new Date();
+    const lastVoteRel = lastVote ? formatRelativeTime(lastVote - now) : "—";
+
+    const kpis = [
+      { label: "Total votes", value: data.total_votes },
+      { label: "Votes today", value: data.votes_today },
+      { label: "Votes (24h)", value: data.votes_24h },
+      { label: "Votes (7d)", value: data.votes_7d },
+      { label: "Unique voters", value: data.unique_voters },
+      { label: "Votes / voter", value: data.votes_per_voter }
+    ];
+
+    grid.innerHTML = kpis.map((k) => `
+      <div class="ops-kpi-item">
+        <div class="ops-kpi-label">${k.label}</div>
+        <div class="ops-kpi-value">${k.value ?? "—"}</div>
+      </div>
+    `).join("");
+
+    meta.textContent = `Last vote: ${lastVoteRel}`;
   }
 
-  function renderRows(rows, metadataById) {
+  async function loadVotesTrend30() {
+    const canvas = document.getElementById("votesTrendChart30");
+    if (!canvas || !supabase || typeof window.Chart === "undefined") return;
+
+    const { data, error } = await supabase
+      .from("ops_votes_by_day_30")
+      .select("day,votes,unique_voters,avg_rating")
+      .order("day", { ascending: true });
+
+    if (error) {
+      console.error("Daily trend load error:", error);
+      return;
+    }
+
+    const labels = data.map((r) => r.day);
+    const votes = data.map((r) => r.votes);
+    const ctx = canvas.getContext("2d");
+
+    if (votesTrendChart30Instance) votesTrendChart30Instance.destroy();
+
+    votesTrendChart30Instance = new window.Chart(ctx, {
+      type: "line",
+      data: {
+        labels,
+        datasets: [{
+          label: "Votes per day",
+          data: votes,
+          tension: 0.35,
+          fill: true
+        }]
+      },
+      options: {
+        responsive: true,
+        plugins: { legend: { display: false } },
+        scales: {
+          x: { grid: { color: "#222" }, ticks: { color: "#aaa" } },
+          y: { beginAtZero: true, grid: { color: "#222" }, ticks: { color: "#aaa" } }
+        }
+      }
+    });
+  }
+
+  async function loadFilmSummary() {
+    if (!stateEl || !tableBody || !supabase) return;
+    stateEl.className = "ops-loading";
+    stateEl.textContent = "Loading vote health metrics…";
     tableBody.innerHTML = "";
 
-    rows.forEach((row, index) => {
-      const meta = metadataById.get(row.film_id) || {};
-      const title = meta.title || row.film_id;
-      const versionLabel = meta.versionLabel || "";
-      const detailsId = `ops-details-${index}`;
+    const [
+      { data: rows, error },
+      metadata
+    ] = await Promise.all([
+      supabase
+        .from("ops_film_vote_summary")
+        .select("film_id,votes_total,last_vote_at,votes_last_24h,avg_rating")
+        .order("last_vote_at", { ascending: false }),
+      loadMetadataFromManifest()
+    ]);
 
+    if (error) {
+      stateEl.className = "ops-error";
+      stateEl.textContent = `Could not load vote summary: ${error.message}`;
+      return;
+    }
+
+    if (!rows?.length) {
+      stateEl.className = "ops-empty";
+      stateEl.textContent = "No aggregated vote data found.";
+      return;
+    }
+
+    stateEl.className = "";
+    stateEl.textContent = "";
+
+    rows.forEach((row) => {
+      const meta = metadata.get(row.film_id) || {};
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>
-          <button class="ops-film-btn" type="button" aria-expanded="false" aria-controls="${detailsId}">
-            <span class="ops-film-title">${title}</span>
-            ${versionLabel ? `<span class="ops-version-tag">[${versionLabel}]</span>` : ""}
-            <span class="ops-film-date">Podcasted: ${fmtDateOnly(meta.podcastDate)}</span>
-          </button>
+          <span class="ops-film-title">${meta.title || row.film_id}</span>
+          <span class="ops-film-date">Podcasted: ${fmtDateOnly(meta.podcastDate)}</span>
         </td>
         <td>${Number(row.votes_total || 0).toLocaleString()}</td>
         <td>${fmtRelative(row.last_vote_at)}</td>
         <td>${Number(row.votes_last_24h || 0).toLocaleString()}</td>
         <td>${Number(row.avg_rating || 0).toFixed(2)}</td>
       `;
-
-      const detailsRow = document.createElement("tr");
-      detailsRow.className = "ops-details-row";
-      detailsRow.id = detailsId;
-      detailsRow.hidden = true;
-      detailsRow.innerHTML = `
-        <td colspan="5">
-          <div class="ops-details">
-            <div class="ops-details-grid">
-              <div><strong>Last vote:</strong> ${fmtAbsolute(row.last_vote_at)}</div>
-              <div><strong>First vote:</strong> ${fmtAbsolute(row.first_vote_at)}</div>
-              <div><strong>Votes last 7d:</strong> ${Number(row.votes_last_7d || 0).toLocaleString()}</div>
-            </div>
-            <div class="ops-rating-dist">
-              ${Array.from({ length: 10 }, (_, i) => i + 1)
-                .map((score) => `<span class="ops-rating-pill">${score}: ${getRatingCount(row.rating_counts, score)}</span>`)
-                .join("")}
-            </div>
-          </div>
-        </td>
-      `;
-
-      const toggleBtn = tr.querySelector(".ops-film-btn");
-      toggleBtn?.addEventListener("click", () => {
-        const expanded = toggleBtn.getAttribute("aria-expanded") === "true";
-        toggleBtn.setAttribute("aria-expanded", String(!expanded));
-        detailsRow.hidden = expanded;
-      });
-
       tableBody.appendChild(tr);
-      tableBody.appendChild(detailsRow);
     });
   }
 
+  async function loadVoterDistribution() {
+    if (!voterStateEl || !voterTableBody || !voterKpisEl || !supabase) return;
+    voterStateEl.className = "ops-loading";
+    voterStateEl.textContent = "Loading voter engagement…";
+    voterKpisEl.hidden = true;
+    voterTableBody.innerHTML = "";
 
-  async function fetchVoterDistribution() {
-    if (!supabaseClient) {
-      throw new Error("Supabase client is unavailable on this page.");
-    }
-
-    const { data, error } = await supabaseClient
+    const { data, error } = await supabase
       .from("ops_voter_film_count_distribution")
       .select("films_voted,voters")
       .order("films_voted", { ascending: true });
 
     if (error) {
-      throw new Error(`Could not load voter distribution: ${error.message}`);
+      voterStateEl.className = "ops-error";
+      voterStateEl.textContent = `Could not load voter engagement: ${error.message}`;
+      return;
     }
 
-    return Array.isArray(data) ? data : [];
-  }
+    if (!data?.length) {
+      voterStateEl.className = "ops-empty";
+      voterStateEl.textContent = "No voter engagement data found.";
+      return;
+    }
 
-  function sumVoters(rows, predicate = () => true) {
-    return rows.reduce((total, row) => {
-      const filmsVoted = Number(row.films_voted || 0);
-      const voters = Number(row.voters || 0);
-      if (!Number.isFinite(voters) || !predicate(filmsVoted)) return total;
-      return total + voters;
-    }, 0);
-  }
-
-  function renderVoterKpis(rows) {
-    const uniqueVoters = sumVoters(rows);
-    const votersWith2Plus = sumVoters(rows, (filmsVoted) => filmsVoted >= 2);
-    const votersWith3Plus = sumVoters(rows, (filmsVoted) => filmsVoted >= 3);
+    const totalVoters = data.reduce((sum, row) => sum + (Number(row.voters) || 0), 0);
+    const votersWith3Plus = data
+      .filter((row) => Number(row.films_voted) >= 3)
+      .reduce((sum, row) => sum + (Number(row.voters) || 0), 0);
 
     voterKpisEl.innerHTML = `
       <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Unique voters</span>
-        <span class="ops-kpi-value">${uniqueVoters.toLocaleString()}</span>
-      </div>
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Voters with 2+ films</span>
-        <span class="ops-kpi-value">${votersWith2Plus.toLocaleString()}</span>
+        <span class="ops-kpi-label">Total voters</span>
+        <span class="ops-kpi-value">${totalVoters.toLocaleString()}</span>
       </div>
       <div class="ops-kpi-card">
         <span class="ops-kpi-label">Voters with 3+ films</span>
@@ -220,12 +247,10 @@
       </div>
     `;
     voterKpisEl.hidden = false;
-  }
 
-  function renderVoterDistribution(rows) {
-    voterTableBody.innerHTML = "";
-
-    rows.forEach((row) => {
+    voterStateEl.className = "";
+    voterStateEl.textContent = "";
+    data.forEach((row) => {
       const tr = document.createElement("tr");
       tr.innerHTML = `
         <td>${Number(row.films_voted || 0).toLocaleString()}</td>
@@ -235,152 +260,22 @@
     });
   }
 
-  async function renderVoterSection() {
-    if (!voterStateEl || !voterTableBody || !voterKpisEl) return;
-
-    voterStateEl.className = "ops-loading";
-    voterStateEl.textContent = "Loading voter engagement…";
-    voterKpisEl.hidden = true;
-    voterKpisEl.innerHTML = "";
-    voterTableBody.innerHTML = "";
-
-    try {
-      const rows = await fetchVoterDistribution();
-      if (rows.length === 0) {
-        voterStateEl.className = "ops-empty";
-        voterStateEl.textContent = "No voter engagement data found.";
-        return;
-      }
-
-      voterStateEl.className = "";
-      voterStateEl.textContent = "";
-      renderVoterKpis(rows);
-      renderVoterDistribution(rows);
-    } catch (error) {
-      voterStateEl.className = "ops-error";
-      voterStateEl.textContent = error instanceof Error ? error.message : "Unable to load voter engagement data.";
-    }
-  }
-
-  async function loadOpsData() {
-    if (!supabaseClient) {
-      throw new Error("Supabase client is unavailable on this page.");
-    }
-
-    const [
-      { data: aggregateRows, error: aggregateError },
-      { data: totalsRows, error: totalsError },
-      metadataById
-    ] = await Promise.all([
-      supabaseClient
-        .from("ops_film_vote_summary")
-        .select("film_id,votes_total,last_vote_at,first_vote_at,votes_last_24h,votes_last_7d,avg_rating,rating_counts")
-        .order("last_vote_at", { ascending: false }),
-      supabaseClient
-        .from("ops_vote_totals")
-        .select("total_votes,votes_today,votes_24h,votes_7d,unique_voters,last_vote_at,votes_per_voter")
-        .limit(1),
-      (async () => {
-        return (await loadMetadataFromSupabase()) || (await loadMetadataFromManifest());
-      })()
-    ]);
-
-    if (aggregateError) {
-      throw new Error(`Could not load vote summary: ${aggregateError.message}`);
-    }
-
-    if (totalsError) {
-      throw new Error(`Could not load vote totals: ${totalsError.message}`);
-    }
-
-    return {
-      rows: Array.isArray(aggregateRows) ? aggregateRows : [],
-      totals: Array.isArray(totalsRows) ? totalsRows[0] || null : null,
-      metadataById: metadataById || new Map()
-    };
-  }
-
-  function renderTotalsKpis(totals) {
-    if (!totalsStateEl || !totalsKpisEl) return;
-
-    if (!totals) {
-      totalsKpisEl.innerHTML = "";
-      totalsKpisEl.hidden = true;
-      totalsStateEl.className = "ops-empty";
-      totalsStateEl.textContent = "No KPI totals found.";
+  async function refreshAll() {
+    if (!supabase) {
+      stateEl.textContent = "Supabase client is unavailable on this page.";
+      stateEl.className = "ops-error";
       return;
     }
 
-    totalsStateEl.className = "";
-    totalsStateEl.textContent = "";
-    totalsKpisEl.hidden = false;
-    totalsKpisEl.innerHTML = `
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Total votes</span>
-        <span class="ops-kpi-value">${Number(totals.total_votes || 0).toLocaleString()}</span>
-      </div>
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Votes today</span>
-        <span class="ops-kpi-value">${Number(totals.votes_today || 0).toLocaleString()}</span>
-      </div>
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Votes last 7 days</span>
-        <span class="ops-kpi-value">${Number(totals.votes_7d || 0).toLocaleString()}</span>
-      </div>
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Unique voters</span>
-        <span class="ops-kpi-value">${Number(totals.unique_voters || 0).toLocaleString()}</span>
-      </div>
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Votes per voter</span>
-        <span class="ops-kpi-value">${Number(totals.votes_per_voter || 0).toFixed(2)}</span>
-      </div>
-      <div class="ops-kpi-card">
-        <span class="ops-kpi-label">Last vote</span>
-        <span class="ops-kpi-value" title="${fmtAbsolute(totals.last_vote_at)}">${fmtRelative(totals.last_vote_at)}</span>
-      </div>
-    `;
-  }
-
-  async function render() {
-    stateEl.className = "ops-loading";
-    stateEl.textContent = "Loading vote health metrics…";
-    if (totalsStateEl) {
-      totalsStateEl.className = "ops-loading";
-      totalsStateEl.textContent = "Loading vote totals…";
-    }
-    if (totalsKpisEl) {
-      totalsKpisEl.hidden = true;
-      totalsKpisEl.innerHTML = "";
-    }
-
-    try {
-      const { rows, totals, metadataById } = await loadOpsData();
-      if (rows.length === 0) {
-        tableBody.innerHTML = "";
-        stateEl.className = "ops-empty";
-        stateEl.textContent = "No aggregated vote data found.";
-      } else {
-        stateEl.className = "";
-        stateEl.textContent = "";
-        renderRows(rows, metadataById);
-      }
-
-      renderTotalsKpis(totals);
-
-      refreshedAtEl.textContent = new Date().toLocaleString();
-      await renderVoterSection();
-    } catch (error) {
-      tableBody.innerHTML = "";
-      stateEl.className = "ops-error";
-      stateEl.textContent = error instanceof Error ? error.message : "Unable to load ops data.";
-      renderTotalsKpis(null);
-      await renderVoterSection();
-    }
+    await loadOpsTotals();
+    await loadVotesTrend30();
+    await loadFilmSummary();
+    await loadVoterDistribution();
+    if (refreshedAtEl) refreshedAtEl.textContent = new Date().toLocaleString();
   }
 
   refreshButton?.addEventListener("click", () => {
-    render();
+    refreshAll();
   });
 
   copyLinkButton?.addEventListener("click", async () => {
@@ -399,5 +294,5 @@
     }
   });
 
-  render();
+  refreshAll();
 })();

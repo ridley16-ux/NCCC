@@ -22,12 +22,16 @@
 
     <p class="ops-last-refreshed">Last refreshed: <span id="ops-refreshed-at">—</span></p>
 
+    <div class="ops-card" id="ops-kpis">
+      <h2>Ops snapshot</h2>
+      <div class="ops-kpi-grid" id="opsKpiGrid"></div>
+      <div class="ops-kpi-meta" id="opsKpiMeta"></div>
+    </div>
 
-    <section class="ops-panel" aria-label="Vote KPI totals">
-      <h2 class="ops-section-title">Vote KPI summary</h2>
-      <div id="ops-totals-state" class="ops-loading">Loading vote totals…</div>
-      <div id="ops-totals-kpis" class="ops-kpi-row ops-kpi-row-summary" hidden></div>
-    </section>
+    <div class="ops-card" id="ops-trend">
+      <h2>Daily votes (Last 30 days)</h2>
+      <canvas id="votesTrendChart30" height="140"></canvas>
+    </div>
 
     <section class="ops-panel" aria-label="Vote health by film">
       <div id="ops-state" class="ops-loading">Loading vote health metrics…</div>
@@ -66,6 +70,7 @@
   </main>
 
   <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
   <script src="/assets/js/ops/rawScores.js"></script>
 </body>
 </html>
