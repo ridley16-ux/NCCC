@@ -90,6 +90,23 @@ body.ops-page {
   margin: 0 0 10px;
 }
 
+
+.ops-kpi-row-summary {
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+}
+
+@media (max-width: 980px) {
+  .ops-kpi-row-summary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+}
+
+@media (max-width: 640px) {
+  .ops-kpi-row-summary {
+    grid-template-columns: 1fr;
+  }
+}
+
 .ops-kpi-card {
   border: 1px solid #3b3b3b;
   background: var(--ops-panel-soft);
