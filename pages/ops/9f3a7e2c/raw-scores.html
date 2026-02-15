@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>NCCC Internal Ops – Raw Scores</title>
+  <meta name="description" content="Internal vote health metrics." />
+  <meta name="robots" content="noindex,nofollow" />
+  <link rel="stylesheet" href="/assets/css/site.css" />
+  <link rel="stylesheet" href="/assets/css/ops.css" />
+</head>
+<body class="ops-page">
+  <!-- Do not link this page publicly -->
+  <main class="ops-wrap">
+    <header class="ops-header">
+      <h1 class="ops-title">Internal Ops</h1>
+      <div class="ops-controls">
+        <button class="ops-btn" type="button" id="ops-copy-link">Copy link</button>
+        <button class="ops-btn" type="button" id="ops-refresh">Refresh</button>
+      </div>
+    </header>
+
+    <p class="ops-last-refreshed">Last refreshed: <span id="ops-refreshed-at">—</span></p>
+
+    <section class="ops-panel" aria-label="Vote health by film">
+      <div id="ops-state" class="ops-loading">Loading vote health metrics…</div>
+      <div class="ops-table-scroll">
+        <table class="ops-table">
+          <thead>
+            <tr>
+              <th>Film</th>
+              <th>Votes</th>
+              <th>Last vote</th>
+              <th>Votes 24h</th>
+              <th>Avg rating</th>
+            </tr>
+          </thead>
+          <tbody id="ops-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+  </main>
+
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <script src="/assets/js/ops/rawScores.js"></script>
+</body>
+</html>
