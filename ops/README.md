@@ -5,6 +5,7 @@ This folder contains the SQL and operational notes for the hidden internal vote-
 - Page path: `/pages/ops/<token>/raw-scores.html` (current token managed internally)
 - Aggregate source: `public.ops_film_vote_summary`
 - Voter engagement source: `public.ops_voter_film_count_distribution`
+- Totals KPI source: `public.ops_vote_totals`
 
 ## Apply SQL in Supabase
 
@@ -12,10 +13,12 @@ This folder contains the SQL and operational notes for the hidden internal vote-
 2. Go to **SQL Editor**.
 3. Paste and run `ops/sql/ops_film_vote_summary.sql`.
 4. Paste and run `ops/sql/ops_voter_film_count_distribution.sql`.
-5. Verify with:
+5. Paste and run `ops/sql/ops_vote_totals.sql`.
+6. Verify with:
    ```sql
    select * from public.ops_film_vote_summary order by last_vote_at desc limit 20;
    select * from public.ops_voter_film_count_distribution order by films_voted asc;
+   select * from public.ops_vote_totals;
    ```
 
 ## How to deploy
@@ -29,7 +32,7 @@ This folder contains the SQL and operational notes for the hidden internal vote-
 
 - This page is **obscurity-only**, not true access control.
 - Keep `film_votes` raw rows protected by RLS/policies.
-- The page should read only `ops_film_vote_summary` and `ops_voter_film_count_distribution` (aggregate columns only).
+- The page should read only `ops_film_vote_summary`, `ops_voter_film_count_distribution`, and `ops_vote_totals` (aggregate columns only).
 - If you need tighter guarantees, replace direct view access with a `SECURITY DEFINER` RPC function that returns the same aggregate shape.
 
 ## Rotating the hidden path

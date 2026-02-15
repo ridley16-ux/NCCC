@@ -12,6 +12,8 @@
   const voterStateEl = document.getElementById("ops-voter-state");
   const voterTableBody = document.getElementById("ops-voter-table-body");
   const voterKpisEl = document.getElementById("ops-voter-kpis");
+  const totalsStateEl = document.getElementById("ops-totals-state");
+  const totalsKpisEl = document.getElementById("ops-totals-kpis");
 
   const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -265,11 +267,19 @@
       throw new Error("Supabase client is unavailable on this page.");
     }
 
-    const [{ data: aggregateRows, error: aggregateError }, metadataById] = await Promise.all([
+    const [
+      { data: aggregateRows, error: aggregateError },
+      { data: totalsRows, error: totalsError },
+      metadataById
+    ] = await Promise.all([
       supabaseClient
         .from("ops_film_vote_summary")
         .select("film_id,votes_total,last_vote_at,first_vote_at,votes_last_24h,votes_last_7d,avg_rating,rating_counts")
         .order("last_vote_at", { ascending: false }),
+      supabaseClient
+        .from("ops_vote_totals")
+        .select("total_votes,votes_today,votes_24h,votes_7d,unique_voters,last_vote_at,votes_per_voter")
+        .limit(1),
       (async () => {
         return (await loadMetadataFromSupabase()) || (await loadMetadataFromManifest());
       })()
@@ -279,18 +289,73 @@
       throw new Error(`Could not load vote summary: ${aggregateError.message}`);
     }
 
+    if (totalsError) {
+      throw new Error(`Could not load vote totals: ${totalsError.message}`);
+    }
+
     return {
       rows: Array.isArray(aggregateRows) ? aggregateRows : [],
+      totals: Array.isArray(totalsRows) ? totalsRows[0] || null : null,
       metadataById: metadataById || new Map()
     };
+  }
+
+  function renderTotalsKpis(totals) {
+    if (!totalsStateEl || !totalsKpisEl) return;
+
+    if (!totals) {
+      totalsKpisEl.innerHTML = "";
+      totalsKpisEl.hidden = true;
+      totalsStateEl.className = "ops-empty";
+      totalsStateEl.textContent = "No KPI totals found.";
+      return;
+    }
+
+    totalsStateEl.className = "";
+    totalsStateEl.textContent = "";
+    totalsKpisEl.hidden = false;
+    totalsKpisEl.innerHTML = `
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Total votes</span>
+        <span class="ops-kpi-value">${Number(totals.total_votes || 0).toLocaleString()}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Votes today</span>
+        <span class="ops-kpi-value">${Number(totals.votes_today || 0).toLocaleString()}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Votes last 7 days</span>
+        <span class="ops-kpi-value">${Number(totals.votes_7d || 0).toLocaleString()}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Unique voters</span>
+        <span class="ops-kpi-value">${Number(totals.unique_voters || 0).toLocaleString()}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Votes per voter</span>
+        <span class="ops-kpi-value">${Number(totals.votes_per_voter || 0).toFixed(2)}</span>
+      </div>
+      <div class="ops-kpi-card">
+        <span class="ops-kpi-label">Last vote</span>
+        <span class="ops-kpi-value" title="${fmtAbsolute(totals.last_vote_at)}">${fmtRelative(totals.last_vote_at)}</span>
+      </div>
+    `;
   }
 
   async function render() {
     stateEl.className = "ops-loading";
     stateEl.textContent = "Loading vote health metrics…";
+    if (totalsStateEl) {
+      totalsStateEl.className = "ops-loading";
+      totalsStateEl.textContent = "Loading vote totals…";
+    }
+    if (totalsKpisEl) {
+      totalsKpisEl.hidden = true;
+      totalsKpisEl.innerHTML = "";
+    }
 
     try {
-      const { rows, metadataById } = await loadOpsData();
+      const { rows, totals, metadataById } = await loadOpsData();
       if (rows.length === 0) {
         tableBody.innerHTML = "";
         stateEl.className = "ops-empty";
@@ -301,12 +366,15 @@
         renderRows(rows, metadataById);
       }
 
+      renderTotalsKpis(totals);
+
       refreshedAtEl.textContent = new Date().toLocaleString();
       await renderVoterSection();
     } catch (error) {
       tableBody.innerHTML = "";
       stateEl.className = "ops-error";
       stateEl.textContent = error instanceof Error ? error.message : "Unable to load ops data.";
+      renderTotalsKpis(null);
       await renderVoterSection();
     }
   }
