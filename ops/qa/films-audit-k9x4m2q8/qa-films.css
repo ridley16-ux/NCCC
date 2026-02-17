@@ -1,0 +1,72 @@
+:root {
+  --qa-bg: #111;
+  --qa-panel: #1b1b1b;
+  --qa-border: #343434;
+  --qa-text: #efefef;
+  --qa-muted: #bbbbbb;
+  --qa-good: #70d98a;
+  --qa-warn: #f6c25b;
+  --qa-bad: #ef7272;
+}
+
+* { box-sizing: border-box; }
+body.qa-page {
+  margin: 0;
+  background: var(--qa-bg);
+  color: var(--qa-text);
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.qa-wrap { max-width: 1400px; margin: 0 auto; padding: 16px; }
+.qa-gate, #qaApp, .qa-toolbar { border: 1px solid var(--qa-border); background: var(--qa-panel); border-radius: 10px; }
+.qa-gate { max-width: 520px; margin: 60px auto; padding: 18px; }
+.qa-gate-row { display: flex; gap: 8px; margin: 10px 0; }
+.qa-gate input, .qa-toolbar input, .qa-toolbar select {
+  width: 100%;
+  border: 1px solid #555;
+  border-radius: 8px;
+  background: #121212;
+  color: var(--qa-text);
+  padding: 8px;
+}
+button { border: 1px solid #737373; background: #202020; color: #fff; border-radius: 8px; padding: 8px 10px; cursor: pointer; }
+button:hover, button:focus-visible { background: #2b2b2b; }
+
+#qaApp { padding: 10px; }
+.qa-header h1 { margin: 4px 0; font-size: 22px; }
+.qa-muted { color: var(--qa-muted); font-size: 13px; }
+.qa-disclaimer { color: #9d9d9d; font-size: 12px; }
+
+.qa-toolbar {
+  position: sticky;
+  top: 0;
+  z-index: 20;
+  display: grid;
+  grid-template-columns: 1.5fr repeat(2, minmax(120px, 1fr)) auto auto auto auto;
+  gap: 8px;
+  padding: 10px;
+  margin: 12px 0;
+}
+.qa-toggle { display: flex; align-items: center; gap: 6px; font-size: 13px; }
+.qa-toggle input { width: auto; }
+
+.qa-table-scroll { overflow-x: auto; }
+.qa-table { width: 100%; min-width: 1220px; border-collapse: collapse; }
+.qa-table th, .qa-table td { padding: 8px; border-bottom: 1px solid #2a2a2a; vertical-align: top; font-size: 13px; }
+.qa-table th { position: sticky; top: 76px; background: #181818; text-align: left; z-index: 5; }
+
+.badge { display: inline-block; border-radius: 999px; padding: 2px 7px; font-size: 11px; font-weight: 700; }
+.badge-real { background: #2e5cff33; color: #99b2ff; border: 1px solid #4e70ff66; }
+.badge-rob { background: #d1632e33; color: #ffbb92; border: 1px solid #d1632e88; }
+.health-ok { color: var(--qa-good); }
+.health-warn { color: var(--qa-warn); }
+.health-bad { color: var(--qa-bad); }
+.qa-row-warning { background: #2a2112; }
+.qa-row-error { background: #2c1818; }
+
+.qa-links a { color: #9ec1ff; margin-right: 8px; }
+
+@media (max-width: 980px) {
+  .qa-toolbar { grid-template-columns: 1fr 1fr; }
+  .qa-table th { top: 124px; }
+}
