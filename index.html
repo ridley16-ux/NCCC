@@ -4827,6 +4827,17 @@ function getPodcastedDateValue(film) {
     ?? null;
 }
 
+function isPodcastedInPastOrToday(film) {
+  const podcastDate = parseTimestamp(
+    film?.podcasted_at ?? film?.podcastedAt ?? film?.podcastDate ?? null
+  );
+  if (!podcastDate) return false;
+  const now = new Date();
+  const todayStart = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const podcastStart = new Date(podcastDate.getFullYear(), podcastDate.getMonth(), podcastDate.getDate());
+  return podcastStart.getTime() <= todayStart.getTime();
+}
+
 function computeStandardDeviation(values) {
   const parsed = values
     .map((value) => Number(value))
@@ -5329,6 +5340,9 @@ function renderFilmAwards() {
 
 function getFilteredFilms() {
   let films = allFilms.filter(f => f.active);
+  if (!includeFutureFilms) {
+    films = films.filter(isPodcastedInPastOrToday);
+  }
   if (currentFilter === "rob") films = films.filter(f => f.rob);
   if (currentFilter === "real") films = films.filter(f => !f.rob);
   if (filmSearchQuery) {
