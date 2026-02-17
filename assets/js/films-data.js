@@ -43,13 +43,14 @@ function parsePodcastDateTime(value) {
   return Number.isNaN(isoDateTime.getTime()) ? null : isoDateTime;
 }
 
-export function isFilmLive(podcastDate) {
+export function isFilmLive(podcastDate, { includeFuture = false } = {}) {
   const date = parsePodcastDateTime(podcastDate);
   if (!date) return true;
+  if (includeFuture) return true;
   return date.getTime() <= Date.now();
 }
 
-export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL } = {}) {
+export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL, includeFuture = false } = {}) {
   const manifestRes = await fetch(manifestUrl);
   if (!manifestRes.ok) {
     throw new Error("Failed to load films manifest");
@@ -66,7 +67,7 @@ export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL } = {})
     }
     const film = await res.json();
     film.podcasted_at = getPodcastedAtValue(film);
-    film.active = Boolean(entry.active) && isFilmLive(film.podcasted_at);
+    film.active = Boolean(entry.active) && isFilmLive(film.podcasted_at, { includeFuture });
     films.push(film);
   }
 
