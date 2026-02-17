@@ -1,5 +1,3 @@
 User-agent: *
 Allow: /
-Disallow: /ops/
-Disallow: /ops/qa/films-audit-k9x4m2q8/
 Sitemap: https://nocontextcinemaclub.com/sitemap.xml
