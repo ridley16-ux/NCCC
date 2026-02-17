@@ -19,7 +19,7 @@
     {
       "path": "/assets/data/films/robs/face-off.json",
       "active": true
-  
+    },
     {
       "path": "/assets/data/films/robs/training-day.json",
       "active": true
@@ -47,21 +47,20 @@
     {
       "path": "/assets/data/films/real/training-day.json",
       "active": true
-    }
-      },
+    },
     {
       "path": "/assets/data/films/robs/last-king-of-scotland.json",
       "active": true
     },
-     {
+    {
       "path": "/assets/data/films/real/last-king-of-scotland.json",
       "active": true
-    }
-      {
+    },
+    {
       "path": "/assets/data/films/robs/high-fidelity.json",
       "active": true
     },
-     {
+    {
       "path": "/assets/data/films/real/high-fidelity.json",
       "active": true
     }
