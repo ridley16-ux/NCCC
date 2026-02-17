@@ -3837,7 +3837,7 @@ body.modal-open {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
 import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.js";
-import { loadFilmsData } from "./assets/js/films-data.js";
+import { loadFilmsData } from "/assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
@@ -3852,6 +3852,7 @@ const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
 const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
 const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 const localRatings = loadLocalRatings();
+const includeFutureFilms = window.NCCC_OPS?.includeFuture === true;
 let openTooltip = null;
 
 const INSIGHT_MIN_VOTES = 1;
@@ -6219,7 +6220,7 @@ function toggleFilmSearch() {
 
 async function loadFilms() {
   try {
-    const films = await loadFilmsData();
+    const films = await loadFilmsData({ includeFuture: includeFutureFilms });
     films.forEach((film, index) => {
       if (film.robFilm && film.rob === undefined) {
         film.rob = film.robFilm;

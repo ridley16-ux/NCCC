@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>NCCC Internal Ops – Raw Films</title>
+  <style>
+    html, body {
+      margin: 0;
+      min-height: 100%;
+      background: #0f0f0f;
+      color: #fff;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    .ops-loading {
+      min-height: 100vh;
+      display: grid;
+      place-items: center;
+      text-align: center;
+      padding: 24px;
+    }
+  </style>
+</head>
+<body>
+  <div class="ops-loading" id="ops-loading">Loading raw films…</div>
+  <script>
+    window.NCCC_OPS = { includeFuture: true };
+
+    fetch('/index.html', { cache: 'no-store' })
+      .then((response) => {
+        if (!response.ok) throw new Error(`Failed to load index: ${response.status}`);
+        return response.text();
+      })
+      .then((html) => {
+        document.open();
+        document.write(html);
+        document.close();
+      })
+      .catch((error) => {
+        const loading = document.getElementById('ops-loading');
+        if (loading) {
+          loading.textContent = 'Failed to load raw films page.';
+        }
+        console.error('Failed to bootstrap raw films ops page:', error);
+      });
+  </script>
+</body>
+</html>
