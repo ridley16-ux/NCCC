@@ -10,7 +10,10 @@
   "podcastDate": "2026-02-28",
   "podcasted_at": "2026-02-28T08:00:00+00:00",
   "summary": "Thirty years from now, the birthrate in the USA has fallen to dangerously low levels, jeopardising the future prosperity of the nation. Prospective parents are offered a million dollars for each successful birth, unwittingly committing their children to become the next generation of soldiers in a brutal war.",
+  "transcriptTxt": "/assets/data/transcripts/million-dollar-baby.txt",
+  "transcriptId": "million-dollar-baby",
   "link": "#",
   "linkType": "podcast",
-  "buzzsproutEmbedUrl": ""
+  "buzzsproutEmbedUrl": "https://www.buzzsprout.com/2591128/episodes/18734755-episode-5-million-dollar-baby?client_source=small_player",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18734755-episode-5-million-dollar-baby.js?container_id=buzzsprout-player-18734755&player=small"
 }
