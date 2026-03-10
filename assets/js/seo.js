@@ -94,14 +94,15 @@ export function buildPodcastSeriesSchema({ pageTitle, pageDescription, pageUrl }
 export function buildPodcastEpisodeSchemaFromFilm(film, { baseUrl = DEFAULT_BASE_URL } = {}) {
   if (!film || !film.id || !film.title) return null;
   const normalizedBase = normalizeBaseUrl(baseUrl);
+  const episodeUrl = `${normalizedBase}pages/episode.html?id=${encodeURIComponent(film.id)}`;
   const description = film.summary?.trim() || "Episode coming soon.";
   const schema = {
     "@context": "https://schema.org",
     "@type": "PodcastEpisode",
-    "@id": `${normalizedBase}films/${film.id}#episode`,
+    "@id": `${episodeUrl}#episode`,
     name: `${film.title} – No Context Cinema Club`,
     description,
-    url: `${normalizedBase}#${film.id}`,
+    url: episodeUrl,
     partOfSeries: {
       "@id": `${normalizedBase}#podcast`
     }
