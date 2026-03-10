@@ -48,7 +48,7 @@ function generateSitemap() {
         const film = readJson(filmPath);
         if (!film || !film.id) return;
         urls.push({
-          loc: `${BASE_URL}#${film.id}`,
+          loc: `${BASE_URL}/pages/episode.html?id=${encodeURIComponent(film.id)}`,
           lastmod: isValidDateString(film.podcastDate) ? film.podcastDate : today
         });
       } catch (error) {

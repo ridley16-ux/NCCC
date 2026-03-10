@@ -430,7 +430,7 @@ label {
     .then((response) => response.text())
     .then((html) => {
       headerContainer.innerHTML = html;
-      const activePath = window.location.pathname === "/" ? "/index.html" : window.location.pathname;
+      const activePath = window.location.pathname === "/index.html" ? "/" : window.location.pathname;
       const navLinks = headerContainer.querySelectorAll(".nav-links a");
       navLinks.forEach((link) => {
         if (link.getAttribute("href") === activePath) {
