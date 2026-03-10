@@ -10,6 +10,11 @@
 
   gtag('config', 'G-BHEJTM2PGH');
 </script>
+<script>
+  if (window.location.pathname === "/index.html") {
+    window.location.replace(`${window.location.origin}/`);
+  }
+</script>
 
 <link rel="apple-touch-icon" sizes="180x180" href="/assets/img/icons/apple-touch-icon.png">
 <link rel="icon" type="image/png" sizes="32x32" href="/assets/img/icons/favicon-32x32.png">
@@ -3804,7 +3809,7 @@ body.modal-open {
     .then((response) => response.text())
     .then((html) => {
       headerContainer.innerHTML = html;
-      const activePath = window.location.pathname === "/" ? "/index.html" : window.location.pathname;
+      const activePath = window.location.pathname === "/index.html" ? "/" : window.location.pathname;
       const navLinks = headerContainer.querySelectorAll(".nav-links a");
       navLinks.forEach((link) => {
         if (link.getAttribute("href") === activePath) {
