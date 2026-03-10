@@ -11,12 +11,37 @@
   gtag('config', 'G-BHEJTM2PGH');
 </script>
 <meta charset="UTF-8" />
-<title>No Context Cinema Club – Episode</title>
+<title>Episode | No Context Cinema Club</title>
 <meta name="description" content="Listen to No Context Cinema Club episodes directly on-site." />
 <meta name="robots" content="index,follow" />
-<link rel="canonical" href="https://nocontextcinemaclub.com/pages/episode.html" />
+<link rel="canonical" id="episode-canonical" href="https://nocontextcinemaclub.com/pages/episode.html" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 <meta name="website-version" content="1.16.3" />
+<script>
+  (function setEpisodeSeoEarly() {
+    const params = new URLSearchParams(window.location.search);
+    const id = params.get("id");
+    const canonical = document.getElementById("episode-canonical");
+    if (id && canonical) {
+      canonical.href = `https://nocontextcinemaclub.com/pages/episode.html?id=${encodeURIComponent(id)}`;
+      const titleFromId = id
+        .replace(/^rob-/, "")
+        .replace(/^real-/, "")
+        .split("-")
+        .filter(Boolean)
+        .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
+        .join(" ");
+      if (titleFromId) {
+        document.title = `${titleFromId} – Rob Rewrites the Plot | No Context Cinema Club`;
+        const desc = document.querySelector('meta[name="description"]');
+        if (desc) {
+          desc.setAttribute("content", `Rob attempts to rewrite ${titleFromId} without ever seeing the film. Kev reveals the real plot and scores the chaos on No Context Cinema Club.`);
+        }
+      }
+    }
+  })();
+</script>
+
 <link rel="stylesheet" href="/assets/css/site.css" />
 <style>
 :root {
@@ -327,7 +352,7 @@ body {
     </div>
 
     <div class="episode-footer-row">
-      <a class="back-link" href="/index.html">← Back to films</a>
+      <a class="back-link" href="/">← Back to films</a>
     </div>
   </section>
 </main>
@@ -342,7 +367,7 @@ body {
     .then((response) => response.text())
     .then((html) => {
       headerContainer.innerHTML = html;
-      const activePath = window.location.pathname === "/" ? "/index.html" : window.location.pathname;
+      const activePath = window.location.pathname === "/" ? "/" : window.location.pathname;
       const navLinks = headerContainer.querySelectorAll(".nav-links a");
       navLinks.forEach((link) => {
         if (link.getAttribute("href") === activePath) {
@@ -933,6 +958,7 @@ function renderPlayer(film) {
 }
 
 function showNotFoundState() {
+  updateEpisodeMeta(null);
   titleEl.textContent = "Episode not found";
   podcastedEl.textContent = "Podcasted: —";
   summaryEl.textContent = "We couldn't find that episode. Please return to the films list and choose another episode.";
@@ -996,8 +1022,30 @@ async function fetchListenerVotesForFilms(films = []) {
   }
 }
 
+function updateEpisodeMeta(film) {
+  const filmTitle = (film?.title || "").trim();
+  document.title = filmTitle
+    ? `${filmTitle} – Rob Rewrites the Plot | No Context Cinema Club`
+    : "Episode | No Context Cinema Club";
+
+  const descriptionEl = document.querySelector('meta[name="description"]');
+  if (descriptionEl) {
+    const fallback = "Listen to No Context Cinema Club episodes directly on-site.";
+    const generated = filmTitle
+      ? `Rob attempts to rewrite ${filmTitle} without ever seeing the film. Kev reveals the real plot and scores the chaos on No Context Cinema Club.`
+      : fallback;
+    descriptionEl.setAttribute("content", generated);
+  }
+
+  const canonicalEl = document.getElementById("episode-canonical");
+  const id = film?.id || new URLSearchParams(window.location.search).get("id");
+  if (canonicalEl && id) {
+    canonicalEl.href = `https://nocontextcinemaclub.com/pages/episode.html?id=${encodeURIComponent(id)}`;
+  }
+}
+
 function renderEpisode(film) {
-  document.title = `${film.title} – No Context Cinema Club`;
+  updateEpisodeMeta(film);
   titleEl.textContent = film.title || "Episode";
   podcastedEl.textContent = `Podcasted: ${formatPodcastDateDisplay(film.podcastDate)}`;
   summaryEl.textContent = film.summary || "";
