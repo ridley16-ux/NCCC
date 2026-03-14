@@ -64,5 +64,21 @@
       "path": "/assets/data/films/real/high-fidelity.json",
       "active": true
     }
+        {
+      "path": "/assets/data/films/robs/usual-suspects.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/usual-suspects.json",
+      "active": true
+    }
+        {
+      "path": "/assets/data/films/robs/dr-strangelove.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/real/dr-strangelove.json",
+      "active": true
+    }
   ]
 }
