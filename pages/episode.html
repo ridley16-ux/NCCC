@@ -33,10 +33,12 @@
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(" ");
       if (titleFromId) {
-        document.title = `${titleFromId} – Rob Rewrites the Plot | No Context Cinema Club`;
+        const isKevId = /^kev-/i.test(id);
+        const displayTitle = isKevId ? `${titleFromId} [Kev’s Version]` : titleFromId;
+        document.title = `${displayTitle} – Rob Rewrites the Plot | No Context Cinema Club`;
         const desc = document.querySelector('meta[name="description"]');
         if (desc) {
-          desc.setAttribute("content", `Rob attempts to rewrite ${titleFromId} without ever seeing the film. Kev reveals the real plot and scores the chaos on No Context Cinema Club.`);
+          desc.setAttribute("content", `Rob attempts to rewrite ${displayTitle} without ever seeing the film. Kev reveals the real plot and scores the chaos on No Context Cinema Club.`);
         }
       }
     }
@@ -393,7 +395,7 @@ body {
 </script>
 
 <script type="module">
-import { loadFilmsData } from "/assets/js/films-data.js";
+import { getFilmCategory, getFilmDisplayTitle, loadFilmsData } from "/assets/js/films-data.js";
 
 const BUZZSPROUT_HOST = "www.buzzsprout.com";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
@@ -588,30 +590,6 @@ const AWARDS = [
     )
   }
 ];
-
-const REWRITE_TYPES = new Set(["rob", "kev"]);
-
-function normalizeRewriteType(value) {
-  const normalized = String(value || "").trim().toLowerCase();
-  return REWRITE_TYPES.has(normalized) ? normalized : null;
-}
-
-function getFilmCategory(film) {
-  if (!film) return "real";
-  const explicitType = normalizeRewriteType(
-    film.rewriteType
-    ?? film.rewrite_type
-    ?? film.rewriteOwner
-    ?? film.rewrite_owner
-    ?? film.variant
-  );
-  if (explicitType) return explicitType;
-  const rawId = String(film.id || "").trim().toLowerCase();
-  if (rawId.startsWith("rob-")) return "rob";
-  if (rawId.startsWith("kev-")) return "kev";
-  if (film.rob === true) return "rob";
-  return "real";
-}
 
 function isRewrittenFilm(film) {
   return getFilmCategory(film) !== "real";
@@ -1058,7 +1036,7 @@ async function fetchListenerVotesForFilms(films = []) {
 }
 
 function updateEpisodeMeta(film) {
-  const filmTitle = (film?.title || "").trim();
+  const filmTitle = (getFilmDisplayTitle(film) || film?.title || "").trim();
   document.title = filmTitle
     ? `${filmTitle} – Rob Rewrites the Plot | No Context Cinema Club`
     : "Episode | No Context Cinema Club";
@@ -1080,14 +1058,15 @@ function updateEpisodeMeta(film) {
 }
 
 function renderEpisode(film) {
+  const displayTitle = getFilmDisplayTitle(film) || film.title || "Episode";
   updateEpisodeMeta(film);
-  titleEl.textContent = film.title || "Episode";
+  titleEl.textContent = displayTitle;
   podcastedEl.textContent = `Podcasted: ${formatPodcastDateDisplay(film.podcastDate)}`;
   summaryEl.textContent = film.summary || "";
 
   if (film.poster) {
     posterEl.src = film.poster;
-    posterEl.alt = `Poster for ${film.title || "episode"}`;
+    posterEl.alt = `Poster for ${displayTitle || "episode"}`;
     posterEl.hidden = false;
   } else {
     posterEl.hidden = true;

@@ -2,6 +2,7 @@
   SEO helpers for No Context Cinema Club.
   - Add the podcast cover at /assets/branding/podcast-cover.webp (update this when the artwork is ready).
 */
+import { getFilmDisplayTitle } from "/assets/js/films-data.js";
 
 const DEFAULT_BASE_URL = "https://nocontextcinemaclub.com/";
 const PODCAST_IMAGE = `${DEFAULT_BASE_URL}assets/branding/podcast-cover.webp`;
@@ -93,6 +94,7 @@ export function buildPodcastSeriesSchema({ pageTitle, pageDescription, pageUrl }
 
 export function buildPodcastEpisodeSchemaFromFilm(film, { baseUrl = DEFAULT_BASE_URL } = {}) {
   if (!film || !film.id || !film.title) return null;
+  const displayTitle = getFilmDisplayTitle(film) || film.title;
   const normalizedBase = normalizeBaseUrl(baseUrl);
   const episodeUrl = `${normalizedBase}pages/episode.html?id=${encodeURIComponent(film.id)}`;
   const description = film.summary?.trim() || "Episode coming soon.";
@@ -100,7 +102,7 @@ export function buildPodcastEpisodeSchemaFromFilm(film, { baseUrl = DEFAULT_BASE
     "@context": "https://schema.org",
     "@type": "PodcastEpisode",
     "@id": `${episodeUrl}#episode`,
-    name: `${film.title} – No Context Cinema Club`,
+    name: `${displayTitle} – No Context Cinema Club`,
     description,
     url: episodeUrl,
     partOfSeries: {

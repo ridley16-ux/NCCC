@@ -351,6 +351,7 @@ img, svg {
 </script>
 <script type="module">
 import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.js";
+import { normalizeFilmMetadata, getFilmDisplayTitle } from "/assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
 const MANIFEST_URL = "/assets/data/films/manifest.json";
@@ -416,7 +417,7 @@ function buildBanner(episode) {
       </div>
       <div class="upcoming-banner__content">
         <span class="upcoming-banner__label">Don't miss our next episode...</span>
-        <h3 class="upcoming-banner__title">${episode.title}</h3>
+        <h3 class="upcoming-banner__title">${getFilmDisplayTitle(episode) || episode.title}</h3>
         <p class="upcoming-banner__copy">Subscribe now!</p>
       </div>
     </div>
@@ -435,7 +436,9 @@ async function loadUpcomingEpisodeBanner() {
     const filmData = await Promise.all(
       robEntries.map(async (entry) => {
         const response = await fetch(entry.path);
-        return response.ok ? response.json() : null;
+        if (!response.ok) return null;
+        const film = await response.json();
+        return normalizeFilmMetadata(film, entry.path);
       })
     );
     const cutoff = new Date(Date.now() - 60 * 1000);
