@@ -3846,7 +3846,7 @@ body.modal-open {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
 import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.js";
-import { loadFilmsData } from "/assets/js/films-data.js";
+import { getFilmCategory, getFilmDisplayTitle, loadFilmsData } from "/assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
@@ -3863,30 +3863,6 @@ const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON
 const localRatings = loadLocalRatings();
 const includeFutureFilms = window.NCCC_OPS?.includeFuture === true;
 let openTooltip = null;
-
-const REWRITE_TYPES = new Set(["rob", "kev"]);
-
-function normalizeRewriteType(value) {
-  const normalized = String(value || "").trim().toLowerCase();
-  return REWRITE_TYPES.has(normalized) ? normalized : null;
-}
-
-function getFilmCategory(film) {
-  if (!film) return "real";
-  const explicitType = normalizeRewriteType(
-    film.rewriteType
-    ?? film.rewrite_type
-    ?? film.rewriteOwner
-    ?? film.rewrite_owner
-    ?? film.variant
-  );
-  if (explicitType) return explicitType;
-  const rawId = String(film.id || "").trim().toLowerCase();
-  if (rawId.startsWith("rob-")) return "rob";
-  if (rawId.startsWith("kev-")) return "kev";
-  if (film.rob === true) return "rob";
-  return "real";
-}
 
 function isRewrittenFilm(film) {
   return getFilmCategory(film) !== "real";
@@ -4282,7 +4258,7 @@ function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
     : null;
   const film = filmFromTranscript || filmFromId || null;
 
-  const resolvedTitle = film?.title || title || cardTitle || "Transcript";
+  const resolvedTitle = getFilmDisplayTitle(film) || film?.title || title || cardTitle || "Transcript";
   const resolvedPoster = film?.poster || cardPoster || "";
   const resolvedSummary = film?.summary || cardSummary || "";
   const resolvedDate = film?.podcastDate || "";
@@ -5843,7 +5819,7 @@ function updateTranscriptSlots(slug, { exists }) {
     }
     const button = buildTranscriptButton({
       slug,
-      title: film.title,
+      title: getFilmDisplayTitle(film) || film.title,
       dateValue: film.podcastDate || ""
     });
     slot.appendChild(button);
@@ -5984,6 +5960,7 @@ async function render(options = {}) {
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
 
+    const displayTitle = getFilmDisplayTitle(film) || film.title || "";
     const rosettes = [
       {
         className: rewrittenFilm ? filmCategory : "real",
@@ -6041,8 +6018,7 @@ async function render(options = {}) {
           <div class="detail-row">
             <div>
               <h2 class="detail-title">
-                ${film.title}<br>
-                <span class="variant">[${filmCategory === "kev" ? "Kev's" : "Rob's"} Version]</span>
+                ${displayTitle}${filmCategory === "rob" ? `<br><span class="variant">[Rob's Version]</span>` : ""}
               </h2>
               <p class="meta-line">
                 Starring: ${film.starring}
@@ -6103,7 +6079,7 @@ async function render(options = {}) {
                     <span class="rating-output" data-rating-output>${storedRating ? `${storedRating}/10` : "Vote now"}</span>
                   </div>
                 </div>
-                <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${film.title}">
+                <input class="rating-slider" type="range" min="1" max="10" step="1" value="${storedRating ?? 5}" data-rating-slider data-film-id="${film.id}" aria-label="Your rating for ${displayTitle}">
                 <span class="rating-tick" aria-hidden="true">✓</span>
               </div>
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
