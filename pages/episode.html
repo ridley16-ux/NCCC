@@ -26,6 +26,7 @@
       canonical.href = `https://nocontextcinemaclub.com/pages/episode.html?id=${encodeURIComponent(id)}`;
       const titleFromId = id
         .replace(/^rob-/, "")
+        .replace(/^kev-/, "")
         .replace(/^real-/, "")
         .split("-")
         .filter(Boolean)
@@ -165,6 +166,7 @@ body {
 
 .badge-icon { font-size: 0.9em; line-height: 1; }
 .rosette.rob { background: #3e5f3e; color: #d8f0d8; }
+.rosette.kev { background: #325a8a; color: #d8e8ff; }
 .rosette.real { background: #444; }
 .rosette--kev-pick { background: var(--rosette-kev-pick); }
 .rosette--listener-pick { background: var(--rosette-listener-pick); }
@@ -587,6 +589,34 @@ const AWARDS = [
   }
 ];
 
+const REWRITE_TYPES = new Set(["rob", "kev"]);
+
+function normalizeRewriteType(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return REWRITE_TYPES.has(normalized) ? normalized : null;
+}
+
+function getFilmCategory(film) {
+  if (!film) return "real";
+  const explicitType = normalizeRewriteType(
+    film.rewriteType
+    ?? film.rewrite_type
+    ?? film.rewriteOwner
+    ?? film.rewrite_owner
+    ?? film.variant
+  );
+  if (explicitType) return explicitType;
+  const rawId = String(film.id || "").trim().toLowerCase();
+  if (rawId.startsWith("rob-")) return "rob";
+  if (rawId.startsWith("kev-")) return "kev";
+  if (film.rob === true) return "rob";
+  return "real";
+}
+
+function isRewrittenFilm(film) {
+  return getFilmCategory(film) !== "real";
+}
+
 function parseLocalDate(d) {
   if (!d) return null;
   const [year, month, day] = String(d).split("-").map(Number);
@@ -728,7 +758,7 @@ function getRottenTomatoesScore10FromFilm(film) {
   const directNormalized = normaliseScoreToPercent(directValue);
   if (directNormalized !== null) return directNormalized / 10;
   const scoreLabel = String(film.scoreLabel || "");
-  if (!film.rob && scoreLabel.toLowerCase().includes("rotten")) {
+  if (getFilmCategory(film) === "real" && scoreLabel.toLowerCase().includes("rotten")) {
     const normalized = normaliseScoreToPercent(film.score);
     return normalized !== null ? normalized / 10 : null;
   }
@@ -895,10 +925,15 @@ function isValidBuzzsproutScriptSrc(value) {
 
 
 function getRosettesForFilm(film) {
-  const rosettes = [{ className: film.rob ? "rob" : "real", label: film.rob ? "Rob’s Film" : "Real Film", icon: "" }];
+  const filmCategory = getFilmCategory(film);
+  const rosettes = [{
+    className: isRewrittenFilm(film) ? filmCategory : "real",
+    label: filmCategory === "rob" ? "Rob's Film" : (filmCategory === "kev" ? "Kev's Film" : "Real Film"),
+    icon: ""
+  }];
 
-  if (film.rob) {
-    const robFilmsAll = allFilms.filter((entry) => entry.active && entry.rob);
+  if (isRewrittenFilm(film)) {
+    const robFilmsAll = allFilms.filter((entry) => entry.active && isRewrittenFilm(entry));
     const awardsContext = { audienceScores, allFilms };
     const visibleAwards = getVisibleAwards(robFilmsAll, awardsContext);
     const awardWinnersByKey = Object.fromEntries(
@@ -990,7 +1025,7 @@ async function fetchAudienceScoresForFilms(_films = []) {
 
 async function fetchListenerVotesForFilms(films = []) {
   if (!supabaseClient) return;
-  const robIds = films.filter((film) => film?.rob).map((film) => film.id).filter(Boolean);
+  const robIds = films.filter((film) => isRewrittenFilm(film)).map((film) => film.id).filter(Boolean);
   if (!robIds.length) return;
 
   const pageSize = 1000;

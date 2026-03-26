@@ -429,7 +429,9 @@ async function loadUpcomingEpisodeBanner() {
   try {
     const manifestRes = await fetch(MANIFEST_URL);
     const manifest = await manifestRes.json();
-    const robEntries = (manifest.films || []).filter((entry) => entry.active && entry.path.includes("/robs/"));
+    const robEntries = (manifest.films || []).filter((entry) => (
+      entry.active && (entry.path.includes("/robs/") || entry.path.includes("/kevs/"))
+    ));
     const filmData = await Promise.all(
       robEntries.map(async (entry) => {
         const response = await fetch(entry.path);

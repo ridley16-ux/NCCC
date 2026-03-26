@@ -4,18 +4,20 @@
 
 When you add a new episode/film pair, you normally touch **four places**:
 
-1. **Rob film JSON**: `assets/data/films/robs/<slug>.json`
+1. **Rewritten film JSON**: `assets/data/films/robs/<slug>.json` **or** `assets/data/films/kevs/<slug>.json`
 2. **Real film JSON**: `assets/data/films/real/<slug>.json`
 3. **Manifest index**: `assets/data/films/manifest.json` (add both JSON paths)
 4. **Poster asset(s)**:
    - Rob posters are local files in: `assets/img/posters/robs/`
+   - Kev posters are local files in: `assets/img/posters/kevs/`
    - Real film posters are currently mostly remote URLs (Flixster/RT links in JSON), not local files
 
 How the page works today:
 
 - The films page loads data from `assets/data/films/manifest.json`, then fetches each listed JSON file from its `path` value. If a film is not in `manifest.json`, it will not load.
-- “Rob’s films” vs “Real films” are split by the JSON field `rob`:
-  - `"rob": true` = Rob’s version
+- “Rewritten films” vs “Real films” are split by ID/path/type:
+  - `rob-<slug>` and `/robs/` = Rob’s version
+  - `kev-<slug>` and `/kevs/` = Kev’s version
   - `"rob": false` = Real film
 - Search only checks **title** and **starring**.
 - Sorting is calculated in code:
