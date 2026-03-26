@@ -392,7 +392,8 @@ label {
   --badge-above-poster-gap: 8px;
 }
 
-.film-card.rob-film {
+.film-card.rob-film,
+.film-card.kev-film {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a;
 }
 
@@ -428,6 +429,7 @@ label {
   text-transform: uppercase;
 }
 .flag.rob { background: #3e5f3e; color: #d8f0d8; }
+.flag.kev { background: #325a8a; color: #d8e8ff; }
 .flag.real { background: #444; color: #fff; }
 
 .hero-layout {
@@ -677,6 +679,7 @@ label {
 .kev-badge .badge-label { color: #ffd7bf; }
 
 .rosette.rob { background: #3e5f3e; color: #d8f0d8; }
+.rosette.kev { background: #325a8a; color: #d8e8ff; }
 .rosette.real { background: #444; color: #fff; }
 .rosette--kev-pick { background: var(--rosette-kev-pick); }
 .rosette--listener-pick { background: var(--rosette-listener-pick); }
@@ -2257,7 +2260,8 @@ body.modal-open {
           <select id="filmFilter" class="mobile-filter-control" data-default-value="rob">
             <option value="all">All Films</option>
             <option value="real">Real Films</option>
-            <option value="rob" selected>Rewritten Films</option>
+            <option value="rob" selected>Robs Films</option>
+            <option value="kev">Kev's Films</option>
           </select>
           <span class="select-icon select-icon--filter" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
@@ -3860,6 +3864,34 @@ const localRatings = loadLocalRatings();
 const includeFutureFilms = window.NCCC_OPS?.includeFuture === true;
 let openTooltip = null;
 
+const REWRITE_TYPES = new Set(["rob", "kev"]);
+
+function normalizeRewriteType(value) {
+  const normalized = String(value || "").trim().toLowerCase();
+  return REWRITE_TYPES.has(normalized) ? normalized : null;
+}
+
+function getFilmCategory(film) {
+  if (!film) return "real";
+  const explicitType = normalizeRewriteType(
+    film.rewriteType
+    ?? film.rewrite_type
+    ?? film.rewriteOwner
+    ?? film.rewrite_owner
+    ?? film.variant
+  );
+  if (explicitType) return explicitType;
+  const rawId = String(film.id || "").trim().toLowerCase();
+  if (rawId.startsWith("rob-")) return "rob";
+  if (rawId.startsWith("kev-")) return "kev";
+  if (film.rob === true) return "rob";
+  return "real";
+}
+
+function isRewrittenFilm(film) {
+  return getFilmCategory(film) !== "real";
+}
+
 const INSIGHT_MIN_VOTES = 1;
 const INSIGHT_GAP_MIN = 1;
 const INSIGHT_DIV_MIN = 1;
@@ -4787,7 +4819,7 @@ function getRottenTomatoesScore10FromFilm(film) {
   const directNormalized = normaliseScoreToPercent(directValue);
   if (directNormalized !== null) return directNormalized / 10;
   const scoreLabel = String(film.scoreLabel || "");
-  if (!film.rob && scoreLabel.toLowerCase().includes("rotten")) {
+  if (getFilmCategory(film) === "real" && scoreLabel.toLowerCase().includes("rotten")) {
     const normalized = normaliseScoreToPercent(film.score);
     return normalized !== null ? normalized / 10 : null;
   }
@@ -4910,7 +4942,7 @@ function compareDivisiveCandidates(a, b) {
 
 function computeInsightRosettes(films) {
   const candidates = films
-    .filter((film) => film.rob)
+    .filter((film) => isRewrittenFilm(film))
     .map((film) => {
       const insight = getInsightEligibleData(film);
       return {
@@ -5207,8 +5239,8 @@ function setAwardsLastUpdated(timestamp) {
 }
 
 function shouldShowFilmAwards() {
-  // Visibility gating: show for Rob or All filters when no search query is active.
-  const allowedFilter = currentFilter === "rob" || currentFilter === "all";
+  // Visibility gating: show for rewritten film filters (Rob, Kev, All) when no search query is active.
+  const allowedFilter = currentFilter === "rob" || currentFilter === "kev" || currentFilter === "all";
   return allowedFilter && filmSearchQuery.trim() === "";
 }
 
@@ -5285,7 +5317,7 @@ function renderFilmAwards() {
     return;
   }
 
-  const robFilms = allFilms.filter((film) => film.active && film.rob);
+  const robFilms = allFilms.filter((film) => film.active && isRewrittenFilm(film));
   const awardsContext = { audienceScores, allFilms };
   const visibleAwards = getVisibleAwards(robFilms, awardsContext);
   const awardRows = visibleAwards.map((award) => {
@@ -5348,8 +5380,9 @@ function getFilteredFilms() {
   if (!includeFutureFilms) {
     films = films.filter(isPodcastedInPastOrToday);
   }
-  if (currentFilter === "rob") films = films.filter(f => f.rob);
-  if (currentFilter === "real") films = films.filter(f => !f.rob);
+  if (currentFilter === "rob") films = films.filter((film) => getFilmCategory(film) === "rob");
+  if (currentFilter === "kev") films = films.filter((film) => getFilmCategory(film) === "kev");
+  if (currentFilter === "real") films = films.filter((film) => getFilmCategory(film) === "real");
   if (filmSearchQuery) {
     const normalizedQuery = filmSearchQuery.toLowerCase();
     films = films.filter((film) => {
@@ -5361,31 +5394,34 @@ function getFilteredFilms() {
   return films;
 }
 
-function buildRobFilmIndexes(films) {
-  const robBySlug = new Map();
-  const robByTitle = new Map();
-  films.filter((film) => film.rob).forEach((film) => {
+function buildRewrittenFilmIndexes(films) {
+  const rewrittenBySlug = new Map();
+  const rewrittenByTitle = new Map();
+  films.filter((film) => isRewrittenFilm(film)).forEach((film) => {
     if (typeof film.id === "string" && film.id.startsWith("rob-")) {
-      robBySlug.set(film.id.slice(4), film);
+      rewrittenBySlug.set(film.id.slice(4), film);
+    }
+    if (typeof film.id === "string" && film.id.startsWith("kev-")) {
+      rewrittenBySlug.set(film.id.slice(4), film);
     }
     const normalizedTitle = normalizeFilmTitleForMatch(film.title);
     if (!normalizedTitle) return;
-    const list = robByTitle.get(normalizedTitle) ?? [];
+    const list = rewrittenByTitle.get(normalizedTitle) ?? [];
     list.push(film);
-    robByTitle.set(normalizedTitle, list);
+    rewrittenByTitle.set(normalizedTitle, list);
   });
-  return { robBySlug, robByTitle };
+  return { rewrittenBySlug, rewrittenByTitle };
 }
 
-function resolveRobMatchForReal(realFilm, indexes, ambiguousMatches) {
+function resolveRewrittenMatchForReal(realFilm, indexes, ambiguousMatches) {
   if (!realFilm) return null;
   if (typeof realFilm.id === "string" && realFilm.id.startsWith("real-")) {
-    const robMatch = indexes.robBySlug.get(realFilm.id.slice(5));
-    if (robMatch) return robMatch;
+    const rewrittenMatch = indexes.rewrittenBySlug.get(realFilm.id.slice(5));
+    if (rewrittenMatch) return rewrittenMatch;
   }
   const normalizedTitle = normalizeFilmTitleForMatch(realFilm.title);
   if (!normalizedTitle) return null;
-  const matches = indexes.robByTitle.get(normalizedTitle) ?? [];
+  const matches = indexes.rewrittenByTitle.get(normalizedTitle) ?? [];
   if (matches.length > 1) {
     ambiguousMatches.push({ title: realFilm.title, ids: matches.map((film) => film.id) });
     return null;
@@ -5394,17 +5430,17 @@ function resolveRobMatchForReal(realFilm, indexes, ambiguousMatches) {
 }
 
 function assignPodcastedDates(films) {
-  const indexes = buildRobFilmIndexes(films);
+  const indexes = buildRewrittenFilmIndexes(films);
   const unmatchedReals = [];
   const ambiguousMatches = [];
 
   films.forEach((film) => {
-    if (film.rob) {
+    if (isRewrittenFilm(film)) {
       film.podcasted_at = film.podcasted_at ?? film.podcastDate ?? film.podcastedAt ?? null;
       return;
     }
 
-    const match = resolveRobMatchForReal(film, indexes, ambiguousMatches);
+    const match = resolveRewrittenMatchForReal(film, indexes, ambiguousMatches);
     if (match?.podcasted_at || match?.podcastDate || match?.podcastedAt) {
       // Inherit the Rob film's podcasted date so real films stay in sync.
       film.podcasted_at = match.podcasted_at ?? match.podcastDate ?? match.podcastedAt ?? null;
@@ -5519,16 +5555,16 @@ function syncFilterControls() {
 }
 
 async function refreshListenerScores(films) {
-  const robIds = films.filter(f => f.rob).map(f => f.id);
-  if (!supabaseClient || robIds.length === 0) return;
-  const fetchKey = [...robIds].sort().join("|");
+  const rewrittenIds = films.filter((film) => isRewrittenFilm(film)).map((film) => film.id);
+  if (!supabaseClient || rewrittenIds.length === 0) return;
+  const fetchKey = [...rewrittenIds].sort().join("|");
   if (fetchKey === lastScoreFetchKey) return;
   lastScoreFetchKey = fetchKey;
 
   const { data, error } = await supabaseClient
     .from("film_listener_scores")
     .select("film_id, listener_score")
-    .in("film_id", robIds);
+    .in("film_id", rewrittenIds);
 
   if (error) {
     console.error("Failed to fetch listener scores.", error);
@@ -5573,7 +5609,7 @@ async function fetchAudienceScores() {
 
 async function fetchListenerVotes(films = []) {
   if (!supabaseClient) return {};
-  const robIds = films.filter((film) => film.rob).map((film) => film.id);
+  const robIds = films.filter((film) => isRewrittenFilm(film)).map((film) => film.id);
   if (!robIds.length) return {};
   const votesByFilmId = {};
   const pageSize = 1000;
@@ -5734,6 +5770,7 @@ const transcriptExistsRequests = new Map();
 function normalizeTranscriptSlug(rawId) {
   if (!rawId) return null;
   if (rawId.startsWith("rob-")) return rawId.slice(4);
+  if (rawId.startsWith("kev-")) return rawId.slice(4);
   if (rawId.startsWith("real-")) return rawId.slice(5);
   return rawId;
 }
@@ -5800,7 +5837,7 @@ function updateTranscriptSlots(slug, { exists }) {
     if (slot.querySelector(".transcript-link")) return;
     const filmId = slot.closest(".film-card")?.dataset?.filmId;
     const film = filmId ? allFilms.find((entry) => entry.id === filmId) : null;
-    if (!film || !film.rob) {
+    if (!film || !isRewrittenFilm(film)) {
       slot.innerHTML = "";
       return;
     }
@@ -5814,7 +5851,7 @@ function updateTranscriptSlots(slug, { exists }) {
 }
 
 function ensureTranscriptAvailability(film, card) {
-  if (!film?.rob) {
+  if (!isRewrittenFilm(film)) {
     const slot = card?.querySelector("[data-transcript-slot]");
     if (slot) {
       slot.innerHTML = "";
@@ -5884,7 +5921,7 @@ async function render(options = {}) {
 
   const allResults = sortFilms(films);
 
-  const robFilmsAll = allFilms.filter(f => f.active && f.rob);
+  const robFilmsAll = allFilms.filter((film) => film.active && isRewrittenFilm(film));
   const awardsContext = { audienceScores, allFilms };
   const visibleAwards = getVisibleAwards(robFilmsAll, awardsContext);
   const awardWinnersByKey = Object.fromEntries(
@@ -5941,19 +5978,21 @@ async function render(options = {}) {
     const audienceScoreDisplay = formatPercentLabel(audienceRaw);
     const storedRating = localRatings[film.id] ?? null;
     const card = document.createElement("div");
-    card.className = `film-card ${film.rob ? "rob-film" : ""}`;
+    const filmCategory = getFilmCategory(film);
+    const rewrittenFilm = isRewrittenFilm(film);
+    card.className = `film-card ${rewrittenFilm ? `${filmCategory}-film` : ""}`;
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
 
     const rosettes = [
       {
-        className: film.rob ? "rob" : "real",
-        label: film.rob ? "Rob’s Film" : "Real Film",
+        className: rewrittenFilm ? filmCategory : "real",
+        label: filmCategory === "rob" ? "Rob's Film" : (filmCategory === "kev" ? "Kev's Film" : "Real Film"),
         icon: ""
       }
     ];
 
-    if (film.rob) {
+    if (rewrittenFilm) {
       visibleAwards.forEach((award) => {
         if (!awardWinnersByKey[award.key]?.has(film.id)) return;
         rosettes.push({
@@ -5997,13 +6036,13 @@ async function render(options = {}) {
           </div>
         </div>
 
-      ${film.rob ? `
+      ${rewrittenFilm ? `
         <div class="film-details rob-details">
           <div class="detail-row">
             <div>
               <h2 class="detail-title">
                 ${film.title}<br>
-                <span class="variant">[Rob’s Version]</span>
+                <span class="variant">[${filmCategory === "kev" ? "Kev's" : "Rob's"} Version]</span>
               </h2>
               <p class="meta-line">
                 Starring: ${film.starring}
@@ -6247,11 +6286,17 @@ async function loadFilms() {
       if (film.realFilm && film.rob === undefined) {
         film.rob = !film.realFilm;
       }
-      if (film.rob) calcRobScore(film);
-      if (!film.rob && film.rottenTomatoesScore === undefined && Number.isFinite(Number(film.score))) {
+      const filmCategory = getFilmCategory(film);
+      if (filmCategory === "rob") {
+        film.rob = true;
+      } else if (filmCategory === "real") {
+        film.rob = false;
+      }
+      if (isRewrittenFilm(film)) calcRobScore(film);
+      if (filmCategory === "real" && film.rottenTomatoesScore === undefined && Number.isFinite(Number(film.score))) {
         film.rottenTomatoesScore = Number(film.score);
       }
-      if (film.rob && film.kevScore === undefined && Number.isFinite(Number(film.score))) {
+      if (isRewrittenFilm(film) && film.kevScore === undefined && Number.isFinite(Number(film.score))) {
         film.kevScore = Number(film.score);
       }
       film.originalIndex = index;
