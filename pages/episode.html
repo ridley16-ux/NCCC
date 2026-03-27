@@ -400,7 +400,7 @@ body {
 </script>
 
 <script type="module">
-import { getFilmCategory, getFilmDisplayTitle, loadFilmsData } from "/assets/js/films-data.js";
+import { getFilmCategory, getFilmDisplayTitle, getFilmRosetteMeta, loadFilmsData } from "/assets/js/films-data.js";
 
 const BUZZSPROUT_HOST = "www.buzzsprout.com";
 const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
@@ -597,7 +597,8 @@ const AWARDS = [
 ];
 
 function isRewrittenFilm(film) {
-  return getFilmCategory(film) !== "real";
+  const category = getFilmCategory(film);
+  return category === "rob" || category === "kev" || category === "rewritten";
 }
 
 function parseLocalDate(d) {
@@ -908,10 +909,10 @@ function isValidBuzzsproutScriptSrc(value) {
 
 
 function getRosettesForFilm(film) {
-  const filmCategory = getFilmCategory(film);
+  const rosetteMeta = getFilmRosetteMeta(film);
   const rosettes = [{
-    className: isRewrittenFilm(film) ? filmCategory : "real",
-    label: filmCategory === "rob" ? "Rob’s Film" : (filmCategory === "kev" ? "Kev’s Film" : "Real Film"),
+    className: rosetteMeta.className,
+    label: rosetteMeta.label,
     icon: ""
   }];
 
