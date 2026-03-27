@@ -33,8 +33,13 @@
         .map((part) => part.charAt(0).toUpperCase() + part.slice(1))
         .join(" ");
       if (titleFromId) {
-        const isKevId = /^kev-/i.test(id);
-        const displayTitle = isKevId ? `${titleFromId} [Kev’s Version]` : titleFromId;
+        const ownerFromId = /^kev-/i.test(id)
+          ? "kev"
+          : (/^rob-/i.test(id) ? "rob" : "real");
+        const ownerSuffix = ownerFromId === "kev"
+          ? " [Kev’s Version]"
+          : (ownerFromId === "rob" ? " [Rob’s Version]" : "");
+        const displayTitle = `${titleFromId}${ownerSuffix}`;
         document.title = `${displayTitle} – Rob Rewrites the Plot | No Context Cinema Club`;
         const desc = document.querySelector('meta[name="description"]');
         if (desc) {
@@ -727,7 +732,7 @@ function normalizeFilmTitle(value) {
 function findMatchingRealFilm(film, films = []) {
   if (!film?.title) return null;
   const targetTitle = normalizeFilmTitle(film.title);
-  return films.find((candidate) => !candidate.rob && normalizeFilmTitle(candidate.title) === targetTitle) ?? null;
+  return films.find((candidate) => getFilmCategory(candidate) === "real" && normalizeFilmTitle(candidate.title) === targetTitle) ?? null;
 }
 
 function getRottenTomatoesScore10FromFilm(film) {
@@ -906,7 +911,7 @@ function getRosettesForFilm(film) {
   const filmCategory = getFilmCategory(film);
   const rosettes = [{
     className: isRewrittenFilm(film) ? filmCategory : "real",
-    label: filmCategory === "rob" ? "Rob's Film" : (filmCategory === "kev" ? "Kev's Film" : "Real Film"),
+    label: filmCategory === "rob" ? "Rob’s Film" : (filmCategory === "kev" ? "Kev’s Film" : "Real Film"),
     icon: ""
   }];
 

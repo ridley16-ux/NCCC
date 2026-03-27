@@ -2260,7 +2260,7 @@ body.modal-open {
           <select id="filmFilter" class="mobile-filter-control" data-default-value="rob">
             <option value="all">All Films</option>
             <option value="real">Real Films</option>
-            <option value="rob" selected>Robs Films</option>
+            <option value="rob" selected>Rob's Films</option>
             <option value="kev">Kev's Films</option>
           </select>
           <span class="select-icon select-icon--filter" aria-hidden="true">
@@ -4782,7 +4782,7 @@ function findMatchingRealFilm(film, films = []) {
   if (!film?.title) return null;
   const targetTitle = normalizeFilmTitle(film.title);
   return films.find((candidate) => (
-    !candidate.rob && normalizeFilmTitle(candidate.title) === targetTitle
+    getFilmCategory(candidate) === "real" && normalizeFilmTitle(candidate.title) === targetTitle
   )) ?? null;
 }
 
@@ -5964,7 +5964,7 @@ async function render(options = {}) {
     const rosettes = [
       {
         className: rewrittenFilm ? filmCategory : "real",
-        label: filmCategory === "rob" ? "Rob's Film" : (filmCategory === "kev" ? "Kev's Film" : "Real Film"),
+        label: filmCategory === "rob" ? "Rob’s Film" : (filmCategory === "kev" ? "Kev’s Film" : "Real Film"),
         icon: ""
       }
     ];
@@ -6018,7 +6018,7 @@ async function render(options = {}) {
           <div class="detail-row">
             <div>
               <h2 class="detail-title">
-                ${displayTitle}${filmCategory === "rob" ? `<br><span class="variant">[Rob's Version]</span>` : ""}
+                ${displayTitle}
               </h2>
               <p class="meta-line">
                 Starring: ${film.starring}
@@ -6256,18 +6256,7 @@ async function loadFilms() {
   try {
     const films = await loadFilmsData({ includeFuture: includeFutureFilms });
     films.forEach((film, index) => {
-      if (film.robFilm && film.rob === undefined) {
-        film.rob = film.robFilm;
-      }
-      if (film.realFilm && film.rob === undefined) {
-        film.rob = !film.realFilm;
-      }
       const filmCategory = getFilmCategory(film);
-      if (filmCategory === "rob") {
-        film.rob = true;
-      } else if (filmCategory === "real") {
-        film.rob = false;
-      }
       if (isRewrittenFilm(film)) calcRobScore(film);
       if (filmCategory === "real" && film.rottenTomatoesScore === undefined && Number.isFinite(Number(film.score))) {
         film.rottenTomatoesScore = Number(film.score);

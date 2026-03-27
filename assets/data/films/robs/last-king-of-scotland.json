@@ -1,6 +1,5 @@
 {
   "id": "rob-last-king-of-scotland",
-  "rob": true,
   "title": "The Last King of Scotland",
   "starring": "Robbie Coltrane, David Tennant",
   "poster": "/assets/img/posters/robs/last-king-of-scotland.webp",
@@ -12,11 +11,6 @@
   "summary": "400 years of paranormal energy is unexpectedly released during a castle renovation, revealing a spectral internet sensation who faces a startling awakening into modern times. Stripped of his authority, and with only Kevin MacLeod to rely on, the last true king of Scotland learns the harsh lessons of twenty-first century living.",
   "link": "#",
   "linkType": "podcast",
-  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18836399-episode-7-the-last-king-of-scotland.js?container_id=buzzsprout-player-18836399&player=small"
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18836399-episode-7-the-last-king-of-scotland.js?container_id=buzzsprout-player-18836399&player=small",
+  "owner": "rob"
 }
-
-
-
-
-
-

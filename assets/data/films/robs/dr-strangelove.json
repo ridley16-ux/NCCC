@@ -1,6 +1,5 @@
 {
   "id": "rob-dr-strangelove",
-  "rob": true,
   "title": "Dr Strangelove",
   "starring": "Peter Capaldi",
   "poster": "/assets/img/posters/robs/dr-strangelove.webp",
@@ -12,10 +11,6 @@
   "summary": "A brilliant but emotionally detached scientist invents a medical patch that allows people to trade and transfer emotions like medicine. As demand for his breakthrough technology explodes, the system begins spreading strange and unpredictable feelings through society, forcing him to confront the true cost of turning human emotion into a commodity.",
   "link": "#",
   "linkType": "podcast",
-  "buzzsproutScriptSrc": ""
+  "buzzsproutScriptSrc": "",
+  "owner": "rob"
 }
-
-
-
-
-

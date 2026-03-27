@@ -1,6 +1,5 @@
 {
   "id": "rob-training-day",
-  "rob": true,
   "title": "Training Day",
   "starring": "Jenna Ortega, Jesse Eisenberg",
   "poster": "/assets/img/posters/robs/training-day-rob.webp",
@@ -13,5 +12,6 @@
   "link": "#",
   "linkType": "podcast",
   "buzzsproutEmbedUrl": "",
-  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18734764-episode-6-training-day.js?container_id=buzzsprout-player-18734764&player=small"
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18734764-episode-6-training-day.js?container_id=buzzsprout-player-18734764&player=small",
+  "owner": "rob"
 }

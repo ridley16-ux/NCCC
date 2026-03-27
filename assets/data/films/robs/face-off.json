@@ -1,6 +1,5 @@
 {
   "id": "rob-face-off",
-  "rob": true,
   "title": "Face/Off",
   "starring": "John Candy",
   "poster": "/assets/img/posters/robs/face-off-rob.webp",
@@ -15,5 +14,6 @@
   "link": "#",
   "linkType": "podcast",
   "buzzsproutEmbedUrl": "https://www.buzzsprout.com/2591128/episodes/18586740-face-off?client_source=small_player",
-  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18586740-episode-1-face-off.js?container_id=buzzsprout-player-18586740&player=small"
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18586740-episode-1-face-off.js?container_id=buzzsprout-player-18586740&player=small",
+  "owner": "rob"
 }

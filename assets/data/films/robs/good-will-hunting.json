@@ -1,6 +1,5 @@
 {
   "id": "rob-good-will-hunting",
-  "rob": true,
   "title": "Good Will Hunting",
   "starring": "Joe Keery (Steve Harrington)",
   "poster": "/assets/img/posters/robs/good-will-hunting-rob.webp",
@@ -13,5 +12,6 @@
   "link": "#",
   "linkType": "podcast",
   "buzzsproutEmbedUrl": "",
-  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18632092-episode-2-good-will-hunting.js?container_id=buzzsprout-player-18632092&player=small"
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18632092-episode-2-good-will-hunting.js?container_id=buzzsprout-player-18632092&player=small",
+  "owner": "rob"
 }
