@@ -1,5 +1,6 @@
 const DEFAULT_MANIFEST_URL = "/assets/data/films/manifest.json";
 const FILM_OWNERS = new Set(["rob", "kev", "real"]);
+const REWRITTEN_OWNER = "rewritten";
 const OWNER_VERSION_SUFFIX = {
   rob: "[Rob’s Version]",
   kev: "[Kev’s Version]"
@@ -97,11 +98,28 @@ export function getFilmCategory(film) {
     ?? film.variant
   );
   if (explicitType) return explicitType;
+  const explicitRewriteType = String(
+    film.rewriteType
+    ?? film.rewrite_type
+    ?? film.rewriteOwner
+    ?? film.rewrite_owner
+    ?? film.variant
+    ?? ""
+  ).trim().toLowerCase();
+  if (explicitRewriteType === REWRITTEN_OWNER) return REWRITTEN_OWNER;
 
   const rawId = String(film.id || "").trim().toLowerCase();
   if (rawId.startsWith("rob-")) return "rob";
   if (rawId.startsWith("kev-")) return "kev";
+  if (rawId.startsWith("real-")) return "real";
   if (film.rob === true) return "rob";
+  if (
+    film.rewrite === true
+    || film.rewritten === true
+    || explicitRewriteType.length > 0
+  ) {
+    return REWRITTEN_OWNER;
+  }
   return "real";
 }
 
