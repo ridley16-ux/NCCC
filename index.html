@@ -3845,7 +3845,15 @@ body.modal-open {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
 import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.js";
-import { getFilmCategory, getFilmDisplayTitle, getFilmRosetteMeta, loadFilmsData } from "/assets/js/films-data.js";
+import {
+  getFilmCategory,
+  getFilmDisplayTitle,
+  getFilmRosetteMeta,
+  getPosterForFilm,
+  getScoreLabelForFilm,
+  isEligibleForKevPick,
+  loadFilmsData
+} from "/assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
@@ -3890,6 +3898,7 @@ const AWARDS = [
       let topKevRating = null;
       const tiedFilms = [];
       films.forEach((film) => {
+        if (!isEligibleForKevPick(film)) return;
         const kevRating = getKevRating10(film, aggregates);
         const normalisedKevRating = normaliseScoreToPercent(kevRating);
         if (!Number.isFinite(normalisedKevRating)) return;
@@ -4211,7 +4220,7 @@ function calcRobScore(film) {
   film.totalScore = total;
   film.score = (total / 30) * 100;
   film.kevScore = film.kevScore ?? film.score;
-  film.scoreLabel = "🎙️ Kev’s Score";
+  film.scoreLabel = `🎙️ ${getScoreLabelForFilm(film)}`;
 }
 
 function escapeHtml(value) {
@@ -4261,7 +4270,7 @@ function setTranscriptHero({ transcriptId, title, dateValue, trigger }) {
   const film = filmFromTranscript || filmFromId || null;
 
   const resolvedTitle = getFilmDisplayTitle(film) || film?.title || title || cardTitle || "Transcript";
-  const resolvedPoster = film?.poster || cardPoster || "";
+  const resolvedPoster = getPosterForFilm(film) || cardPoster || "";
   const resolvedSummary = film?.summary || cardSummary || "";
   const resolvedDate = film?.podcastDate || "";
   const resolvedPlay = getPlayNowUrl(film, cardPlay);
@@ -6041,7 +6050,7 @@ async function render(options = {}) {
       <div class="hero-layout">
         <div class="film-poster-wrapper">
           <div class="poster-wrap">
-            <img src="${film.poster}" class="poster" />
+            <img src="${getPosterForFilm(film)}" class="poster" />
           </div>
         </div>
 
@@ -6061,7 +6070,7 @@ async function render(options = {}) {
             <div class="score-row" data-score-row data-kev-score="${film.score}" data-audience-score="${audienceRaw ?? ""}">
               <div class="score-card score-card--stat" data-score-card="kev">
                 <div class="score-stat" data-score-half="kev">
-                  <div class="score-label">Kev’s Score</div>
+                  <div class="score-label">${getScoreLabelForFilm(film)}</div>
                   <div class="score-value" data-score-value>${kevScoreDisplay}</div>
                 </div>
               </div>

@@ -11,6 +11,8 @@ const OWNER_TAG = {
   real: "Real Film",
   rewritten: "Rewritten Film"
 };
+const ROB_PLACEHOLDER_POSTER = "/assets/img/posters/robs/blank-rob.webp";
+const KEV_PLACEHOLDER_POSTER = "/assets/img/posters/kevs/blank-kev.svg";
 
 function getPodcastedAtValue(film) {
   if (!film) return null;
@@ -157,6 +159,26 @@ export function getFilmRosetteMeta(film) {
     default:
       return { className: "rewritten", label: "Rewritten Film" };
   }
+}
+
+export function getScoreLabelForFilm(film) {
+  return getFilmCategory(film) === "kev" ? "Rob’s Score" : "Kev’s Score";
+}
+
+export function isEligibleForKevPick(film) {
+  const category = getFilmCategory(film);
+  return category === "rob" || category === "rewritten";
+}
+
+export function getPosterForFilm(film) {
+  const category = getFilmCategory(film);
+  const poster = String(film?.poster || "").trim();
+  if (category === "kev") {
+    if (!poster || poster === ROB_PLACEHOLDER_POSTER || poster === KEV_PLACEHOLDER_POSTER) {
+      return KEV_PLACEHOLDER_POSTER;
+    }
+  }
+  return poster;
 }
 
 export function normalizeFilmMetadata(film, sourcePath = "") {
