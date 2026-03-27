@@ -2257,10 +2257,11 @@ body.modal-open {
       <div class="filter control filters-toolbar__group">
         <label for="filmFilter">Show films</label>
         <div class="select-field select-field--filter">
-          <select id="filmFilter" class="mobile-filter-control" data-default-value="rob">
+          <select id="filmFilter" class="mobile-filter-control" data-default-value="rewritten">
             <option value="all">All Films</option>
+            <option value="rewritten" selected>Rewritten Films</option>
             <option value="real">Real Films</option>
-            <option value="rob" selected>Rob's Films</option>
+            <option value="rob">Rob's Films</option>
             <option value="kev">Kev's Films</option>
           </select>
           <span class="select-icon select-icon--filter" aria-hidden="true">
@@ -3850,7 +3851,7 @@ import { getFilmCategory, getFilmDisplayTitle, loadFilmsData } from "/assets/js/
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
-let currentFilter = "rob";
+let currentFilter = "rewritten";
 let currentSort = "rating-desc";
 let filmSearchQuery = "";
 let lastScoreFetchKey = "";
@@ -5215,8 +5216,8 @@ function setAwardsLastUpdated(timestamp) {
 }
 
 function shouldShowFilmAwards() {
-  // Visibility gating: show for rewritten film filters (Rob, Kev, All) when no search query is active.
-  const allowedFilter = currentFilter === "rob" || currentFilter === "kev" || currentFilter === "all";
+  // Visibility gating: show for rewritten film filters (Rewritten, Rob, Kev, All) when no search query is active.
+  const allowedFilter = currentFilter === "rewritten" || currentFilter === "rob" || currentFilter === "kev" || currentFilter === "all";
   return allowedFilter && filmSearchQuery.trim() === "";
 }
 
@@ -5356,6 +5357,7 @@ function getFilteredFilms() {
   if (!includeFutureFilms) {
     films = films.filter(isPodcastedInPastOrToday);
   }
+  if (currentFilter === "rewritten") films = films.filter((film) => isRewrittenFilm(film));
   if (currentFilter === "rob") films = films.filter((film) => getFilmCategory(film) === "rob");
   if (currentFilter === "kev") films = films.filter((film) => getFilmCategory(film) === "kev");
   if (currentFilter === "real") films = films.filter((film) => getFilmCategory(film) === "real");
