@@ -2261,8 +2261,6 @@ body.modal-open {
             <option value="all">All Films</option>
             <option value="rewritten" selected>Rewritten Films</option>
             <option value="real">Real Films</option>
-            <option value="rob">Rob's Films</option>
-            <option value="kev">Kev's Films</option>
           </select>
           <span class="select-icon select-icon--filter" aria-hidden="true">
             <svg viewBox="0 0 24 24" focusable="false" aria-hidden="true">
@@ -3855,6 +3853,8 @@ let currentFilter = "rewritten";
 let currentSort = "rating-desc";
 let filmSearchQuery = "";
 let lastScoreFetchKey = "";
+const FILTER_STORAGE_KEY = "nccc_film_filter";
+const VALID_UI_FILTERS = new Set(["all", "rewritten", "real"]);
 const listenerScores = {};
 const audienceScores = {};
 const RATING_STORAGE_KEY = "nccc_film_ratings";
@@ -5217,9 +5217,27 @@ function setAwardsLastUpdated(timestamp) {
 }
 
 function shouldShowFilmAwards() {
-  // Visibility gating: show for rewritten film filters (Rewritten, Rob, Kev, All) when no search query is active.
-  const allowedFilter = currentFilter === "rewritten" || currentFilter === "rob" || currentFilter === "kev" || currentFilter === "all";
+  // Visibility gating: show for rewritten/all filters when no search query is active.
+  const allowedFilter = currentFilter === "rewritten" || currentFilter === "all";
   return allowedFilter && filmSearchQuery.trim() === "";
+}
+
+function normalizeFilterValue(rawValue) {
+  if (rawValue === "rob" || rawValue === "kev") return "rewritten";
+  if (VALID_UI_FILTERS.has(rawValue)) return rawValue;
+  return "rewritten";
+}
+
+function getInitialFilterValue() {
+  let urlFilter = null;
+  try {
+    const params = new URLSearchParams(window.location.search);
+    urlFilter = params.get("filter");
+  } catch (error) {
+    console.warn("Unable to read filter from URL params.", error);
+  }
+  const storedFilter = localStorage.getItem(FILTER_STORAGE_KEY);
+  return normalizeFilterValue(urlFilter ?? storedFilter ?? "rewritten");
 }
 
 function formatAwardWinnersLine(
@@ -5365,8 +5383,6 @@ function getFilteredFilms() {
         return category === "rob" || category === "kev" || category === "rewritten";
       });
       break;
-    case "rob":
-    case "kev":
     case "real":
       films = films.filter((film) => getFilmCategory(film) === currentFilter);
       break;
@@ -6301,6 +6317,9 @@ async function loadFilms() {
 }
 
 document.addEventListener("DOMContentLoaded", () => {
+  currentFilter = getInitialFilterValue();
+  localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
+
   document.addEventListener("header:ready", () => {
     syncFilterControls();
     const shouldExpand = isMobileViewport() && hasAdvancedFiltersApplied();
@@ -6349,7 +6368,8 @@ document.addEventListener("DOMContentLoaded", () => {
 
   document.addEventListener("change", (event) => {
     if (event.target?.id === "filmFilter") {
-      currentFilter = event.target.value;
+      currentFilter = normalizeFilterValue(event.target.value);
+      localStorage.setItem(FILTER_STORAGE_KEY, currentFilter);
       updateListenerSortAvailability();
       refreshSearchFilterToggleState();
       resetPagination();
