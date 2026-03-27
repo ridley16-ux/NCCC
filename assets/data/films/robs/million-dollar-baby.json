@@ -1,6 +1,5 @@
 {
   "id": "rob-million-dollar-baby",
-  "rob": true,
   "title": "Million Dollar Baby",
   "starring": "Andy Allo, John Krasinski",
   "poster": "/assets/img/posters/robs/million-dollar-baby-rob.webp",
@@ -15,5 +14,6 @@
   "link": "#",
   "linkType": "podcast",
   "buzzsproutEmbedUrl": "https://www.buzzsprout.com/2591128/episodes/18734755-episode-5-million-dollar-baby?client_source=small_player",
-  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18734755-episode-5-million-dollar-baby.js?container_id=buzzsprout-player-18734755&player=small"
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18734755-episode-5-million-dollar-baby.js?container_id=buzzsprout-player-18734755&player=small",
+  "owner": "rob"
 }

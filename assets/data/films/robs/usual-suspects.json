@@ -1,6 +1,5 @@
 {
   "id": "rob-usual-suspects",
-  "rob": true,
   "title": "The Usual Suspects",
   "starring": "James Buckley, Joe Thomas, Charlotte Ritchie",
   "poster": "/assets/img/posters/robs/usual-suspects.webp",
@@ -12,11 +11,6 @@
   "summary": "In a quiet Yorkshire village, two easygoing police officers investigate the sudden death of a local favourite known as Old Don. Doorbell footage along a country lane leads them to three mysterious elderly strangers staying at the village pub, while an ambitious young journalist becomes convinced the police are missing something. As the summer fair approaches, her determination to uncover the truth pushes the small village investigation toward a dramatic showdown.",
   "link": "#",
   "linkType": "podcast",
-  "buzzsproutScriptSrc": "",
-  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18888235-episode-9-the-usual-suspects.js?container_id=buzzsprout-player-18888235&player=small"
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/18888235-episode-9-the-usual-suspects.js?container_id=buzzsprout-player-18888235&player=small",
+  "owner": "rob"
 }
-
-
-
-
-

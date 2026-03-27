@@ -1,6 +1,14 @@
 const DEFAULT_MANIFEST_URL = "/assets/data/films/manifest.json";
-const REWRITE_TYPES = new Set(["rob", "kev"]);
-const KEV_VERSION_SUFFIX = "[Kev’s Version]";
+const FILM_OWNERS = new Set(["rob", "kev", "real"]);
+const OWNER_VERSION_SUFFIX = {
+  rob: "[Rob’s Version]",
+  kev: "[Kev’s Version]"
+};
+const OWNER_TAG = {
+  rob: "Rob’s Film",
+  kev: "Kev’s Film",
+  real: "Real Film"
+};
 
 function getPodcastedAtValue(film) {
   if (!film) return null;
@@ -52,12 +60,12 @@ export function isFilmLive(podcastDate, { includeFuture = false } = {}) {
   return date.getTime() <= Date.now();
 }
 
-function normalizeRewriteType(value) {
+function normalizeOwner(value) {
   const normalized = String(value || "").trim().toLowerCase();
-  return REWRITE_TYPES.has(normalized) ? normalized : null;
+  return FILM_OWNERS.has(normalized) ? normalized : null;
 }
 
-function detectRewriteTypeFromPath(path) {
+function detectOwnerFromPath(path) {
   const normalizedPath = String(path || "").toLowerCase();
   if (normalizedPath.includes("/films/robs/")) return "rob";
   if (normalizedPath.includes("/films/kevs/")) return "kev";
@@ -75,10 +83,13 @@ function getFilmTags(film) {
 export function getFilmCategory(film) {
   if (!film) return "real";
 
-  const bySourcePath = detectRewriteTypeFromPath(film.sourcePath ?? film.source_path);
+  const explicitOwner = normalizeOwner(film.owner ?? film.filmOwner ?? film.film_owner);
+  if (explicitOwner) return explicitOwner;
+
+  const bySourcePath = detectOwnerFromPath(film.sourcePath ?? film.source_path);
   if (bySourcePath) return bySourcePath;
 
-  const explicitType = normalizeRewriteType(
+  const explicitType = normalizeOwner(
     film.rewriteType
     ?? film.rewrite_type
     ?? film.rewriteOwner
@@ -98,39 +109,45 @@ function hasKevVersionSuffix(title) {
   return /\[(kev['’]s version)\]\s*$/i.test(String(title || "").trim());
 }
 
+function hasOwnerVersionSuffix(title, owner) {
+  if (owner === "kev") return hasKevVersionSuffix(title);
+  if (owner === "rob") return /\[(rob['’]s version)\]\s*$/i.test(String(title || "").trim());
+  return false;
+}
+
 export function getFilmDisplayTitle(film) {
   const baseTitle = String(film?.title || "").trim();
   if (!baseTitle) return "";
-  if (getFilmCategory(film) !== "kev") return baseTitle;
-  if (hasKevVersionSuffix(baseTitle)) return baseTitle;
-  return `${baseTitle} ${KEV_VERSION_SUFFIX}`;
+  const owner = getFilmCategory(film);
+  const suffix = OWNER_VERSION_SUFFIX[owner];
+  if (!suffix) return baseTitle;
+  if (hasOwnerVersionSuffix(baseTitle, owner)) return baseTitle;
+  return `${baseTitle} ${suffix}`;
 }
 
 export function normalizeFilmMetadata(film, sourcePath = "") {
   const normalizedFilm = { ...film };
   normalizedFilm.sourcePath = sourcePath;
 
-  const category = getFilmCategory({ ...normalizedFilm, sourcePath });
-  if (category === "kev") {
-    normalizedFilm.rewriteType = "kev";
-    normalizedFilm.rewrite_type = "kev";
-    normalizedFilm.rob = false;
-  } else if (category === "rob") {
-    normalizedFilm.rewriteType = "rob";
-    normalizedFilm.rewrite_type = "rob";
+  const owner = getFilmCategory({ ...normalizedFilm, sourcePath });
+  normalizedFilm.owner = owner;
+
+  if (owner === "kev" || owner === "rob") {
+    normalizedFilm.rewriteType = owner;
+    normalizedFilm.rewrite_type = owner;
   }
 
   const existingTags = getFilmTags(normalizedFilm)
     .map((tag) => String(tag || "").trim())
     .filter(Boolean)
-    .filter((tag) => tag.toLowerCase() !== "robs film");
+    .filter((tag) => !["robs film", "rob's film", "rob’s film", "kevs film", "kev's film", "kev’s film", "real film"].includes(tag.toLowerCase()));
 
-  if (category === "kev") {
-    normalizedFilm.tags = ["Kev's Film", ...existingTags.filter((tag) => tag.toLowerCase() !== "kev's film")];
-    normalizedFilm.tag = "Kev's Film";
-  } else {
-    normalizedFilm.tags = existingTags;
-  }
+  const ownerTag = OWNER_TAG[owner];
+  normalizedFilm.tags = ownerTag ? [ownerTag, ...existingTags] : existingTags;
+  if (ownerTag) normalizedFilm.tag = ownerTag;
+
+  // Backwards compatibility for old consumers while ownership migrates.
+  normalizedFilm.rob = owner === "rob";
 
   normalizedFilm.displayTitle = getFilmDisplayTitle(normalizedFilm);
   return normalizedFilm;
@@ -163,5 +180,5 @@ export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL, includ
 
 export async function getRobsFilmsCount(options) {
   const films = await loadFilmsData(options);
-  return films.filter((film) => film.active && film.rob).length;
+  return films.filter((film) => film.active && getFilmCategory(film) === "rob").length;
 }

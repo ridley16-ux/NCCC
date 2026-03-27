@@ -1,6 +1,5 @@
 {
   "id": "rob-blank",
-  "rob": true,
   "title": "Place Holder - Coming Soon",
   "starring": "TBC",
   "poster": "/assets/img/posters/robs/blank-rob.webp",
@@ -12,5 +11,6 @@
   "summary": "Place Holder - Coming Soon",
   "link": "#",
   "linkType": "podcast",
-  "buzzsproutEmbedUrl": ""
+  "buzzsproutEmbedUrl": "",
+  "owner": "rob"
 }
