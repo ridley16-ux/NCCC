@@ -3847,7 +3847,7 @@ body.modal-open {
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script type="module">
 import { buildPodcastEpisodeSchemaFromFilm, injectJsonLd } from "/assets/js/seo.js";
-import { getFilmCategory, getFilmDisplayTitle, loadFilmsData } from "/assets/js/films-data.js";
+import { getFilmCategory, getFilmDisplayTitle, getFilmRosetteMeta, loadFilmsData } from "/assets/js/films-data.js";
 
 const BASE_URL = "https://nocontextcinemaclub.com/";
 let allFilms = [];
@@ -3866,7 +3866,8 @@ const includeFutureFilms = window.NCCC_OPS?.includeFuture === true;
 let openTooltip = null;
 
 function isRewrittenFilm(film) {
-  return getFilmCategory(film) !== "real";
+  const category = getFilmCategory(film);
+  return category === "rob" || category === "kev" || category === "rewritten";
 }
 
 const INSIGHT_MIN_VOTES = 1;
@@ -5357,10 +5358,22 @@ function getFilteredFilms() {
   if (!includeFutureFilms) {
     films = films.filter(isPodcastedInPastOrToday);
   }
-  if (currentFilter === "rewritten") films = films.filter((film) => isRewrittenFilm(film));
-  if (currentFilter === "rob") films = films.filter((film) => getFilmCategory(film) === "rob");
-  if (currentFilter === "kev") films = films.filter((film) => getFilmCategory(film) === "kev");
-  if (currentFilter === "real") films = films.filter((film) => getFilmCategory(film) === "real");
+  switch (currentFilter) {
+    case "rewritten":
+      films = films.filter((film) => {
+        const category = getFilmCategory(film);
+        return category === "rob" || category === "kev" || category === "rewritten";
+      });
+      break;
+    case "rob":
+    case "kev":
+    case "real":
+      films = films.filter((film) => getFilmCategory(film) === currentFilter);
+      break;
+    case "all":
+    default:
+      break;
+  }
   if (filmSearchQuery) {
     const normalizedQuery = filmSearchQuery.toLowerCase();
     films = films.filter((film) => {
@@ -5957,16 +5970,17 @@ async function render(options = {}) {
     const storedRating = localRatings[film.id] ?? null;
     const card = document.createElement("div");
     const filmCategory = getFilmCategory(film);
+    const rosetteMeta = getFilmRosetteMeta(film);
     const rewrittenFilm = isRewrittenFilm(film);
-    card.className = `film-card ${rewrittenFilm ? `${filmCategory}-film` : ""}`;
+    card.className = `film-card ${filmCategory}-film`;
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
 
     const displayTitle = getFilmDisplayTitle(film) || film.title || "";
     const rosettes = [
       {
-        className: rewrittenFilm ? filmCategory : "real",
-        label: filmCategory === "rob" ? "Rob’s Film" : (filmCategory === "kev" ? "Kev’s Film" : "Real Film"),
+        className: rosetteMeta.className,
+        label: rosetteMeta.label,
         icon: ""
       }
     ];

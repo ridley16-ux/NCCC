@@ -1,5 +1,5 @@
 const DEFAULT_MANIFEST_URL = "/assets/data/films/manifest.json";
-const FILM_OWNERS = new Set(["rob", "kev", "real"]);
+const FILM_OWNERS = new Set(["rob", "kev", "real", "rewritten"]);
 const REWRITTEN_OWNER = "rewritten";
 const OWNER_VERSION_SUFFIX = {
   rob: "[Rob’s Version]",
@@ -8,7 +8,8 @@ const OWNER_VERSION_SUFFIX = {
 const OWNER_TAG = {
   rob: "Rob’s Film",
   kev: "Kev’s Film",
-  real: "Real Film"
+  real: "Real Film",
+  rewritten: "Rewritten Film"
 };
 
 function getPodcastedAtValue(film) {
@@ -141,6 +142,21 @@ export function getFilmDisplayTitle(film) {
   if (!suffix) return baseTitle;
   if (hasOwnerVersionSuffix(baseTitle, owner)) return baseTitle;
   return `${baseTitle} ${suffix}`;
+}
+
+export function getFilmRosetteMeta(film) {
+  const category = getFilmCategory(film);
+  switch (category) {
+    case "rob":
+      return { className: "rob", label: "Rob’s Film" };
+    case "kev":
+      return { className: "kev", label: "Kev’s Film" };
+    case "real":
+      return { className: "real", label: "Real Film" };
+    case "rewritten":
+    default:
+      return { className: "rewritten", label: "Rewritten Film" };
+  }
 }
 
 export function normalizeFilmMetadata(film, sourcePath = "") {
