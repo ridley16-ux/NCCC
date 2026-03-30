@@ -1,6 +1,6 @@
 import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-const FUNCTION_VERSION = "cast_vote_v2_debug_2026-02-06";
+const FUNCTION_VERSION = "cast_vote_v3_add_kev_2026-03-30";
 
 const SUPABASE_URL = Deno.env.get("SUPABASE_URL");
 const SERVICE_ROLE_KEY = Deno.env.get("SERVICE_ROLE_KEY");
