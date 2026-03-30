@@ -87,6 +87,14 @@
     {
       "path": "/assets/data/films/real/man-from-earth.json",
       "active": true
+    },
+    {
+      "path": "/assets/data/films/real/running-man.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/running-man.json",
+      "active": true
     }
   ]
 }
