@@ -16,7 +16,7 @@ const corsHeaders = {
   "Vary": "Origin",
 };
 
-const filmIdRegex = /^(rob|real)-[a-z0-9-]+$/i;
+const filmIdRegex = /^(rob|kev|real)-[a-z0-9-]+$/i;
 
 type VotePayload = {
   film_id: unknown;
