@@ -83,6 +83,10 @@
     {
       "path": "/assets/data/films/kevs/coming-soon.json",
       "active": true
-    }
+    },
+    {
+      "path": "/assets/data/films/real/man-from-earth.json",
+      "active": true
+    },
   ]
 }
