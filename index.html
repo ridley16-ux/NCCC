@@ -6014,9 +6014,18 @@ async function render(options = {}) {
     const filmCategory = getFilmCategory(film);
     const rosetteMeta = getFilmRosetteMeta(film);
     const rewrittenFilm = isRewrittenFilm(film);
+    const matchingRealFilm = rewrittenFilm ? findMatchingRealFilm(film, allFilms) : null;
+    const rewriteKevScore10 = normaliseScoreToPercent(film.score);
+    const realRtScore10 = getRottenTomatoesScore10FromFilm(matchingRealFilm);
+    // "fixed-it" means the rewrite scored higher than the paired real film's Rotten Tomatoes score.
+    const fixedIt = rewrittenFilm
+      && matchingRealFilm
+      && rewriteKevScore10 !== null
+      && realRtScore10 !== null
+      && (rewriteKevScore10 / 10) > realRtScore10;
     const realFilmEpisodeUrl = getRealFilmPrimaryCtaTarget(film);
     const realFilmHasEpisode = Boolean(realFilmEpisodeUrl);
-    card.className = `film-card ${filmCategory}-film${film.fixedIt ? " fixed-it" : ""}`;
+    card.className = `film-card ${filmCategory}-film${fixedIt ? " fixed-it" : ""}`;
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
 
