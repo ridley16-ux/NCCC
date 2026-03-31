@@ -95,6 +95,14 @@
     {
       "path": "/assets/data/films/robs/running-man.json",
       "active": true
+    },
+    {
+      "path": "/assets/data/films/real/nightcrawler.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/nightcrawler.json",
+      "active": true
     }
   ]
 }
