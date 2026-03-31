@@ -393,35 +393,14 @@ label {
 }
 
 .film-card.fixed-it {
-  position: relative;
-  border: 3px solid #e6c200;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), var(--card) padding-box,
+    linear-gradient(135deg, #c9a646, #ffd700, #b8962e) border-box;
   box-shadow:
-    0 0 0 1px rgba(255, 215, 0, 0.6),
-    0 0 14px rgba(255, 215, 0, 0.45),
-    0 18px 60px rgba(0, 0, 0, 0.45);
-}
-
-.film-card.fixed-it::after {
-  content: "";
-  position: absolute;
-  inset: -2px;
-  border-radius: 18px;
-  pointer-events: none;
-  background: linear-gradient(
-    120deg,
-    transparent 30%,
-    rgba(255, 215, 0, 0.6),
-    transparent 70%
-  );
-  opacity: 0.35;
-  transform: translateX(-100%);
-  animation: fixedItShimmer 3s ease-in-out infinite;
-  z-index: 1;
-}
-
-.film-card.fixed-it > * {
-  position: relative;
-  z-index: 2;
+    0 0 12px rgba(255, 215, 0, 0.24),
+    0 18px 60px rgba(0, 0, 0, 0.45),
+    inset 0 0 8px rgba(0, 0, 0, 0.16);
 }
 
 .film-card.rob-film,
@@ -429,16 +408,11 @@ label {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a;
 }
 
-@keyframes fixedItShimmer {
-  0% {
-    transform: translateX(-100%);
-  }
-  60% {
-    transform: translateX(100%);
-  }
-  100% {
-    transform: translateX(100%);
-  }
+.film-card.fixed-it.rob-film,
+.film-card.fixed-it.kev-film {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a padding-box,
+    linear-gradient(135deg, #c9a646, #ffd700, #b8962e) border-box;
 }
 
 :root {
