@@ -406,6 +406,7 @@ import {
   getFilmRosetteMeta,
   getPosterForFilm,
   getScoreLabelForFilm,
+  isRewrittenFilm,
   isEligibleForKevPick,
   loadFilmsData
 } from "/assets/js/films-data.js";
@@ -606,11 +607,6 @@ const AWARDS = [
   }
 ];
 
-function isRewrittenFilm(film) {
-  const category = getFilmCategory(film);
-  return category === "rob" || category === "kev" || category === "rewritten";
-}
-
 function parseLocalDate(d) {
   if (!d) return null;
   const [year, month, day] = String(d).split("-").map(Number);
@@ -736,14 +732,12 @@ function getRobComponentAverage10(film) {
   return (coherence + entertainment + originality) / 3;
 }
 
-function normalizeFilmTitle(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
 function findMatchingRealFilm(film, films = []) {
-  if (!film?.title) return null;
-  const targetTitle = normalizeFilmTitle(film.title);
-  return films.find((candidate) => getFilmCategory(candidate) === "real" && normalizeFilmTitle(candidate.title) === targetTitle) ?? null;
+  const rawId = String(film?.id || "").trim().toLowerCase();
+  if (!rawId) return null;
+  const baseId = rawId.startsWith("rob-") ? rawId.slice(4) : (rawId.startsWith("kev-") ? rawId.slice(4) : null);
+  if (!baseId) return null;
+  return films.find((candidate) => String(candidate?.id || "").trim().toLowerCase() === `real-${baseId}`) ?? null;
 }
 
 function getRottenTomatoesScore10FromFilm(film) {

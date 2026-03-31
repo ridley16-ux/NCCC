@@ -3890,6 +3890,7 @@ import {
   getFilmRosetteMeta,
   getPosterForFilm,
   getScoreLabelForFilm,
+  isRewrittenFilm,
   isEligibleForKevPick,
   loadFilmsData
 } from "/assets/js/films-data.js";
@@ -3911,11 +3912,6 @@ const supabaseClient = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON
 const localRatings = loadLocalRatings();
 const includeFutureFilms = window.NCCC_OPS?.includeFuture === true;
 let openTooltip = null;
-
-function isRewrittenFilm(film) {
-  const category = getFilmCategory(film);
-  return category === "rob" || category === "kev" || category === "rewritten";
-}
 
 const INSIGHT_MIN_VOTES = 1;
 const INSIGHT_GAP_MIN = 1;
@@ -4828,23 +4824,12 @@ function getKevRating10(film, _aggregates = {}) {
   return normalized !== null ? normalized / 10 : null;
 }
 
-function normalizeFilmTitle(value) {
-  return String(value || "").trim().toLowerCase();
-}
-
-function normalizeFilmTitleForMatch(value) {
-  return String(value || "")
-    .toLowerCase()
-    .replace(/[^\p{L}\p{N}]+/gu, " ")
-    .trim();
-}
-
 function findMatchingRealFilm(film, films = []) {
-  if (!film?.title) return null;
-  const targetTitle = normalizeFilmTitle(film.title);
-  return films.find((candidate) => (
-    getFilmCategory(candidate) === "real" && normalizeFilmTitle(candidate.title) === targetTitle
-  )) ?? null;
+  const rawId = String(film?.id || "").trim().toLowerCase();
+  if (!rawId) return null;
+  const baseId = rawId.startsWith("rob-") ? rawId.slice(4) : (rawId.startsWith("kev-") ? rawId.slice(4) : null);
+  if (!baseId) return null;
+  return films.find((candidate) => String(candidate?.id || "").trim().toLowerCase() === `real-${baseId}`) ?? null;
 }
 
 function getRottenTomatoesScore10FromFilm(film) {
@@ -5435,20 +5420,7 @@ function getFilteredFilms() {
   if (!includeFutureFilms) {
     films = films.filter(isPodcastedInPastOrToday);
   }
-  switch (currentFilter) {
-    case "rewritten":
-      films = films.filter((film) => {
-        const category = getFilmCategory(film);
-        return category === "rob" || category === "kev" || category === "rewritten";
-      });
-      break;
-    case "real":
-      films = films.filter((film) => getFilmCategory(film) === currentFilter);
-      break;
-    case "all":
-    default:
-      break;
-  }
+  films = films.filter((film) => matchesFilter(film, currentFilter));
   if (filmSearchQuery) {
     const normalizedQuery = filmSearchQuery.toLowerCase();
     films = films.filter((film) => {
@@ -5460,9 +5432,16 @@ function getFilteredFilms() {
   return films;
 }
 
+function matchesFilter(film, filter) {
+  const category = getFilmCategory(film);
+  if (filter === "rewritten") return category === "rewritten";
+  if (filter === "real") return category === "real";
+  if (filter === "all") return true;
+  return category === "rewritten";
+}
+
 function buildRewrittenFilmIndexes(films) {
   const rewrittenBySlug = new Map();
-  const rewrittenByTitle = new Map();
   films.filter((film) => isRewrittenFilm(film)).forEach((film) => {
     if (typeof film.id === "string" && film.id.startsWith("rob-")) {
       rewrittenBySlug.set(film.id.slice(4), film);
@@ -5470,13 +5449,8 @@ function buildRewrittenFilmIndexes(films) {
     if (typeof film.id === "string" && film.id.startsWith("kev-")) {
       rewrittenBySlug.set(film.id.slice(4), film);
     }
-    const normalizedTitle = normalizeFilmTitleForMatch(film.title);
-    if (!normalizedTitle) return;
-    const list = rewrittenByTitle.get(normalizedTitle) ?? [];
-    list.push(film);
-    rewrittenByTitle.set(normalizedTitle, list);
   });
-  return { rewrittenBySlug, rewrittenByTitle };
+  return { rewrittenBySlug };
 }
 
 function resolveRewrittenMatchForReal(realFilm, indexes, ambiguousMatches) {
@@ -5485,14 +5459,7 @@ function resolveRewrittenMatchForReal(realFilm, indexes, ambiguousMatches) {
     const rewrittenMatch = indexes.rewrittenBySlug.get(realFilm.id.slice(5));
     if (rewrittenMatch) return rewrittenMatch;
   }
-  const normalizedTitle = normalizeFilmTitleForMatch(realFilm.title);
-  if (!normalizedTitle) return null;
-  const matches = indexes.rewrittenByTitle.get(normalizedTitle) ?? [];
-  if (matches.length > 1) {
-    ambiguousMatches.push({ title: realFilm.title, ids: matches.map((film) => film.id) });
-    return null;
-  }
-  return matches[0] ?? null;
+  return null;
 }
 
 function assignPodcastedDates(films) {

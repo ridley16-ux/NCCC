@@ -69,14 +69,6 @@ function normalizeOwner(value) {
   return FILM_OWNERS.has(normalized) ? normalized : null;
 }
 
-function detectOwnerFromPath(path) {
-  const normalizedPath = String(path || "").toLowerCase();
-  if (normalizedPath.includes("/films/robs/")) return "rob";
-  if (normalizedPath.includes("/films/kevs/")) return "kev";
-  if (normalizedPath.includes("/films/real/")) return "real";
-  return null;
-}
-
 function getFilmTags(film) {
   if (Array.isArray(film?.tags)) return film.tags;
   if (typeof film?.tags === "string") return [film.tags];
@@ -84,45 +76,33 @@ function getFilmTags(film) {
   return [];
 }
 
-export function getFilmCategory(film) {
+export function getFilmOwner(film) {
   if (!film) return "real";
-
-  const explicitOwner = normalizeOwner(film.owner ?? film.filmOwner ?? film.film_owner);
-  if (explicitOwner) return explicitOwner;
-
-  const bySourcePath = detectOwnerFromPath(film.sourcePath ?? film.source_path);
-  if (bySourcePath) return bySourcePath;
-
-  const explicitType = normalizeOwner(
-    film.rewriteType
+  const explicitOwner = normalizeOwner(
+    film.owner
+    ?? film.filmOwner
+    ?? film.film_owner
+    ?? film.rewriteType
     ?? film.rewrite_type
     ?? film.rewriteOwner
     ?? film.rewrite_owner
     ?? film.variant
   );
-  if (explicitType) return explicitType;
-  const explicitRewriteType = String(
-    film.rewriteType
-    ?? film.rewrite_type
-    ?? film.rewriteOwner
-    ?? film.rewrite_owner
-    ?? film.variant
-    ?? ""
-  ).trim().toLowerCase();
-  if (explicitRewriteType === REWRITTEN_OWNER) return REWRITTEN_OWNER;
+  if (explicitOwner) return explicitOwner;
 
   const rawId = String(film.id || "").trim().toLowerCase();
   if (rawId.startsWith("rob-")) return "rob";
   if (rawId.startsWith("kev-")) return "kev";
   if (rawId.startsWith("real-")) return "real";
   if (film.rob === true) return "rob";
-  if (
-    film.rewrite === true
-    || film.rewritten === true
-    || explicitRewriteType.length > 0
-  ) {
-    return REWRITTEN_OWNER;
-  }
+  if (film.rewrite === true || film.rewritten === true) return REWRITTEN_OWNER;
+  return "real";
+}
+
+export function getFilmCategory(film) {
+  const owner = String(getFilmOwner(film) || "").toLowerCase();
+  if (owner === "rob" || owner === "kev" || owner === REWRITTEN_OWNER) return REWRITTEN_OWNER;
+  if (owner === "real") return "real";
   return "real";
 }
 
@@ -139,7 +119,7 @@ function hasOwnerVersionSuffix(title, owner) {
 export function getFilmDisplayTitle(film) {
   const baseTitle = String(film?.title || "").trim();
   if (!baseTitle) return "";
-  const owner = getFilmCategory(film);
+  const owner = getFilmOwner(film);
   const suffix = OWNER_VERSION_SUFFIX[owner];
   if (!suffix) return baseTitle;
   if (hasOwnerVersionSuffix(baseTitle, owner)) return baseTitle;
@@ -147,33 +127,28 @@ export function getFilmDisplayTitle(film) {
 }
 
 export function getFilmRosetteMeta(film) {
-  const category = getFilmCategory(film);
-  switch (category) {
-    case "rob":
-      return { className: "rob", label: "Rob’s Film" };
-    case "kev":
-      return { className: "kev", label: "Kev’s Film" };
-    case "real":
-      return { className: "real", label: "Real Film" };
-    case "rewritten":
-    default:
-      return { className: "rewritten", label: "Rewritten Film" };
-  }
+  const owner = String(getFilmOwner(film) || "").toLowerCase();
+  if (owner === "rob") return { label: "Rob’s Film", className: "rob" };
+  if (owner === "kev") return { label: "Kev’s Film", className: "kev" };
+  return { label: "Real Film", className: "real" };
 }
 
 export function getScoreLabelForFilm(film) {
-  return getFilmCategory(film) === "kev" ? "Rob’s Score" : "Kev’s Score";
+  return getFilmOwner(film) === "kev" ? "Rob’s Score" : "Kev’s Score";
+}
+
+export function isRewrittenFilm(film) {
+  return getFilmCategory(film) === REWRITTEN_OWNER;
 }
 
 export function isEligibleForKevPick(film) {
-  const category = getFilmCategory(film);
-  return category === "rob" || category === "rewritten";
+  return isRewrittenFilm(film);
 }
 
 export function getPosterForFilm(film) {
-  const category = getFilmCategory(film);
+  const owner = getFilmOwner(film);
   const poster = String(film?.poster || "").trim();
-  if (category === "kev") {
+  if (owner === "kev") {
     if (!poster || poster === ROB_PLACEHOLDER_POSTER || poster === KEV_PLACEHOLDER_POSTER) {
       return KEV_PLACEHOLDER_POSTER;
     }
@@ -185,12 +160,13 @@ export function normalizeFilmMetadata(film, sourcePath = "") {
   const normalizedFilm = { ...film };
   normalizedFilm.sourcePath = sourcePath;
 
-  const owner = getFilmCategory({ ...normalizedFilm, sourcePath });
+  const owner = getFilmOwner({ ...normalizedFilm, sourcePath });
   normalizedFilm.owner = owner;
+  normalizedFilm.category = getFilmCategory(normalizedFilm);
 
-  if (owner === "kev" || owner === "rob") {
-    normalizedFilm.rewriteType = owner;
-    normalizedFilm.rewrite_type = owner;
+  if (normalizedFilm.category === REWRITTEN_OWNER) {
+    normalizedFilm.rewriteType = REWRITTEN_OWNER;
+    normalizedFilm.rewrite_type = REWRITTEN_OWNER;
   }
 
   const existingTags = getFilmTags(normalizedFilm)
@@ -198,7 +174,7 @@ export function normalizeFilmMetadata(film, sourcePath = "") {
     .filter(Boolean)
     .filter((tag) => !["robs film", "rob's film", "rob’s film", "kevs film", "kev's film", "kev’s film", "real film"].includes(tag.toLowerCase()));
 
-  const ownerTag = OWNER_TAG[owner];
+  const ownerTag = OWNER_TAG[owner] || OWNER_TAG[normalizedFilm.category];
   normalizedFilm.tags = ownerTag ? [ownerTag, ...existingTags] : existingTags;
   if (ownerTag) normalizedFilm.tag = ownerTag;
 
@@ -236,5 +212,5 @@ export async function loadFilmsData({ manifestUrl = DEFAULT_MANIFEST_URL, includ
 
 export async function getRobsFilmsCount(options) {
   const films = await loadFilmsData(options);
-  return films.filter((film) => film.active && getFilmCategory(film) === "rob").length;
+  return films.filter((film) => film.active && isRewrittenFilm(film)).length;
 }
