@@ -1,16 +1,16 @@
 {
-  "id": "rob-nightcrawler",
+  "id": "real-nightcrawler-man",
   "title": "Nightcrawler",
-  "starring": "Emma Stone, Kieran Culkin",
-  "poster": "/assets/img/posters/robs/nightcrawler.webp",
-  "coherence": 9,
-  "entertainment": 8,
-  "originality": 8,
+  "director": "Paul Michael Glaser",
+  "starring": "Jake Gyllenhaal, Rene Russo, Bill Paxton",
+  "poster": "https://resizing.flixster.com/Phg92T8uFooqX2dblY9-EwBWcDM=/206x305/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p10939779_p_v10_ad.jpg,
+  "score": 95,
+  "scoreLabel": "\ud83c\udf45 Rotten Tomatoes",
   "podcastDate": "2026-04-18",
   "podcasted_at": "2026-04-18T08:00:00+00:00",
-  "summary": "A series of grisly discoveries tied to a cross-country mail train draws amateur sleuths Paige and Eli into a mystery they believe they can solve. When Paige takes a reckless step to prove her theory, what started as an online obsession quickly becomes far more dangerous as the truth begins to close in.",
-  "link": "#",
-  "linkType": "podcast",
-  "buzzsproutScriptSrc": "",
-  "owner": "rob"
+  "summary": "A young opportunist finds success prowling the nighttime streets of LA to film disasters and death - but the darkness he captures begins to take hold.",
+  "link": "https://www.rottentomatoes.com/m/nightcrawler",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": "",
+  "owner": "real"
 }
