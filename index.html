@@ -4273,9 +4273,15 @@ function getEpisodePageUrl(filmId) {
   return `/pages/episode.html?id=${encodeURIComponent(filmId)}`;
 }
 
-function hasEpisodePageId(film) {
-  const episodeId = String(film?.id || "").trim();
-  return Boolean(episodeId);
+function getRealFilmPrimaryCtaTarget(film, filmsCollection = allFilms) {
+  if (film?.owner !== "real") return null;
+  const rawId = String(film?.id || "").trim();
+  if (!rawId.startsWith("real-")) return null;
+  const rewrittenTargetId = `rob-${rawId.replace(/^real-/, "")}`;
+  const targetExists = Array.isArray(filmsCollection)
+    && filmsCollection.some((entry) => String(entry?.id || "").trim() === rewrittenTargetId);
+  if (!targetExists) return null;
+  return getEpisodePageUrl(rewrittenTargetId);
 }
 
 function getPlayNowUrl(film, fallback = "") {
@@ -6023,8 +6029,8 @@ async function render(options = {}) {
     const filmCategory = getFilmCategory(film);
     const rosetteMeta = getFilmRosetteMeta(film);
     const rewrittenFilm = isRewrittenFilm(film);
-    const realFilmHasEpisode = hasEpisodePageId(film);
-    const realFilmEpisodeUrl = realFilmHasEpisode ? getEpisodePageUrl(film.id) : "#";
+    const realFilmEpisodeUrl = getRealFilmPrimaryCtaTarget(film);
+    const realFilmHasEpisode = Boolean(realFilmEpisodeUrl);
     card.className = `film-card ${filmCategory}-film`;
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
