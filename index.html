@@ -392,9 +392,27 @@ label {
   --badge-above-poster-gap: 8px;
 }
 
+.film-card.fixed-it {
+  border: 3px solid transparent;
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), var(--card) padding-box,
+    linear-gradient(135deg, #c9a646, #ffd700, #b8962e) border-box;
+  box-shadow:
+    0 0 12px rgba(255, 215, 0, 0.24),
+    0 18px 60px rgba(0, 0, 0, 0.45),
+    inset 0 0 8px rgba(0, 0, 0, 0.16);
+}
+
 .film-card.rob-film,
 .film-card.kev-film {
   background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a;
+}
+
+.film-card.fixed-it.rob-film,
+.film-card.fixed-it.kev-film {
+  background:
+    linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #2a2a2a padding-box,
+    linear-gradient(135deg, #c9a646, #ffd700, #b8962e) border-box;
 }
 
 :root {
@@ -6031,7 +6049,7 @@ async function render(options = {}) {
     const rewrittenFilm = isRewrittenFilm(film);
     const realFilmEpisodeUrl = getRealFilmPrimaryCtaTarget(film);
     const realFilmHasEpisode = Boolean(realFilmEpisodeUrl);
-    card.className = `film-card ${filmCategory}-film`;
+    card.className = `film-card ${filmCategory}-film${film.fixedIt ? " fixed-it" : ""}`;
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
 
