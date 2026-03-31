@@ -751,6 +751,27 @@ label {
 }
 .btn.podcast:focus { outline-color: rgba(212, 106, 42, 0.35); }
 
+.button.is-disabled {
+  opacity: 0.5;
+  pointer-events: none;
+}
+
+.rt-secondary-link {
+  display: inline-flex;
+  margin-top: 8px;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: 0.02em;
+  color: rgba(255, 228, 179, 0.92);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.rt-secondary-link:hover,
+.rt-secondary-link:focus-visible {
+  color: #ffffff;
+}
+
 .button {
   position: relative;
   transition: all 0.3s ease-in-out;
@@ -4252,6 +4273,11 @@ function getEpisodePageUrl(filmId) {
   return `/pages/episode.html?id=${encodeURIComponent(filmId)}`;
 }
 
+function hasEpisodePageId(film) {
+  const episodeId = String(film?.id || "").trim();
+  return Boolean(episodeId);
+}
+
 function getPlayNowUrl(film, fallback = "") {
   if (film?.linkType === "podcast") {
     return getEpisodePageUrl(film.id);
@@ -5997,6 +6023,8 @@ async function render(options = {}) {
     const filmCategory = getFilmCategory(film);
     const rosetteMeta = getFilmRosetteMeta(film);
     const rewrittenFilm = isRewrittenFilm(film);
+    const realFilmHasEpisode = hasEpisodePageId(film);
+    const realFilmEpisodeUrl = realFilmHasEpisode ? getEpisodePageUrl(film.id) : "#";
     card.className = `film-card ${filmCategory}-film`;
     card.dataset.filmId = film.id;
     card.id = `film-${film.id}`;
@@ -6144,6 +6172,7 @@ async function render(options = {}) {
             <aside class="badge rt-badge" aria-label="Rotten Tomatoes score">
               <div class="badge-label">Rotten Tomatoes</div>
               <div class="badge-value">🍅 ${kevScoreDisplay}</div>
+              ${film.link ? `<a class="rt-secondary-link" href="${film.link}" target="_blank" rel="noopener noreferrer">View on Rotten Tomatoes</a>` : ""}
             </aside>
           </div>
 
@@ -6152,7 +6181,14 @@ async function render(options = {}) {
           <p class="synopsis">${film.summary}</p>
 
           <div class="cta">
-            <a class="btn rt" href="${film.link}" target="_blank">Rotten Tomatoes</a>
+            <a
+              class="button${realFilmHasEpisode ? "" : " is-disabled"}"
+              href="${realFilmEpisodeUrl}"
+              target="_self"
+              aria-label="Listen to episode"
+              aria-disabled="${realFilmHasEpisode ? "false" : "true"}"
+              ${realFilmHasEpisode ? "" : "tabindex=\"-1\""}
+            >Listen to Episode</a>
           </div>
         </div>
       `}
