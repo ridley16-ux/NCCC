@@ -416,52 +416,52 @@ label {
 }
 
 
-.poster-bonus-ribbon {
+.film-card[data-film-id="rob-minority-report"] .poster-bonus-ribbon {
   position: absolute;
   top: 10px;
   left: 10px;
-  width: 106px;
-  height: 106px;
+  width: 88px;
+  height: 88px;
   z-index: 6;
   border-radius: 12px 0 0 0;
   overflow: hidden;
   text-decoration: none;
 }
 
-.poster-bonus-ribbon::before {
+.film-card[data-film-id="rob-minority-report"] .poster-bonus-ribbon::before {
   content: "";
   position: absolute;
   top: 0;
   left: 0;
   width: 0;
   height: 0;
-  border-top: 106px solid rgba(15, 10, 3, 0.35);
-  border-right: 106px solid transparent;
-  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35));
+  border-top: 88px solid rgba(25, 17, 6, 0.44);
+  border-right: 88px solid transparent;
+  filter: drop-shadow(0 8px 10px rgba(0, 0, 0, 0.34));
 }
 
-.poster-bonus-ribbon::after {
+.film-card[data-film-id="rob-minority-report"] .poster-bonus-ribbon::after {
   content: "BONUS";
   position: absolute;
-  top: 24px;
-  left: 3px;
-  width: 96px;
+  top: 20px;
+  left: 2px;
+  width: 78px;
   transform: rotate(-45deg);
   transform-origin: center;
   text-align: center;
-  font-size: 12px;
+  font-size: 11px;
   font-weight: 900;
   line-height: 1;
   letter-spacing: 0.08em;
-  color: #1f1508;
-  background: linear-gradient(135deg, #b8741d 0%, #d7983c 52%, #a96418 100%);
-  border: 1px solid rgba(81, 45, 11, 0.65);
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  color: #1c1205;
+  background: linear-gradient(135deg, #9f6117 0%, #cb8931 56%, #8f5514 100%);
+  border: 1px solid rgba(57, 34, 12, 0.72);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.32);
   padding: 6px 0;
 }
 
-.poster-bonus-ribbon:focus-visible {
-  outline: 3px solid rgba(255, 227, 167, 0.95);
+.film-card[data-film-id="rob-minority-report"] .poster-bonus-ribbon:focus-visible {
+  outline: 3px solid rgba(255, 229, 172, 0.95);
   outline-offset: 2px;
 }
 
