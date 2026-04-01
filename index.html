@@ -415,6 +415,44 @@ label {
     linear-gradient(135deg, #c9a646, #ffd700, #b8962e) border-box;
 }
 
+
+.bonus-track-strip {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin: 14px -18px -18px;
+  min-height: 40px;
+  padding: 10px 12px;
+  background: linear-gradient(180deg, rgba(0, 0, 0, 0.28), rgba(0, 0, 0, 0.5));
+  border-top: 1px solid rgba(255, 255, 255, 0.14);
+  color: rgba(255, 255, 255, 0.92);
+  font-size: 0.95rem;
+  font-weight: 500;
+  text-decoration: none;
+  cursor: pointer;
+  transition: filter 0.2s ease, box-shadow 0.2s ease;
+}
+
+.bonus-track-strip:hover {
+  filter: brightness(1.08);
+  box-shadow: inset 0 0 16px rgba(255, 255, 255, 0.08);
+}
+
+.bonus-track-strip:focus-visible {
+  outline: 2px solid rgba(255, 255, 255, 0.65);
+  outline-offset: -2px;
+}
+
+.bonus-track-icon {
+  font-size: 0.95rem;
+  line-height: 1;
+  opacity: 0.95;
+}
+
+.bonus-track-text {
+  flex: 1;
+}
+
 :root {
   --badge-height: 30px;
   --badge-font-size: 15px;
@@ -1654,6 +1692,12 @@ body.modal-open {
   .hero-layout {
     grid-template-columns: 1fr;
     padding-top: 0;
+  }
+  .bonus-track-strip {
+    margin: 12px -16px -16px;
+    min-height: 38px;
+    padding: 9px 11px;
+    font-size: 0.9rem;
   }
   .film-poster-wrapper,
   .poster-wrap {
@@ -6145,6 +6189,16 @@ async function render(options = {}) {
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
           </div>
+          ${film.id === "rob-minority-report" ? `
+            <a
+              class="bonus-track-strip"
+              href="/pages/bonus/everybody-runs.html"
+              aria-label="Bonus track Everybody Runs by Nick Songs"
+            >
+              <span class="bonus-track-icon" aria-hidden="true">🎵</span>
+              <span class="bonus-track-text">Bonus Track: Everybody Runs – Nick Songs</span>
+            </a>
+          ` : ""}
         </div>
       ` : `
         <div class="film-details real-details">
