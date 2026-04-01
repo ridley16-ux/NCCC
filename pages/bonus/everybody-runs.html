@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en-GB">
+<head>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-BHEJTM2PGH"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+
+  gtag('config', 'G-BHEJTM2PGH');
+</script>
+<meta charset="UTF-8" />
+<title>Everybody Runs – Bonus Track | No Context Cinema Club</title>
+<meta name="description" content="Listen to Everybody Runs by Nick Songs, the exclusive Minority Report bonus track from No Context Cinema Club." />
+<meta name="robots" content="index,follow" />
+<link rel="canonical" href="https://nocontextcinemaclub.com/pages/bonus/everybody-runs.html" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="website-version" content="1.0.0" />
+<meta property="og:site_name" content="No Context Cinema Club" />
+<meta property="og:title" content="Everybody Runs – Bonus Track | No Context Cinema Club" />
+<meta property="og:description" content="Listen to Everybody Runs by Nick Songs, the exclusive Minority Report bonus track from No Context Cinema Club." />
+<meta property="og:url" content="https://nocontextcinemaclub.com/pages/bonus/everybody-runs.html" />
+<meta property="og:type" content="music.song" />
+<meta property="og:image" content="https://nocontextcinemaclub.com/assets/img/ui/main-logo.webp" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Everybody Runs – Bonus Track | No Context Cinema Club" />
+<meta name="twitter:description" content="Listen to Everybody Runs by Nick Songs, the exclusive Minority Report bonus track from No Context Cinema Club." />
+<meta name="twitter:image" content="https://nocontextcinemaclub.com/assets/img/ui/main-logo.webp" />
+<link rel="stylesheet" href="/assets/css/site.css" />
+<style>
+* { box-sizing: border-box; }
+html { font-family: Arial, Helvetica, sans-serif; }
+body { margin: 0; background: #0f0f0f; color: #ffffff; }
+.content { max-width: 860px; margin: 0 auto 24px; padding: 12px 16px 0; }
+.bonus-card {
+  background: linear-gradient(180deg, rgba(255, 255, 255, 0.04), transparent 55%), #232323;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 16px;
+  padding: 24px;
+  box-shadow: 0 18px 60px rgba(0, 0, 0, 0.45);
+  text-align: center;
+}
+.bonus-title { margin: 0; font-size: clamp(30px, 5vw, 42px); line-height: 1.1; }
+.bonus-subtitle { margin: 12px 0 0; color: rgba(255, 255, 255, 0.82); font-size: 16px; }
+.bonus-artist { margin: 8px 0 0; color: #f2d8a3; font-weight: 700; font-size: 18px; }
+.audio-wrap {
+  margin: 28px auto 0;
+  max-width: 680px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  padding: 16px;
+  background: rgba(15, 15, 15, 0.74);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.03), 0 8px 20px rgba(0, 0, 0, 0.35);
+}
+.audio-player { width: 100%; display: block; }
+.bonus-flavour { margin: 14px 0 0; color: rgba(255, 255, 255, 0.76); }
+.back-link { margin-top: 24px; display: inline-block; color: #f2d8a3; text-decoration: none; font-weight: 600; }
+.back-link:hover { text-decoration: underline; }
+.back-link:focus-visible { outline: 2px solid rgba(242, 216, 163, 0.75); outline-offset: 3px; border-radius: 6px; }
+@media (max-width: 640px) {
+  .bonus-card { padding: 20px 16px; }
+  .audio-wrap { padding: 12px; }
+}
+</style>
+</head>
+<body>
+<div id="site-header"></div>
+<main class="content" id="main-content">
+  <section class="bonus-card" aria-labelledby="bonus-title">
+    <h1 class="bonus-title" id="bonus-title">Everybody Runs</h1>
+    <p class="bonus-subtitle">Bonus Track from Minority Report</p>
+    <p class="bonus-artist">Nick Songs</p>
+    <div class="audio-wrap" aria-label="Bonus track audio player">
+      <audio class="audio-player" controls preload="none">
+        <source src="/assets/audio/everybody-runs.mp3" type="audio/mpeg" />
+        Your browser does not support the audio element. You can still access the track at /assets/audio/everybody-runs.mp3.
+      </audio>
+    </div>
+    <p class="bonus-flavour">“An exclusive extra from No Context Cinema Club.”</p>
+    <a class="back-link" href="/pages/episode.html?id=rob-minority-report">← Back to the Minority Report episode</a>
+  </section>
+</main>
+<div id="site-footer"></div>
+<script src="/assets/js/shared.js"></script>
+<script>
+  const headerContainer = document.getElementById("site-header");
+  fetch("/assets/header.html")
+    .then((r) => r.text())
+    .then((html) => {
+      headerContainer.innerHTML = html;
+      document.dispatchEvent(new Event("header:ready"));
+    })
+    .catch(() => {
+      headerContainer.innerHTML = "";
+    });
+
+  const footerContainer = document.getElementById("site-footer");
+  fetch("/assets/footer.html")
+    .then((r) => r.text())
+    .then((html) => {
+      footerContainer.innerHTML = html;
+      document.dispatchEvent(new Event("footer:ready"));
+    })
+    .catch(() => {
+      footerContainer.innerHTML = "";
+    });
+</script>
+</body>
+</html>
