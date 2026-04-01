@@ -416,33 +416,52 @@ label {
 }
 
 
-.bonus-track-strip {
-  display: block;
-  width: 100%;
-  margin-top: 14px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(128, 88, 24, 0.38);
-  background: #f0dca8;
-  color: #2f2411;
-  text-align: center;
-  font-size: 0.95rem;
-  font-weight: 600;
+.poster-bonus-ribbon {
+  position: absolute;
+  top: 10px;
+  left: 10px;
+  width: 106px;
+  height: 106px;
+  z-index: 6;
+  border-radius: 12px 0 0 0;
+  overflow: hidden;
   text-decoration: none;
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
-  cursor: pointer;
-  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
 }
 
-.bonus-track-strip:hover,
-.bonus-track-strip:active {
-  filter: brightness(1.04);
-  transform: translateY(-1px) scale(1.01);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+.poster-bonus-ribbon::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 0;
+  height: 0;
+  border-top: 106px solid rgba(15, 10, 3, 0.35);
+  border-right: 106px solid transparent;
+  filter: drop-shadow(0 8px 12px rgba(0, 0, 0, 0.35));
 }
 
-.bonus-track-strip:focus-visible {
-  outline: 3px solid rgba(243, 202, 116, 0.9);
+.poster-bonus-ribbon::after {
+  content: "BONUS";
+  position: absolute;
+  top: 24px;
+  left: 3px;
+  width: 96px;
+  transform: rotate(-45deg);
+  transform-origin: center;
+  text-align: center;
+  font-size: 12px;
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: 0.08em;
+  color: #1f1508;
+  background: linear-gradient(135deg, #b8741d 0%, #d7983c 52%, #a96418 100%);
+  border: 1px solid rgba(81, 45, 11, 0.65);
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.35);
+  padding: 6px 0;
+}
+
+.poster-bonus-ribbon:focus-visible {
+  outline: 3px solid rgba(255, 227, 167, 0.95);
   outline-offset: 2px;
 }
 
@@ -1685,11 +1704,6 @@ body.modal-open {
   .hero-layout {
     grid-template-columns: 1fr;
     padding-top: 0;
-  }
-  .bonus-track-strip {
-    margin-top: 12px;
-    padding: 10px 12px;
-    font-size: 0.9rem;
   }
   .film-poster-wrapper,
   .poster-wrap {
@@ -6105,6 +6119,13 @@ async function render(options = {}) {
       <div class="hero-layout">
         <div class="film-poster-wrapper">
           <div class="poster-wrap">
+            ${film.id === "rob-minority-report" ? `
+              <a
+                class="poster-bonus-ribbon"
+                href="/pages/bonus/everybody-runs.html"
+                aria-label="Open bonus track Everybody Runs by Nick Songs"
+              ></a>
+            ` : ""}
             <img src="${getPosterForFilm(film)}" class="poster" />
           </div>
         </div>
@@ -6181,13 +6202,6 @@ async function render(options = {}) {
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
           </div>
-          ${film.id === "rob-minority-report" ? `
-            <a
-              class="bonus-track-strip"
-              href="/pages/bonus/everybody-runs.html"
-              aria-label="Play bonus track Everybody Runs by Nick Songs"
-            >🎵 Bonus Track: Everybody Runs – Nick Songs 🎵</a>
-          ` : ""}
         </div>
       ` : `
         <div class="film-details real-details">
