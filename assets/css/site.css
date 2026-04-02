@@ -234,3 +234,28 @@ body {
     font-size: 18px;
   }
 }
+
+.bonus-track {
+  max-width: 500px;
+  margin: 0 auto;
+  text-align: center;
+  padding: 20px;
+}
+
+.bonus-artwork {
+  width: 100%;
+  border-radius: 12px;
+  margin-bottom: 16px;
+}
+
+.bonus-player {
+  width: 100%;
+  margin: 16px 0;
+}
+
+.bonus-lyrics {
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+  opacity: 0.9;
+}
