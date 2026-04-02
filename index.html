@@ -417,32 +417,47 @@ label {
 
 
 .bonus-track-strip {
-  display: block;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   width: 100%;
-  margin-top: 14px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1px solid rgba(128, 88, 24, 0.38);
-  background: #f0dca8;
-  color: #2f2411;
+  margin-top: 10px;
+  padding: 11px 12px;
+  border-radius: 14px;
+  border: 1px solid rgba(218, 171, 81, 0.52);
+  background: linear-gradient(180deg, #f4e4be 0%, #e9ce92 100%);
+  color: #2a1f0d;
   text-align: center;
-  font-size: 0.95rem;
+  font-size: 0.9rem;
   font-weight: 600;
+  line-height: 1.35;
   text-decoration: none;
-  box-shadow: 0 5px 14px rgba(0, 0, 0, 0.2);
+  box-shadow:
+    0 10px 24px rgba(0, 0, 0, 0.22),
+    inset 0 1px 0 rgba(255, 255, 255, 0.45);
   cursor: pointer;
-  transition: filter 0.2s ease, transform 0.2s ease, box-shadow 0.2s ease;
+  transition: transform 0.2s ease, box-shadow 0.2s ease, filter 0.2s ease;
 }
 
 .bonus-track-strip:hover,
 .bonus-track-strip:active {
-  filter: brightness(1.04);
-  transform: translateY(-1px) scale(1.01);
-  box-shadow: 0 8px 18px rgba(0, 0, 0, 0.24);
+  filter: brightness(1.03);
+  transform: translateY(-1px);
+  box-shadow:
+    0 14px 30px rgba(0, 0, 0, 0.24),
+    0 0 0 1px rgba(218, 171, 81, 0.3),
+    inset 0 1px 0 rgba(255, 255, 255, 0.5);
+}
+
+.bonus-track-strip:active {
+  transform: translateY(0);
+  box-shadow:
+    0 8px 16px rgba(0, 0, 0, 0.2),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
 }
 
 .bonus-track-strip:focus-visible {
-  outline: 3px solid rgba(243, 202, 116, 0.9);
+  outline: 3px solid rgba(243, 202, 116, 0.95);
   outline-offset: 2px;
 }
 
@@ -1687,9 +1702,9 @@ body.modal-open {
     padding-top: 0;
   }
   .bonus-track-strip {
-    margin-top: 12px;
+    margin-top: 10px;
     padding: 10px 12px;
-    font-size: 0.9rem;
+    font-size: 0.88rem;
   }
   .film-poster-wrapper,
   .poster-wrap {
@@ -6107,6 +6122,13 @@ async function render(options = {}) {
           <div class="poster-wrap">
             <img src="${getPosterForFilm(film)}" class="poster" />
           </div>
+          ${film.secretTrack?.href && film.secretTrack?.label ? `
+            <a
+              class="bonus-track-strip"
+              href="${film.secretTrack.href}"
+              aria-label="${film.secretTrack.ariaLabel || `Play bonus track for ${displayTitle}`}"
+            >${film.secretTrack.label}</a>
+          ` : ""}
         </div>
 
       ${rewrittenFilm ? `
@@ -6181,13 +6203,6 @@ async function render(options = {}) {
               <div class="rating-error" role="status" aria-live="polite" hidden></div>
             </div>
           </div>
-          ${film.id === "rob-minority-report" ? `
-            <a
-              class="bonus-track-strip"
-              href="/pages/bonus/everybody-runs.html"
-              aria-label="Play bonus track Everybody Runs by Nick Songs"
-            >🎵 Bonus Track: Everybody Runs – Nick Songs 🎵</a>
-          ` : ""}
         </div>
       ` : `
         <div class="film-details real-details">
