@@ -1,6 +1,6 @@
 (() => {
   const SUPABASE_URL = "https://johklrouorflqfmzpiaw.supabase.co";
-  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImpvaGtscm91b3JmbHFmbXpwaWF3Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3Njk5NzgzNDQsImV4cCI6MjA4NTU1NDM0NH0.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
+  const SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdWIiLCJyZWYiOiJqb2hrbHJvdW9yZmxxZm16cGlhdyIsInJvbGUiOiJhbm9uIiwiaWF0IjoxNzY5OTc4MzQ0LCJleHAiOjIwODU1NTQzNDR9.28kgIYh_BW-Ok2EHtxvm0NZM4e_0k2HzSFN0bkj9NPw";
   const MANIFEST_URL = "/assets/data/films/manifest.json";
 
   const supabase = window.supabase?.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
