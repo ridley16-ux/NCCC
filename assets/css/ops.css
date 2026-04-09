@@ -64,6 +64,35 @@ body.ops-page {
   background: rgba(209, 99, 46, 0.12);
 }
 
+.ops-filters {
+  display: flex;
+  gap: 12px;
+  flex-wrap: wrap;
+  margin: 0 0 12px;
+}
+
+.ops-filter-field {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  min-width: 160px;
+}
+
+.ops-filter-field span {
+  color: var(--ops-text-muted);
+  font-size: 12px;
+}
+
+.ops-filter-field input,
+.ops-filter-field select {
+  border: 1px solid #3b3b3b;
+  border-radius: 8px;
+  background: #121212;
+  color: var(--ops-text);
+  padding: 8px;
+  font-size: 13px;
+}
+
 .ops-last-refreshed {
   color: var(--ops-text-muted);
   font-size: 12px;
@@ -264,6 +293,17 @@ body.ops-page {
   border: 1px solid #6e2f14;
 }
 
+.ops-change-good {
+  color: #56d189;
+}
+
+.ops-change-bad {
+  color: #ff6c6c;
+}
+
+.ops-change-neutral {
+  color: var(--ops-text-muted);
+}
 
 .ops-card {
   border: 1px solid var(--ops-border);
