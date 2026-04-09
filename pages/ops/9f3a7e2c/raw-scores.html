@@ -33,6 +33,64 @@
       <canvas id="votesTrendChart30" height="140"></canvas>
     </div>
 
+    <section class="ops-panel" aria-label="Timeline vote analysis">
+      <h2 class="ops-section-title">Timeline vote analysis</h2>
+      <div class="ops-filters">
+        <label class="ops-filter-field">
+          <span>From</span>
+          <input type="date" id="ops-date-from" />
+        </label>
+        <label class="ops-filter-field">
+          <span>To</span>
+          <input type="date" id="ops-date-to" />
+        </label>
+        <label class="ops-filter-field">
+          <span>Group by</span>
+          <select id="ops-group-by">
+            <option value="daily">Daily</option>
+            <option value="weekly">Weekly</option>
+            <option value="monthly">Monthly</option>
+          </select>
+        </label>
+      </div>
+      <div id="ops-analysis-state" class="ops-loading">Loading timeline analysis…</div>
+      <div class="ops-table-scroll">
+        <table class="ops-table" aria-describedby="ops-analysis-state">
+          <thead>
+            <tr>
+              <th>Period</th>
+              <th>Release annotations</th>
+              <th>Votes</th>
+              <th>Raw score total</th>
+              <th>Average score</th>
+            </tr>
+          </thead>
+          <tbody id="ops-analysis-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <section class="ops-panel" aria-label="Weekly snapshot">
+      <h2 class="ops-section-title">Weekly snapshot (last full Sat–Fri)</h2>
+      <div id="ops-weekly-state" class="ops-loading">Loading weekly snapshot…</div>
+      <div id="ops-weekly-kpis" class="ops-kpi-row ops-kpi-row-summary" hidden></div>
+      <div class="ops-table-scroll">
+        <table class="ops-table ops-table-compact" aria-describedby="ops-weekly-state">
+          <thead>
+            <tr>
+              <th>Comparison</th>
+              <th>Metric</th>
+              <th>Current</th>
+              <th>Baseline</th>
+              <th>Abs change</th>
+              <th>% change</th>
+            </tr>
+          </thead>
+          <tbody id="ops-weekly-table-body"></tbody>
+        </table>
+      </div>
+    </section>
+
     <section class="ops-panel" aria-label="Vote health by film">
       <div id="ops-state" class="ops-loading">Loading vote health metrics…</div>
       <div class="ops-table-scroll">
@@ -41,9 +99,10 @@
             <tr>
               <th>Film</th>
               <th>Votes</th>
+              <th>Raw score total</th>
               <th>Last vote</th>
               <th>Votes 24h</th>
-              <th>Avg rating</th>
+              <th>Average score</th>
             </tr>
           </thead>
           <tbody id="ops-table-body"></tbody>
