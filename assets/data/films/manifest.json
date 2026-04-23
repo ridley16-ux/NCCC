@@ -103,6 +103,14 @@
     {
       "path": "/assets/data/films/robs/nightcrawler.json",
       "active": true
+    },
+     {
+      "path": "/assets/data/films/real/three-billboards.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/three-billboards.json",
+      "active": true
     }
   ]
 }
