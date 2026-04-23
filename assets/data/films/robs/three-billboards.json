@@ -1,0 +1,16 @@
+{
+  "id": "rob-three-billboards",
+  "title": "Three Billboards Outside Ebbing, Missouri",
+  "starring": "Winona Ryder",
+  "poster": "/assets/img/posters/robs/three-billboards.webp",
+  "coherence": 6,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-04-25",
+  "podcasted_at": "2026-04-25T08:00:00+00:00",
+  "summary": "A grieving Missouri town is thrown into chaos when three mysterious billboards begin exposing the hidden failures behind a young girl’s death, with each new message accusing another local figure of negligence or corruption. As public anger builds and the countdown to a final revelation intensifies, the child’s mother takes matters into her own hands, pushing the town toward a far darker reckoning.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "",
+  "owner": "rob"
+}
