@@ -112,5 +112,14 @@
       "path": "/assets/data/films/robs/three-billboards.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/everything-is-illuminated.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/everything-is-illuminated.json",
+      "active": true
+    }
   ]
 }
