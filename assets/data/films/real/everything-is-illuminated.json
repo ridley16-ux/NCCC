@@ -1,16 +1,16 @@
 {
-  "id": "rob-everything-is-illuminated",
+  "id": "real-everything-is-illuminated",
   "title": "Everything Is Illuminated",
-  "starring": "Jack Black",
-  "poster": "/assets/img/posters/robs/everything-is-illuminated.webp",
-  "coherence": 6,
-  "entertainment": 8,
-  "originality": 7,
+  "director": "Liev Schreiber",
+  "starring": "Elijah Wood, Eugene Hutz, Boris Lyoskin",
+  "poster": "https://resizing.flixster.com/pERqKOBQrCdhtimp0ZxX26_tX2Q=/206x305/v2/https://resizing.flixster.com/-XZAfHZM39UwaGJIFWKAE8fS0ak=/v3/t/assets/p88906_p_v10_ae.jpg",
+  "score": 65,
+  "scoreLabel": "\ud83c\udf45 Rotten Tomatoes",
   "podcastDate": "2026-05-02",
   "podcasted_at": "2026-05-02T08:00:00+00:00",
-  "summary": "A man with the power to erase anything from existence discovers that every “fix” carries a hidden cost, from collapsing ecosystems to unraveling the basic functions of society. As his attempts to eliminate suffering push the world into silent, irreversible chaos, he’s forced to confront the true purpose of pain and whether undoing his own choices is the only way to save everything.",
-  "link": "#",
-  "linkType": "podcast",
-  "buzzsproutScriptSrc": "",
-  "owner": "rob"
+  "summary": "Aided by a naïve translator, a young American Jewish man seeks the righteous gentile Ukrainian woman who saved his grandfather during World War II.",
+  "link": "https://www.rottentomatoes.com/m/everything_is_illuminated",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": "",
+  "owner": "real"
 }
