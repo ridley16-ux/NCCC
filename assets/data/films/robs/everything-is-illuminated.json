@@ -1,0 +1,16 @@
+{
+  "id": "rob-everything-is-illuminated",
+  "title": "Everything Is Illuminated",
+  "starring": "Jack Black",
+  "poster": "/assets/img/posters/robs/everything-is-illuminated.webp",
+  "coherence": 6,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-05-02",
+  "podcasted_at": "2026-05-02T08:00:00+00:00",
+  "summary": "A man with the power to erase anything from existence discovers that every “fix” carries a hidden cost, from collapsing ecosystems to unraveling the basic functions of society. As his attempts to eliminate suffering push the world into silent, irreversible chaos, he’s forced to confront the true purpose of pain and whether undoing his own choices is the only way to save everything.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19105924-everything-is-illuminated-reimagined-just-gnomes-suffering-and-wasps-ep-14.js?container_id=buzzsprout-player-19105924&player=small",
+  "owner": "rob"
+}
