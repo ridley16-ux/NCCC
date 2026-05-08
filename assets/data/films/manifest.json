@@ -121,5 +121,23 @@
       "path": "/assets/data/films/robs/everything-is-illuminated.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/hollow-man.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/hollow-man.json",
+      "active": true
+    }
+    ,
+     {
+      "path": "/assets/data/films/real/silence-of-the-lambs.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/silence-of-the-lambs.json",
+      "active": true
+    }
   ]
 }
