@@ -139,5 +139,14 @@
       "path": "/assets/data/films/robs/silence-of-the-lambs.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/vanilla-sky.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/vanilla-sky.json",
+      "active": true
+    }
   ]
 }
