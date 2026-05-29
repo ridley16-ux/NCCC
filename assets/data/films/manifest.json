@@ -148,5 +148,14 @@
       "path": "/assets/data/films/robs/vanilla-sky.json",
       "active": true
     }
+     ,
+     {
+      "path": "/assets/data/films/real/uncle-buck.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/uncle-buck.json",
+      "active": true
+    }
   ]
 }
