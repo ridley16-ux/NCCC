@@ -157,5 +157,14 @@
       "path": "/assets/data/films/robs/uncle-buck.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/prestige.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/prestige.json",
+      "active": true
+    }
   ]
 }
