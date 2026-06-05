@@ -1,0 +1,16 @@
+{
+  "id": "rob-prestige",
+  "title": "The Prestige",
+  "starring": "David Mitchell, Robert Webb",
+  "poster": "/assets/img/posters/robs/prestige.webp",
+  "coherence": 9,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-06-05",
+  "podcasted_at": "2026-06-05T08:00:00+00:00",
+  "summary": "After dying unexpectedly, a confused man discovers that the afterlife is managed by a run-down bureaucracy known as Prestige, where every soul is assessed and reassigned for its next life. As two exhausted reallocation officers clash over how humanity should be judged, their competing attempts to improve the system accidentally push civilisation toward crisis, forcing them to confront whether morality has any meaning when the rewards are known in advance.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19294424-the-prestige-reimagined-a-badger-and-aardvark-and-a-rattlesnake-walk-into-a-bar-ep-19.js?container_id=buzzsprout-player-19294424&player=small",
+  "owner": "rob"
+}
