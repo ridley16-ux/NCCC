@@ -1,0 +1,16 @@
+{
+  "id": "real-prestige",
+  "title": "The Prestige",
+  "director": "Christopher Nolan",
+  "starring": "Hugh Jackman, Christian Bale, Michael Caine",
+  "poster": "https://i.ebayimg.com/images/g/kaMAAMXQ3kRQ9FFO/s-l1200.jpg",
+  "score": 77,
+  "scoreLabel": "\ud83c\udf45 Rotten Tomatoes",
+  "podcastDate": "2026-05-05",
+  "podcasted_at": "2026-05-05T08:00:00+00:00",
+  "summary": "Desperate to reveal each other's secrets, two rival magicians begin to perform increasingly risky tricks - which soon turn deadly.",
+  "link": "https://www.rottentomatoes.com/m/prestige",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": "",
+  "owner": "real"
+}
