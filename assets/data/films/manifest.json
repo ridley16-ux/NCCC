@@ -166,5 +166,14 @@
       "path": "/assets/data/films/robs/prestige.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/limitless.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/limitless.json",
+      "active": true
+    }
   ]
 }
