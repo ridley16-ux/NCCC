@@ -175,5 +175,14 @@
       "path": "/assets/data/films/robs/limitless.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/wicker-man.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/wicker-man.json",
+      "active": true
+    }
   ]
 }
