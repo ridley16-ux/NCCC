@@ -184,5 +184,14 @@
       "path": "/assets/data/films/robs/wicker-man.json",
       "active": true
     }
+     ,
+     {
+      "path": "/assets/data/films/real/tigerland.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/tigerland.json",
+      "active": true
+    }
   ]
 }
