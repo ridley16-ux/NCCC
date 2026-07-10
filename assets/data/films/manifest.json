@@ -201,6 +201,14 @@
     {
       "path": "/assets/data/films/robs/one-hour-photo.json",
       "active": true
+    },
+     {
+      "path": "/assets/data/films/real/descent.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/descent.json",
+      "active": true
     }
   ]
 }
