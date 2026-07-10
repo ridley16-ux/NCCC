@@ -1,0 +1,16 @@
+{
+  "id": "rob-descent",
+  "rob": true,
+  "title": "The Descent",
+  "starring": "Shauna Macdonald, Natalie Mendoza, Alex Reid, Saskia Mulder, MyAnna Buring and Nora-Jane Noone",
+  "poster": "/assets/img/posters/robs/descent.webp",
+  "coherence": 8,
+  "entertainment": 7,
+  "originality": 7,
+  "podcastDate": "2026-07-11",
+  "podcasted_at": "2026-07-11T08:00:00+00:00",
+  "summary": "Scientists unveil the Descent Machine, a breakthrough that allows people to relive and broadcast the memories of their direct ancestors. When a globally watched journey into humanity’s earliest history uncovers evidence of an advanced civilisation erased from existence, the team descends even further into the past and discovers that modern society may be repeating the same mistakes that destroyed the world once before.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19476225-the-descent-reimagined-they-ve-abandoned-ship-pretty-bloody-early-ep-24.js?container_id=buzzsprout-player-19476225&player=small"
+}
