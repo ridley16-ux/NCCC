@@ -210,5 +210,14 @@
       "path": "/assets/data/films/robs/descent.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/t2.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/t2.json",
+      "active": true
+    }
   ]
 }
