@@ -6526,7 +6526,7 @@ container.addEventListener("change", async (event) => {
   const filmId = card?.dataset.filmId;
   const ratingValue = Number(slider.value);
   if (!ratingValue) return;
-  if (!filmId || filmId.length < 8) {
+  if (!filmId || filmId.length < 6) {
     console.error("Invalid film_id for listener vote submission.", {
       filmId,
       ratingValue,
