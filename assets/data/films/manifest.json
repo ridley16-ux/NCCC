@@ -212,11 +212,11 @@
     }
     ,
      {
-      "path": "/assets/data/films/real/t2.json",
+      "path": "/assets/data/films/real/term2jd.json",
       "active": true
     },
     {
-      "path": "/assets/data/films/robs/t2.json",
+      "path": "/assets/data/films/robs/term2jd.json",
       "active": true
     }
   ]
