@@ -219,5 +219,14 @@
       "path": "/assets/data/films/robs/term2jd.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/cloverfield.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/cloverfield.json",
+      "active": true
+    }
   ]
 }
