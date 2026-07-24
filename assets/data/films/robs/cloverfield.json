@@ -1,0 +1,16 @@
+{
+  "id": "rob-cloverfield",
+  "rob": true,
+  "title": "Cloverfield",
+  "starring": "Grant, Hope",
+  "poster": "/assets/img/posters/robs/cloverfield.webp",
+  "coherence": 6,
+  "entertainment": 8,
+  "originality": 6,
+  "podcastDate": "2026-07-25",
+  "podcasted_at": "2026-07-25T08:00:00+00:00",
+  "summary": "At the Cloverfield School of Wishcraft, academically gifted but painfully literal apprentice Grant is paired with Hope, a struggling student who instinctively understands what people truly need. When Grant begins fulfilling wishes exactly as they are spoken, the pair unleash chaos across Manhattan and must learn to combine his knowledge with her empathy before their magical mistakes expose the genie world.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19543986-cloverfield-reimagined-do-genies-have-tails-ep-26.js?container_id=buzzsprout-player-19543986&player=small"
+}
