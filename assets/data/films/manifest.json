@@ -228,5 +228,23 @@
       "path": "/assets/data/films/robs/cloverfield.json",
       "active": true
     }
+        ,
+     {
+      "path": "/assets/data/films/real/pulp.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/pulp.json",
+      "active": true
+    }
+    ,
+     {
+      "path": "/assets/data/films/real/lions.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/lions.json",
+      "active": true
+    }
   ]
 }
