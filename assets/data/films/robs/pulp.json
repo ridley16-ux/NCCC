@@ -1,0 +1,17 @@
+{
+  "id": "rob-pulp",
+  "rob": true,
+  "title": "Pulp Fiction",
+  "starring": "Patrick J. Adams, Emily Deschanel, Harvey Keitel",
+  "poster": "/assets/img/posters/robs/pulp.webp",
+  "coherence": 8,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-08-01",
+  "podcasted_at": "2026-08-01T08:00:00+00:00",
+  "summary": "Two sceptical podcasters build a devoted following by debunking conspiracy theories, only to uncover impossible inconsistencies suggesting reality is rewriting itself. When the government confirms that the world is a simulation programmed to terminate once enough people discover the truth, their movement must decide whether exposing the fiction is worth risking the destruction of everything.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "",
+  "owner": "rob"
+}

@@ -1,0 +1,17 @@
+{
+  "id": "rob-lions",
+  "rob": true,
+  "title": "Four Lions",
+  "starring": "Riz Ahmed, Kayvan Novak, Nigel Lindsay, Adeel Akhtar",
+  "poster": "/assets/img/posters/robs/lions.webp",
+  "coherence": 8,
+  "entertainment": 10,
+  "originality": 8,
+  "podcastDate": "2026-08-08",
+  "podcasted_at": "2026-08-08T08:00:00+00:00",
+  "summary": "During a devastating zombie outbreak, four selfish friends abandon Britain's organised evacuation and begin the dangerous journey back to Chippenham. After escaping soldiers, crossing an infested theme park and sheltering at a deserted wildlife park, they form an unlikely alliance with four escaped lions that may be their only protection from the infected.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "",
+  "owner": "rob"
+}
