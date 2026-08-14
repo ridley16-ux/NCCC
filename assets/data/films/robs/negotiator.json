@@ -1,0 +1,17 @@
+{
+  "id": "rob-negotiator",
+  "rob": true,
+  "title": "The Negotiator",
+  "starring": "Samuel L. Jackson, Kevin Spacey as \"Sleazy\"",
+  "poster": "/assets/img/posters/robs/negotiator.webp",
+  "coherence": 7,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-08-15",
+  "podcasted_at": "2026-08-15T08:00:00+00:00",
+  "summary": "A wedding favour turns into a multi-million-pound mystery when a winning lottery ticket ends up in the wrong hands. Four people stake their claim as a professional negotiator reconstructs one chaotic night to answer a question that's harder than it sounds: who won it?",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "",
+  "owner": "rob"
+}
