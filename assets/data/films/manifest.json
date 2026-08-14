@@ -246,5 +246,15 @@
       "path": "/assets/data/films/robs/lions.json",
       "active": true
     }
+    
+    ,
+     {
+      "path": "/assets/data/films/real/negotiator.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/negotiator.json",
+      "active": true
+    }
   ]
 }
