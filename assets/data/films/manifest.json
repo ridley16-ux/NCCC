@@ -256,5 +256,14 @@
       "path": "/assets/data/films/robs/negotiator.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/madmax.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/madmax.json",
+      "active": true
+    }
   ]
 }
