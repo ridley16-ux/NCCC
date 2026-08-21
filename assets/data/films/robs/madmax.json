@@ -1,0 +1,17 @@
+{
+  "id": "rob-madmax",
+  "rob": true,
+  "title": "Mad Max",
+  "starring": "Mel Gibson",
+  "poster": "/assets/img/posters/robs/madmax.webp",
+  "coherence": 8,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-08-22",
+  "podcasted_at": "2026-08-22T08:00:00+00:00",
+  "summary": "Two friends explore an abandoned maximum-security psychiatric hospital known locally as Mad Max, but the deeper they venture inside, the more the building seems to know about them. As familiar objects, impossible corridors and a mysterious pursuer blur the line between reality and delusion, Leon is forced to confront the possibility that escaping Mad Max may not mean leaving it behind.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19676861-mad-max-reimagined-why-would-a-goose-be-in-an-asylum-ep-30.js?container_id=buzzsprout-player-19676861&player=small",
+  "owner": "rob"
+}
