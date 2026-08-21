@@ -1,0 +1,16 @@
+{
+  "id": "real-madmax",
+  "rob": false,
+  "title": "Mad Max",
+  "director": "George Miller",
+  "starring": "Mel Gibson, Joanne Samuel, Hugh Keays-Byrne, Steve Bisley",
+  "poster": "",
+  "score": 89,
+  "scoreLabel": "🍅 Rotten Tomatoes",
+  "podcastDate": "2026-08-22",
+  "podcasted_at": "2026-08-22T08:00:00+00:00",
+  "summary": "In a post-apocalyptic wasteland, Max helps a rebellious woman and a band of female prisoners flee from tyranny, fend off threats and seek their homeland.",
+  "link": "https://www.rottentomatoes.com/m/mad_max",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": ""
+}
