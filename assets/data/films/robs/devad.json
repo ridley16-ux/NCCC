@@ -1,0 +1,17 @@
+{
+  "id": "rob-devad",
+  "rob": true,
+  "title": "The Devil's Advocate",
+  "starring": "Keanu Reeves",
+  "poster": "/assets/img/posters/robs/devad.webp",
+  "coherence": 4,
+  "entertainment": 6,
+  "originality": 5,
+  "podcastDate": "2026-08-29",
+  "podcasted_at": "2026-08-29T08:00:00+00:00",
+  "summary": "New York's most notorious defence lawyer has built his career taking seemingly impossible murder cases and somehow finding reasonable doubt where nobody else can. But when his remarkable winning streak finally comes to an end, the truth behind his extraordinary courtroom success begins to threaten everything he has built.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19716826-the-devil-s-advocate-reimagined-it-s-just-oven-mitts-all-the-way-down-ep-31.js?container_id=buzzsprout-player-19716826&player=small",
+  "owner": "rob"
+}
