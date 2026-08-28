@@ -265,5 +265,14 @@
       "path": "/assets/data/films/robs/madmax.json",
       "active": true
     }
+        ,
+     {
+      "path": "/assets/data/films/real/devad.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/devad.json",
+      "active": true
+    }
   ]
 }
