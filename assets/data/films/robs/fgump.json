@@ -1,16 +1,17 @@
 {
-  "id": "real-fgump",
-  "rob": false,
+  "id": "rob-fgump",
+  "rob": true,
   "title": "Forrest Gump",
-  "director": "Robert Zemeckis",
-  "starring": "Tom Hanks, Robin Wright, Gary Sinise, Sally Field",
-  "poster": "",
-  "score": 76,
-  "scoreLabel": "🍅 Rotten Tomatoes",
+  "starring": "Tom Hanks",
+  "poster": "/assets/img/posters/robs/forrest-gump.webp",
+  "coherence": 7,
+  "entertainment": 7,
+  "originality": 8,
   "podcastDate": "2026-09-05",
   "podcasted_at": "2026-09-05T08:00:00+00:00",
-  "summary": "A kind-hearted man from Alabama unwittingly finds himself at the centre of several major moments in American history while navigating friendship, love, war and an extraordinary life.",
-  "link": "https://www.rottentomatoes.com/m/forrest_gump",
-  "linkType": "rt",
-  "buzzsproutEmbedUrl": ""
+  "summary": "Forrest Gump's life unfolds across three elections at three very different stages: class president at school, mayor of his hometown and eventually President of the United States. As the same pressures, compromises and fears repeat on an ever bigger scale, Forrest slowly learns that succeeding in politics might depend less on becoming someone else and more on finally trusting who he already is.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19750278-forrest-gump-reimagined-i-won-t-judge-you-against-the-75-iq-president-ep-32.js?container_id=buzzsprout-player-19750278&player=small",
+  "owner": "rob"
 }
