@@ -1,0 +1,16 @@
+{
+  "id": "real-fgump",
+  "rob": false,
+  "title": "Forrest Gump",
+  "director": "Robert Zemeckis",
+  "starring": "Tom Hanks, Robin Wright, Gary Sinise, Sally Field",
+  "poster": "",
+  "score": 76,
+  "scoreLabel": "🍅 Rotten Tomatoes",
+  "podcastDate": "2026-09-05",
+  "podcasted_at": "2026-09-05T08:00:00+00:00",
+  "summary": "A kind-hearted man from Alabama unwittingly finds himself at the centre of several major moments in American history while navigating friendship, love, war and an extraordinary life.",
+  "link": "https://www.rottentomatoes.com/m/forrest_gump",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": ""
+}
