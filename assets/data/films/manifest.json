@@ -283,5 +283,14 @@
       "path": "/assets/data/films/robs/fgump.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/shawshank.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/shawshank.json",
+      "active": true
+    }
   ]
 }
