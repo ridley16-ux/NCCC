@@ -1,0 +1,16 @@
+{
+  "id": "real-shawshank",
+  "rob": false,
+  "title": "The Shawshank Redemption",
+  "director": "Frank Darabont",
+  "starring": "Tim Robbins, Morgan Freeman, Bob Gunton, William Sadler",
+  "poster": "",
+  "score": 89,
+  "scoreLabel": "🍅 Rotten Tomatoes",
+  "podcastDate": "2026-09-05",
+  "podcasted_at": "2026-09-05T08:00:00+00:00",
+  "summary": "After being wrongly convicted of murdering his wife and her lover, banker Andy Dufresne is sentenced to life at Shawshank State Penitentiary, where he forms an enduring friendship with fellow inmate Red and finds ways to hold on to hope.",
+  "link": "https://www.rottentomatoes.com/m/shawshank_redemption",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": ""
+}
