@@ -1,0 +1,17 @@
+{
+  "id": "rob-shawshank",
+  "rob": true,
+  "title": "The Shawshank Redemption",
+  "starring": "Morgan Freeman",
+  "poster": "/assets/img/posters/robs/shawshank.webp",
+  "coherence": 4,
+  "entertainment": 3,
+  "originality": 7,
+  "podcastDate": "2026-09-12",
+  "podcasted_at": "2026-09-12T08:00:00+00:00",
+  "summary": "Five travel bloggers are invited to the grand opening of a remote hotel in British Columbia, unaware that they all share a connection to its mysterious owner. When a strange night inside the Shawshank Hotel turns increasingly dangerous, they must work out whether they've stumbled into an elaborate trap or whether something else is making them see danger everywhere.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19787271-the-shawshank-redemption-reimagined-where-have-all-the-passengers-gone-ep-33.js?container_id=buzzsprout-player-19787271&player=small",
+  "owner": "rob"
+}
