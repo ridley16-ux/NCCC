@@ -1,0 +1,17 @@
+{
+  "id": "rob-trainspotting",
+  "rob": true,
+  "title": "Trainspotting",
+  "starring": "Ewan McGregor",
+  "poster": "/assets/img/posters/robs/trainspotting.webp",
+  "coherence": 8,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-09-19",
+  "podcasted_at": "2026-09-19T08:00:00+00:00",
+  "summary": "Twenty years after Britain was abandoned to a zombie apocalypse, Europe launches an ambitious operation to reclaim the country using heavily armoured trains. But the survivors who have spent two decades rebuilding their lives have no intention of being rescued, and hatch a plan to turn the railway, the zombies and Europe's own invasion force against them.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19823801-trainspotting-reimagined-operation-proceed-directly-to-the-intravenous-injection-of-hard-drugs-ep-34.js?container_id=buzzsprout-player-19823801&player=small",
+  "owner": "rob"
+}
