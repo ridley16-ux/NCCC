@@ -292,5 +292,14 @@
       "path": "/assets/data/films/robs/shawshank.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/trainspotting.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/trainspotting.json",
+      "active": true
+    }
   ]
 }
