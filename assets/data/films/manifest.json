@@ -301,5 +301,14 @@
       "path": "/assets/data/films/robs/trainspotting.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/yuma.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/yuma.json",
+      "active": true
+    }
   ]
 }
