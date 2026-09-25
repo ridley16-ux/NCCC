@@ -1,0 +1,18 @@
+
+{
+  "id": "rob-yuma",
+  "rob": true,
+  "title": "3:10 to Yuma",
+  "starring": "Christian Bale, Russell Crowe",
+  "poster": "/assets/img/posters/robs/yuma.webp",
+  "coherence": 8,
+  "entertainment": 7,
+  "originality": 5,
+  "podcastDate": "2026-09-26",
+  "podcasted_at": "2026-09-26T08:00:00+00:00",
+  "summary": "When a man disappears inside a fenced-off Arizona ghost town, police uncover a century-old mystery buried beneath its abandoned mines. As reports of a monstrous creature emerge, they discover a desperate plan from the town's past involving a train, a mountain of dynamite and a fateful 3:10 departure.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19865106-3-10-to-yuma-reimagined-humour-may-have-been-abandoned-ep-35.js?container_id=buzzsprout-player-19865106&player=small",
+  "owner": "rob"
+}
