@@ -1,0 +1,16 @@
+{
+  "id": "real-gbook",
+  "rob": false,
+  "title": "Green Book",
+  "director": "Peter Farrelly",
+  "starring": "Viggo Mortensen, Mahershala Ali, Linda Cardellini, Sebastian Maniscalco",
+  "poster": "",
+  "score": 77,
+  "scoreLabel": "🍅 Rotten Tomatoes",
+  "podcastDate": "2026-10-03",
+  "podcasted_at": "2026-10-03T08:00:00+00:00",
+  "summary": "In 1962, Italian-American bouncer Tony Lip is hired to drive and protect acclaimed pianist Dr. Don Shirley during a concert tour through the Deep South, where the pair confront racism and form an unexpected friendship.",
+  "link": "https://www.rottentomatoes.com/m/green_book",
+  "linkType": "rt",
+  "buzzsproutEmbedUrl": ""
+}
