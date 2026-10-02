@@ -1,0 +1,17 @@
+{
+  "id": "rob-gbook",
+  "rob": true,
+  "title": "Green Book",
+  "starring": "Kenan Thompson, Kel Mitchell, Viggo Mortensen",
+  "poster": "/assets/img/posters/robs/gbook.webp",
+  "coherence": 4,
+  "entertainment": 4,
+  "originality": 3,
+  "podcastDate": "2026-10-03",
+  "podcasted_at": "2026-10-03T08:00:00+00:00",
+  "summary": "Kenan and Kel discover a mysterious green address book they believe contains the details of wealthy investors who could help them revive Good Burger. With a driver in tow, they embark on a chaotic road trip across America, pitching their business to everyone in the book as they race to raise the money they need.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19901145-green-book-reimagined-please-drive-safely-everybody-ep-36.js?container_id=buzzsprout-player-19901145&player=small",
+  "owner": "rob"
+}
