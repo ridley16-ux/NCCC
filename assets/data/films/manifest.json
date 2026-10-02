@@ -310,5 +310,14 @@
       "path": "/assets/data/films/robs/yuma.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/gbook.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/gbook.json",
+      "active": true
+    }
   ]
 }
