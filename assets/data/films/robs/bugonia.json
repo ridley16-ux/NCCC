@@ -1,0 +1,17 @@
+{
+  "id": "rob-bugonia",
+  "rob": true,
+  "title": "Bugonia",
+  "starring": "Chris Pratt, Emma Stone",
+  "poster": "/assets/img/posters/robs/bugonia.webp",
+  "coherence": 9,
+  "entertainment": 7,
+  "originality": 6,
+  "podcastDate": "2026-10-10",
+  "podcasted_at": "2026-10-10T08:00:00+00:00",
+  "summary": "In a future where millions escape reality inside a vast virtual world, Chris Pratt plays a low-level technician responsible for keeping the simulation running. But when an investigative journalist played by Emma Stone uncovers a series of mysterious disappearances, a dangerous journey into the digital world reveals that some glitches can have deadly consequences.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "",
+  "owner": "rob"
+}
