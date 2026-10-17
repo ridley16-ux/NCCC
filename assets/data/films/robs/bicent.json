@@ -1,0 +1,17 @@
+{
+  "id": "rob-bicent",
+  "rob": true,
+  "title": "Bicentennial Man",
+  "starring": "Robbie Williams, Sam Neill",
+  "poster": "/assets/img/posters/robs/bicent.webp",
+  "coherence": 9,
+  "entertainment": 8,
+  "originality": 7,
+  "podcastDate": "2026-10-17",
+  "podcasted_at": "2026-10-17T08:00:00+00:00",
+  "summary": "Identical twins born minutes apart in different centuries grow into bitterly estranged brothers, one living a successful family life while the other becomes consumed by jealousy. When a violent confrontation leaves one brother dead, a mysterious accident and a case of mistaken identity turn a family home into the centre of a disturbing psychological thriller.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/19976420-bicentennial-man-reimagined-in-da-bungalow-ep-38.js?container_id=buzzsprout-player-19976420&player=small",
+  "owner": "rob"
+}
