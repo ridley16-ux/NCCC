@@ -328,5 +328,14 @@
       "path": "/assets/data/films/robs/bugonia.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/bicent.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/bicent.json",
+      "active": true
+    }
   ]
 }
