@@ -1,0 +1,18 @@
+
+{
+  "id": "rob-eternal",
+  "rob": true,
+  "title": "Eternal Sunshine of the Spotless Mind",
+  "starring": "Ben Shephard, Kate Winslet",
+  "poster": "/assets/img/posters/robs/eternal.webp",
+  "coherence": 5,
+  "entertainment": 5,
+  "originality": 6,
+  "podcastDate": "2026-10-24",
+  "podcasted_at": "2026-10-24T08:00:00+00:00",
+  "summary": "A devoted pastor spends his life helping the dying find forgiveness and peace before entering the afterlife. But when his desire to right the wrongs of others begins to blur the line between justice and divine intervention, his unwavering faith leads him down an increasingly disturbing path. As his mission grows darker, one question remains: who will save his soul?",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/20009089-eternal-sunshine-of-the-spotless-mind-reimagined-you-re-complaining-about-the-thickness-of-the-paper-ep-39.js?container_id=buzzsprout-player-20009089&player=small",
+  "owner": "rob"
+}
