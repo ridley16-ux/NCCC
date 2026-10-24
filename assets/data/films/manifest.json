@@ -337,5 +337,14 @@
       "path": "/assets/data/films/robs/bicent.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/eternal.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/eternal.json",
+      "active": true
+    }
   ]
 }
