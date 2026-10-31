@@ -1,0 +1,17 @@
+{
+  "id": "rob-rain-man",
+  "rob": true,
+  "title": "Rain Man",
+  "starring": "Paul Giamatti as Simeon, Jim Carrey as Truman",
+  "poster": "/assets/img/posters/robs/rain-man.webp",
+  "coherence": 10,
+  "entertainment": 9,
+  "originality": 8,
+  "podcastDate": "2026-10-31",
+  "podcasted_at": "2026-10-31T08:00:00+00:00",
+  "summary": "Behind the scenes of The Truman Show, weather technician Simeon has spent years quietly controlling the skies above Truman's artificial world. When he discovers just how far the production is prepared to go to stop Truman escaping, he begins using the weather itself to help guide him towards the truth.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/20048954-rain-man-reimagined-i-think-he-s-good-at-ping-pong-but-that-s-not-important-ep-40.js?container_id=buzzsprout-player-20048954&player=small",
+  "owner": "rob"
+}
