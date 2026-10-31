@@ -346,5 +346,14 @@
       "path": "/assets/data/films/robs/eternal.json",
       "active": true
     }
+    ,
+     {
+      "path": "/assets/data/films/real/rain-man.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/rain-man.json",
+      "active": true
+    }
   ]
 }
