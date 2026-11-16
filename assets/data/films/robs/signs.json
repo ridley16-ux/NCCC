@@ -1,0 +1,18 @@
+
+{
+  "id": "rob-signs",
+  "rob": true,
+  "title": "Signs",
+  "starring": "Simon Pegg, Nick Frost, Mark Heap, Joaquin Phoenix",
+  "poster": "/assets/img/posters/robs/signs.webp",
+  "coherence": 5,
+  "entertainment": 8,
+  "originality": 4,
+  "podcastDate": "2026-11-17",
+  "podcasted_at": "2026-11-17T08:00:00+00:00",
+  "summary": "After his girlfriend walks out, hopeless layabout Gary sets off to win her back, only to discover that the streets are overflowing with ghosts desperate to be acknowledged. When he accidentally helps one move on simply by saying his name, thousands of restless spirits begin pursuing him, turning his attempts at self-improvement into a supernatural nightmare. With Nick Frost as a ghost determined to stay put and Mark Heap as the perpetually misunderstood Brian, this unlikely hero must navigate the demands of the dead before he can put his own life back together.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/20127674-signs-reimagined-where-s-all-the-dead-cows-ep-41.js?container_id=buzzsprout-player-20127674&player=small",
+  "owner": "rob"
+}
