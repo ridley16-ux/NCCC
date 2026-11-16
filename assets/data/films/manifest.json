@@ -355,5 +355,14 @@
       "path": "/assets/data/films/robs/rain-man.json",
       "active": true
     }
+        ,
+     {
+      "path": "/assets/data/films/real/signs.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/signs.json",
+      "active": true
+    }
   ]
 }
