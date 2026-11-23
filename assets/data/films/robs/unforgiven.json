@@ -1,0 +1,17 @@
+{
+  "id": "rob-unforgiven",
+  "rob": true,
+  "title": "Unforgiven",
+  "starring": "Clint Eastwood, Morgan Freeman",
+  "poster": "/assets/img/posters/robs/unforgiven.webp",
+  "coherence": 8,
+  "entertainment": 7,
+  "originality": 7,
+  "podcastDate": "2026-11-23",
+  "podcasted_at": "2026-11-23T08:00:00+00:00",
+  "summary": "Two teenage friends venture deep into the Wyoming wilderness, determined to uncover the truth behind a grandfather's mysterious disappearance decades earlier. As they retrace his final journey, dangerous terrain, unsettling discoveries and an increasingly obsessive search begin to test their friendship. But some secrets are better left buried, and the past may be closer than either of them realises.",
+  "link": "#",
+  "linkType": "podcast",
+  "buzzsproutScriptSrc": "https://www.buzzsprout.com/2591128/episodes/20169929-unforgiven-reimagined-no-context-geography-club-ep-42.js?container_id=buzzsprout-player-20169929&player=small",
+  "owner": "rob"
+}
