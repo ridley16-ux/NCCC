@@ -364,5 +364,14 @@
       "path": "/assets/data/films/robs/signs.json",
       "active": true
     }
+       ,
+     {
+      "path": "/assets/data/films/real/unforgiven.json",
+      "active": true
+    },
+    {
+      "path": "/assets/data/films/robs/unforgiven.json",
+      "active": true
+    }
   ]
 }
